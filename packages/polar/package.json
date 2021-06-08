@@ -2,5 +2,22 @@
   "name": "polar",
   "version": "1.0.0",
   "main": "build/index.js",
-  "license": "MIT"
+  "author": "Coco sha (https://github.com/coco-sha)",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts src",
+    "lint:fix": "eslint --fix --ext .js,.ts src",
+    "lint:unix": "eslint --format unix --ext .js,.ts src",
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/node": "^15.12.2",
+    "@typescript-eslint/eslint-plugin": "^4.26.1",
+    "@typescript-eslint/parser": "^4.26.1",
+    "eslint": "^7.28.0",
+    "nodemon": "^2.0.7",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
+  }
 }

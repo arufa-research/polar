@@ -1,0 +1,33 @@
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{coffee,js,jsx,ts,tsx}]
+indent_style = space
+indent_size = 2
+max_line_length = 96
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+[*.go]
+max_line_length = 96
+indent_style = tab
+
+[*.sql]
+indent_style = tab
+
+[*.{md,rst}]
+trim_trailing_whitespace = false
+
+[*.{html,mako,less,org}]
+indent_style = tab
+
+[*.py]
+indent_style = space
+indent_size = 4

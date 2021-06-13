@@ -12,7 +12,8 @@
 // Note that while many declarations are repeated here (i.e. network types'
 // fields), we don't use `extends` as that can interfere with plugin authors
 // trying to augment the config types.
-// Networks config
+// Networks config\
+import * as types from "./internal/core/params/argument-types";
 
 export type PolarNetworkAccountsUserConfig = string[];
 
@@ -130,3 +131,181 @@ export type ConfigExtender = (
   config: PolarConfig,
   userConfig: Readonly<PolarUserConfig>
 ) => void;
+
+/**
+ * A function that receives a RuntimeEnv and
+ * modify its properties or add new ones.
+ */
+export type EnvironmentExtender = (env: PolarRuntimeEnvironment) => void;
+
+/**
+ * @type TaskArguments {object-like} - the input arguments for a task.
+ *
+ * TaskArguments type is set to 'any' because it's interface is dynamic.
+ * It's impossible in TypeScript to statically specify a variadic
+ * number of fields and at the same time define specific types for\
+ * the argument values.
+ *
+ * For example, we could define:
+ * type TaskArguments = Record<string, any>;
+ *
+ * ...but then, we couldn't narrow the actual argument value's type in compile time,
+ * thus we have no other option than forcing it to be just 'any'.
+ */
+export type TaskArguments = any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+export type RunTaskFunction = (
+  name: string,
+  taskArguments?: TaskArguments
+) => PromiseAny;
+
+export interface RunSuperFunction<ArgT extends TaskArguments> {
+  (taskArguments?: ArgT): PromiseAny
+  isDefined: boolean
+}
+
+export type ActionType<ArgsT extends TaskArguments> = (
+  taskArgs: ArgsT,
+  env: PolarRuntimeEnvironment,
+  runSuper: RunSuperFunction<ArgsT>
+) => PromiseAny;
+
+export interface Network {
+  name: string
+  config: NetworkConfig
+  // provider:
+}
+
+export interface ResolvedConfig extends PolarUserConfig {
+  paths?: ProjectPathsConfig
+  networks: NetworksConfig
+}
+
+/**
+ * Polar arguments:
+ * + network: the network to be used (default="default").
+ * + showStackTraces: flag to show stack traces.
+ * + version: flag to show polar's version.
+ * + help: flag to show polar's help message.
+ * + config: used to specify polar's config file.
+ */
+export interface RuntimeArgs {
+  network: string
+  showStackTraces: boolean
+  version: boolean
+  help: boolean
+  config?: string
+  verbose: boolean
+}
+
+export interface ConfigurableTaskDefinition {
+  setDescription: (description: string) => this
+
+  setAction: (action: ActionType<TaskArguments>) => this
+
+  addParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T,
+    type?: types.ArgumentType<T>,
+    isOptional?: boolean
+  ) => this
+
+  addOptionalParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T,
+    type?: types.ArgumentType<T>
+  ) => this
+
+  addPositionalParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T,
+    type?: types.ArgumentType<T>,
+    isOptional?: boolean
+  ) => this
+
+  addOptionalPositionalParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T,
+    type?: types.ArgumentType<T>
+  ) => this
+
+  addVariadicPositionalParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T[],
+    type?: types.ArgumentType<T>,
+    isOptional?: boolean
+  ) => this
+
+  addOptionalVariadicPositionalParam: <T>(
+    name: string,
+    description?: string,
+    defaultValue?: T[],
+    type?: types.ArgumentType<T>
+  ) => this
+
+  addFlag: (name: string, description?: string) => this
+}
+
+export interface ParamDefinition<T> {
+  name: string
+  shortName?: string
+  defaultValue?: T
+  type: types.ArgumentType<T>
+  description?: string
+  isOptional: boolean
+  isFlag: boolean
+  isVariadic: boolean
+}
+
+export type ParamDefinitionAny = ParamDefinition<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+export interface OptionalParamDefinition<T> extends ParamDefinition<T> {
+  defaultValue: T
+  isOptional: true
+}
+
+export interface ParamDefinitionsMap {
+  [paramName: string]: ParamDefinitionAny
+}
+
+export type ParamDefinitions = {
+  [param in keyof Required<RuntimeArgs>]: OptionalParamDefinition<
+  RuntimeArgs[param]
+  >;
+};
+
+export interface ShortParamSubstitutions {
+  [name: string]: string
+}
+
+export interface TaskDefinition extends ConfigurableTaskDefinition {
+  readonly name: string
+  readonly description?: string
+  readonly action: ActionType<TaskArguments>
+  readonly isInternal: boolean
+
+  // TODO: Rename this to something better. It doesn't include the positional
+  // params, and that's not clear.
+  readonly paramDefinitions: ParamDefinitionsMap
+
+  readonly positionalParamDefinitions: ParamDefinitionAny[]
+}
+
+export interface TasksMap {
+  [name: string]: TaskDefinition
+}
+
+export interface PolarRuntimeEnvironment {
+  readonly config: ResolvedConfig
+  readonly runtimeArgs: RuntimeArgs
+  readonly tasks: TasksMap
+  readonly run: RunTaskFunction
+  readonly network: Network
+}
+
+export type PromiseAny = Promise<any>;

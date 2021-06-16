@@ -10,7 +10,7 @@ import {
 } from "./task-definitions";
 
 /**
- * This class defines the DSL used in Builder config files
+ * This class defines the DSL used in Polar config files
  * for creating and overriding tasks.
  */
 export class TasksDSL {

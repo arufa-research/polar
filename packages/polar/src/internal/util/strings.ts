@@ -29,3 +29,7 @@ export function replaceAll (
 ): string {
   return str.split(toReplace).join(replacement);
 }
+
+export function cmpStr (a: string, b: string): number {
+  return a.localeCompare(b);
+}

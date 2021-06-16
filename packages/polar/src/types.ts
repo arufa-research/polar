@@ -34,7 +34,7 @@ export type PolarNetworkConfig = PolarNetworkUserConfig;
 
 export type NetworkConfig = PolarNetworkConfig;
 
-export interface NetworksConfig {
+export interface Networks {
   [networkName: string]: PolarNetworkConfig
 }
 
@@ -105,9 +105,17 @@ export interface ProjectPathsConfig {
   cache: string
   artifacts: string
   tests: string
+  sources: string
 }
 
 // Polar config
+export type UserPaths = Omit<Partial<ProjectPathsConfig>, "configFile">;
+
+export interface Config {
+  networks?: Networks
+  paths?: UserPaths
+  mocha?: Mocha.MochaOptions
+}
 
 export interface PolarUserConfig {
   defaultNetwork?: string
@@ -120,7 +128,7 @@ export interface PolarUserConfig {
 export interface PolarConfig {
   defaultNetwork: string
   paths: ProjectPathsConfig
-  networks: NetworksConfig
+  networks: Networks
   mocha: Mocha.MochaOptions
   docker: DockerConfig
 }
@@ -128,7 +136,7 @@ export interface PolarConfig {
 // Plugins config functionality
 
 export type ConfigExtender = (
-  config: PolarConfig,
+  config: ResolvedConfig,
   userConfig: Readonly<PolarUserConfig>
 ) => void;
 
@@ -178,7 +186,7 @@ export interface Network {
 
 export interface ResolvedConfig extends PolarUserConfig {
   paths?: ProjectPathsConfig
-  networks: NetworksConfig
+  networks: Networks
 }
 
 /**
@@ -309,3 +317,7 @@ export interface PolarRuntimeEnvironment {
 }
 
 export type PromiseAny = Promise<any>;
+
+export interface StrMap {
+  [key: string]: string
+}

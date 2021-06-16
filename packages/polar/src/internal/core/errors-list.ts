@@ -871,14 +871,14 @@ Polar's artifact resolution is case sensitive to ensure projects are portable ac
     }
   },
   PLUGINS: {
-    BUIDLER_PLUGIN: {
+    NOT_INSTALLED: {
       number: 800,
-      message: `You are using %plugin%, which is a Buidler plugin. Use the equivalent
-Polar plugin instead.`,
-      title: 'Using a buidler plugin',
-      description: `You are trying to use a Buidler plugin in Polar. This is not supported.
-
-Please use the equivalent Polar plugin instead.`,
+      message: `Plugin %plugin% is not installed.
+  %extraMessage%Please run: npm install --save-dev%extraFlags% %plugin%`,
+      title: "Plugin not installed",
+      description: `You are trying to use a plugin that hasn't been installed.
+  
+  Please follow polar's instructions to resolve this.`,
       shouldBeReported: false
     },
     MISSING_DEPENDENCIES: {
@@ -889,6 +889,27 @@ Please run: npm install --save-dev %missingDependenciesVersions%`,
       description: `You are trying to use a plugin with unmet dependencies.
 
 Please follow Polar's instructions to resolve this.`,
+      shouldBeReported: false
+    },
+    DEPENDENCY_VERSION_MISMATCH: {
+      number: 802,
+      message: `Plugin %plugin% requires %dependency% version %versionSpec% but got %installedVersion%.
+  %extraMessage%If you haven't installed %dependency% manually, please run: npm install --save-dev%extraFlags% "%dependency%@%versionSpec%"
+  If you have installed %dependency% yourself, please reinstall it with a valid version.`,
+      title: "Plugin dependencies's version mismatch",
+      description: `You are trying to use a plugin that requires a different version of one of its dependencies.
+  
+  Please follow polar's instructions to resolve this.`,
+      shouldBeReported: false
+    },
+    OLD_STYLE_IMPORT_DETECTED: {
+      number: 803,
+      message: `You are trying to load %pluginNameText% with a require or import statement.
+  Please replace it with a call to usePlugin("%pluginNameCode%").`,
+      title: "Importing a plugin with `require`",
+      description: `You are trying to load a plugin with a call to \`require\`.
+  
+  Please use \`usePlugin(npm-plugin-package)\` instead.`,
       shouldBeReported: false
     }
   },

@@ -22,6 +22,7 @@ export class PolarError extends Error {
   public readonly errorDescriptor: ErrorDescriptor;
   public readonly number: number;
   public readonly messageArguments: Record<string, any>;
+  public readonly parent?: Error;
 
   private readonly _isPolarError: boolean;
 

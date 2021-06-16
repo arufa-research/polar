@@ -172,6 +172,7 @@ export async function loadEnvironmentAndArgs (
 
 /* eslint-disable sonarjs/cognitive-complexity */
 async function main (): Promise<void> {
+  log(`Initiating polar task !`);
   let showStackTraces = false;
   try {
     const {

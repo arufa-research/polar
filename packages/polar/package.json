@@ -15,6 +15,9 @@
   "bin": {
     "polar": "dist/internal/cli/cli.js"
   },
+  "engines": {
+    "node": ">=14.11.0"
+  },
   "devDependencies": {
     "@types/express": "^4.17.12",
     "@types/node": "^15.12.2",

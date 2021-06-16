@@ -5,10 +5,15 @@
   "author": "Coco sha (https://github.com/coco-sha)",
   "license": "MIT",
   "scripts": {
+    "build": "tsc --build .",
     "lint": "eslint --ext .js,.ts src",
     "lint:fix": "eslint --fix --ext .js,.ts src",
     "lint:unix": "eslint --format unix --ext .js,.ts src",
     "test": "mocha"
+  },
+  "types": "dist/index.d.ts",
+  "bin": {
+    "polar": "dist/internal/cli/cli.js"
   },
   "devDependencies": {
     "@types/express": "^4.17.12",

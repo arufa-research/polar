@@ -1,0 +1,25 @@
+{
+    "defaulNetwork": "",
+    "contract": {
+        "contract-name": {
+            "toolchain": "stable",
+            "sources": ["examples/**/*"]
+        }
+    },
+    "networks": {
+        "developement": {
+            "endpoint": "ws://127.0.0.1:9944",
+            "types": "",
+            "gasLimit": "400000000000",
+            "accounts": [],
+            "explorerUrl": ""
+        }
+    },
+    "mocha": {
+        "timeout": 60000
+    },
+    "docker": {
+        "sudo": false,
+        "runTestNet": "docker run -p ..."
+    }
+}

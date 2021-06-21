@@ -6,7 +6,7 @@ import chalk from "chalk";
 import debug from "debug";
 import semver from "semver";
 
-import { TASK_HELP, TASK_INIT } from "../../builtin-tasks/task-names";
+import { TASK_HELP } from "../../builtin-tasks/task-names";
 import { PolarRuntimeEnvironment, RuntimeArgs, TaskArguments } from "../../types";
 import { PolarContext } from "../context";
 import { loadConfigAndTasks } from "../core/config/config-loading";

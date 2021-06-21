@@ -122,10 +122,10 @@ export async function loadEnvironmentAndArgs (
 ): Promise<EnvAndArgs> {
   const ctx = PolarContext.createPolarContext();
   const config = await loadConfigAndTasks(runtimeArgs);
-
+  console.log("Context created!!");
   const envExtenders = ctx.extendersManager.getExtenders();
   const taskDefinitions = ctx.tasksDSL.getTaskDefinitions();
-
+  console.log(taskDefinitions);
   let taskName = maybeTaskName ?? TASK_HELP;
   if (taskDefinitions[taskName] == null) {
     throw new PolarError(ERRORS.ARGUMENTS.UNRECOGNIZED_TASK, {
@@ -184,13 +184,13 @@ async function main (): Promise<void> {
       argumentsParser
     } = await gatherArguments();
     showStackTraces = showStackTracesUpdate;
-
+    console.log("HEre  ");
     // --version is a special case
     if (runtimeArgs.version) {
       await printVersionMessage(packageJson);
       return;
     }
-
+    console.log("HATSH ");
     const {
       env,
       taskName,
@@ -198,7 +198,7 @@ async function main (): Promise<void> {
     } = await loadEnvironmentAndArgs(
       maybeTaskName, runtimeArgs, argumentsParser, unparsedCLAs
     );
-
+    console.log(env, taskName, taskArguments);
     await env.run(taskName, taskArguments);
 
     log(`Quitting polar after successfully running task ${taskName}`);

@@ -9,7 +9,7 @@ export default function (): void {
   ts.delete('TASK_TEST_GET_TEST_FILES');
 
   const basedir = path.join(__dirname, "..", "..", "..", "builtin-tasks");
-  for (const t in ts) {
+  for (const t of ts) {
     loadPluginFile(path.join(basedir, t[1]));
   }
 }

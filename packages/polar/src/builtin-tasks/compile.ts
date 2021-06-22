@@ -8,7 +8,7 @@ import type { PolarRuntimeEnvironment } from "../types";
 import { TASK_COMPILE } from "./task-names";
 
 export default function (): void {
-  task(TASK_COMPILE, "Compile all TEAL smart contracts")
+  task(TASK_COMPILE, "Compile all secret contracts")
     .addFlag("force", "recompile even if the source file didn't change")
     .setAction(compileTask);
 }

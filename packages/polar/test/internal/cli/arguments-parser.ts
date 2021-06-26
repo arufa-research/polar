@@ -80,17 +80,17 @@ describe("ArgumentsParser", () => {
 
   it("Should throw if a param name CLA isn't all lowercase", () => {
     expectPolarError(
-      () => ArgumentsParser.cLAToParamName(SHOW_STACK),
+      () => ArgumentsParser.cLAToParamName("--show-Stack-traces"),
       ERRORS.ARGUMENTS.PARAM_NAME_INVALID_CASING
     );
 
     expectPolarError(
-      () => ArgumentsParser.cLAToParamName(SHOW_STACK),
+      () => ArgumentsParser.cLAToParamName("--shOw-stack-traces"),
       ERRORS.ARGUMENTS.PARAM_NAME_INVALID_CASING
     );
 
     expectPolarError(
-      () => ArgumentsParser.cLAToParamName(SHOW_STACK),
+      () => ArgumentsParser.cLAToParamName("--show-stack-tRaces"),
       ERRORS.ARGUMENTS.PARAM_NAME_INVALID_CASING
     );
   });

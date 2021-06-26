@@ -14,3 +14,7 @@ yarn build
 
 If you are using repo from master, use:
 - `yarn run polar compile`: To compile your contracts
+
+## Run tests
+
+- `yarn run test`

@@ -44,6 +44,10 @@ export class PolarError extends Error {
     this.number = errorDescriptor.number;
     this.messageArguments = messageArguments;
 
+    if (parentError instanceof Error) {
+      this.parent = parentError;
+    }
+
     this._isPolarError = true;
     Object.setPrototypeOf(this, PolarError.prototype);
   }
@@ -61,6 +65,7 @@ export class PolarPluginError extends Error {
     );
   }
 
+  public readonly parent?: Error;
   public readonly pluginName: string;
 
   private readonly _isPolarPluginError: boolean;
@@ -93,9 +98,11 @@ export class PolarPluginError extends Error {
     if (typeof messageOrParent === 'string') {
       super(messageOrParent);
       this.pluginName = pluginNameOrMessage;
+      this.parent = parent;
     } else {
       super(pluginNameOrMessage);
       this.pluginName = getClosestCallerPackage()!;
+      this.parent = messageOrParent;
     }
 
     this._isPolarPluginError = true;

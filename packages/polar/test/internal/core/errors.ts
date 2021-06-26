@@ -10,7 +10,6 @@ import {
   ERRORS
 } from "../../../src/internal/core/errors-list";
 import { unsafeObjectKeys } from "../../../src/internal/util/unsafe";
-// import { expectPolarError } from "../../helpers/errors";
 
 const mockErrorDescriptor: ErrorDescriptor = {
   number: 123,

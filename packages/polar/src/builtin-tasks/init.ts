@@ -18,10 +18,11 @@ export default function (): void {
 }
 
 function canInit (): boolean {
-  const isValidEnv: string | boolean = checkEnv({ version: '0.6.0' });
+  const reqVersion = '0.6.0';
+  const isValidEnv: string | boolean = checkEnv({ version: reqVersion });
 
   if (!isValidEnv) {
-    console.log(`Cargo generate version ${chalk.green(isValidEnv)} present.`);
+    console.log(`Cargo generate version ${chalk.green(isValidEnv)} present, required ${chalk.green(reqVersion)}.`);
     return false;
   } else {
     return true;

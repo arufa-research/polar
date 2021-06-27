@@ -1,5 +1,5 @@
-import { initProject } from "../internal/contract_init/createApp";
 import { task } from "../internal/core/config/config-env";
+import { initProject } from "../lib/contract_init/createApp";
 import { TASK_INIT } from "./task-names";
 
 export default function (): void {

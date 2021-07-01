@@ -7,7 +7,8 @@ export const JS_CONFIG_FILENAME = "polar.config.js";
 
 export const CONTRACTS_DIR = "contracts";
 export const ARTIFACTS_DIR = "artifacts";
-export const CACHE_DIR = join(ARTIFACTS_DIR, "cache");
+export const CACHE_DIR = join(ARTIFACTS_DIR, ".cache");
+export const TARGET_DIR = "target/wasm32-unknown-unknown/release/";
 
 export function isCwdInsideProject (): boolean {
   return Boolean(findUp.sync(JS_CONFIG_FILENAME));

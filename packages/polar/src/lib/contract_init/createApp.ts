@@ -1,7 +1,7 @@
-import chalk from 'chalk';
-import { execSync } from 'child_process';
-import fs from 'fs-extra';
-import path from 'path';
+import chalk from "chalk";
+import { execSync } from "child_process";
+import fs from "fs-extra";
+import path from "path";
 
 export function initProject (projectName: string): void {
   const currentNodeVersion = process.versions.node;

@@ -2,10 +2,10 @@ import { readdirSync } from "fs";
 import path from "path";
 
 import { task } from "../internal/core/config/config-env";
-import { ARTIFACTS_DIR, assertDir, CACHE_DIR, CONTRACTS_DIR, TARGET_DIR } from "../internal/core/project-structure";
+import { ARTIFACTS_DIR, assertDir, CACHE_DIR, CONTRACTS_DIR, SCHEMA_DIR, TARGET_DIR } from "../internal/core/project-structure";
 import { cmpStr } from "../internal/util/strings";
 import { checkEnv } from "../lib/compile/checkEnv";
-import { compileContract, createArtifacts } from "../lib/compile/compile";
+import { compileContract, createArtifacts, generateSchema } from "../lib/compile/compile";
 import type { PolarRuntimeEnvironment } from "../types";
 import { TASK_COMPILE } from "./task-names";
 
@@ -37,9 +37,9 @@ export async function compile (force: boolean, env: PolarRuntimeEnvironment): Pr
 
   // Only one contract in the contracts dir and compile in contarcts dir only
   if (paths.includes("Cargo.toml")) {
-    console.log(`Cargo is here`);
     compileContract(CONTRACTS_DIR);
-    createArtifacts(TARGET_DIR, ARTIFACTS_DIR);
+    generateSchema(CONTRACTS_DIR);
+    createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
 
     return;
   }
@@ -49,6 +49,7 @@ export async function compile (force: boolean, env: PolarRuntimeEnvironment): Pr
     const f = path.basename(p);
     const contractAbsPath = path.resolve(CONTRACTS_DIR, f);
     compileContract(contractAbsPath);
+    generateSchema(contractAbsPath);
   }
-  createArtifacts(TARGET_DIR, ARTIFACTS_DIR);
+  createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
 }

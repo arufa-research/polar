@@ -1,10 +1,11 @@
 # Polar
+
 Polar is a development environment to compile, deploy, test, run them on a different networks.
 
 ## Setup
 
 To setup `polar` on your system, follow steps below:
-```
+```bash
 git clone https://github.com/arufa-research/polar.git
 cd polar
 yarn install
@@ -12,8 +13,26 @@ yarn build
 ```
 ## Usage
 
-If you are using repo from master, use:
-- `yarn run polar compile`: To compile your contracts
+### Initialize a project
+
+```bash
+yarn run polar init <project-name>
+```
+
+This will create a directory `<project-name>` with boiler-plate code inside the current directory.
+
+### Compile the project
+
+Go to project directory.
+
+```bash
+cd <project-name>
+```
+
+Compile the project and generate `.wasm` and `.json` schema files.
+```bash
+yarn run polar compile
+```
 
 ## Run tests
 

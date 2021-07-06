@@ -37,3 +37,9 @@ yarn run polar compile
 ## Run tests
 
 - `yarn run test`
+
+## License
+This project is forked from hardhat, and just base on the hardhat-core part then modify it under MIT license.
+
+## Thanks
+hardhat - Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. Get Solidity stack traces & console.log.

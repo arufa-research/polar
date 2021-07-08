@@ -4,6 +4,7 @@ import { readdirSync } from "fs";
 import fs from "fs-extra";
 import path from "path";
 
+import { boolean } from "../../internal/core/params/argument-types";
 import {
   ARTIFACTS_DIR,
   assertDir,
@@ -15,30 +16,46 @@ import {
 import { cmpStr } from "../../internal/util/strings";
 import type { PolarRuntimeEnvironment } from "../../types";
 
-export async function compile (force: boolean, env: PolarRuntimeEnvironment): Promise<void> {
+export async function compile (
+  docker: boolean,
+  sourceDir: string[],
+  force: boolean,
+  env: PolarRuntimeEnvironment
+): Promise<void> {
   await assertDir(CACHE_DIR);
-  const paths = readdirSync(CONTRACTS_DIR);
+  const contractDirs: string[] = [];
 
-  // Only one contract in the contracts dir and compile in contracts dir only
-  if (paths.includes("Cargo.toml")) {
-    compileContract(CONTRACTS_DIR);
-    generateSchema(CONTRACTS_DIR);
-    createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
+  // Contract(s) path given
+  if (sourceDir.length > 0) {
+    const currDir = process.cwd();
+    for (const dir of sourceDir) {
+      const contractAbsPath = path.resolve(currDir, dir);
+      contractDirs.push(contractAbsPath);
+    }
+  } else {
+    const paths = readdirSync(CONTRACTS_DIR);
 
-    return;
+    // Only one contract in the contracts dir and compile in contracts dir only
+    if (paths.includes("Cargo.toml")) {
+      contractDirs.push(CONTRACTS_DIR);
+    }
+
+    // Multiple contracts and each should be compiled by going inside each of them
+    for (const p of paths.sort(cmpStr)) {
+      const f = path.basename(p);
+      const contractAbsPath = path.resolve(CONTRACTS_DIR, f);
+      contractDirs.push(contractAbsPath);
+    }
   }
 
-  // Multiple contracts and each should be compiled by going inside each of them
-  for (const p of paths.sort(cmpStr)) {
-    const f = path.basename(p);
-    const contractAbsPath = path.resolve(CONTRACTS_DIR, f);
-    compileContract(contractAbsPath);
-    generateSchema(contractAbsPath);
+  for (const dir of contractDirs) {
+    compileContract(dir, docker);
+    generateSchema(dir, docker);
   }
-  createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
+  createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR, docker);
 }
 
-export function compileContract (contractDir: string): void {
+export function compileContract (contractDir: string, docker: boolean): void {
   const currDir = process.cwd();
   process.chdir(contractDir);
   console.log(`Compiling contract in directory: ${chalk.gray(contractDir)}`);
@@ -49,7 +66,7 @@ export function compileContract (contractDir: string): void {
   process.chdir(currDir);
 }
 
-export function generateSchema (contractDir: string): void {
+export function generateSchema (contractDir: string, docker: boolean): void {
   const currDir = process.cwd();
   process.chdir(contractDir);
   console.log(`Creating schema for contract in directory: ${chalk.gray(contractDir)}`);
@@ -60,7 +77,12 @@ export function generateSchema (contractDir: string): void {
   process.chdir(currDir);
 }
 
-export function createArtifacts (targetDir: string, schemaDir: string, artifactsDir: string): void {
+export function createArtifacts (
+  targetDir: string,
+  schemaDir: string,
+  artifactsDir: string,
+  docker: boolean
+): void {
   const paths = fs.readdirSync(targetDir);
 
   for (const p of paths) {

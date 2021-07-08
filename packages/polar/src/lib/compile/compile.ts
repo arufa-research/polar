@@ -1,7 +1,42 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
+import { readdirSync } from "fs";
 import fs from "fs-extra";
 import path from "path";
+
+import {
+  ARTIFACTS_DIR,
+  assertDir,
+  CACHE_DIR,
+  CONTRACTS_DIR,
+  SCHEMA_DIR,
+  TARGET_DIR
+} from "../../internal/core/project-structure";
+import { cmpStr } from "../../internal/util/strings";
+import type { PolarRuntimeEnvironment } from "../../types";
+
+export async function compile (force: boolean, env: PolarRuntimeEnvironment): Promise<void> {
+  await assertDir(CACHE_DIR);
+  const paths = readdirSync(CONTRACTS_DIR);
+
+  // Only one contract in the contracts dir and compile in contracts dir only
+  if (paths.includes("Cargo.toml")) {
+    compileContract(CONTRACTS_DIR);
+    generateSchema(CONTRACTS_DIR);
+    createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
+
+    return;
+  }
+
+  // Multiple contracts and each should be compiled by going inside each of them
+  for (const p of paths.sort(cmpStr)) {
+    const f = path.basename(p);
+    const contractAbsPath = path.resolve(CONTRACTS_DIR, f);
+    compileContract(contractAbsPath);
+    generateSchema(contractAbsPath);
+  }
+  createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR);
+}
 
 export function compileContract (contractDir: string): void {
   const currDir = process.cwd();

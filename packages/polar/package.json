@@ -12,9 +12,9 @@
     "build:watch": "tsc -w -p .",
     "test": "mocha"
   },
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "bin": {
-    "polar": "dist/internal/cli/cli.js"
+    "polar": "dist/src/internal/cli/cli.js"
   },
   "engines": {
     "node": ">=14.11.0"

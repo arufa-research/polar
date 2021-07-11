@@ -15,6 +15,10 @@ export function isCwdInsideProject (): boolean {
   return Boolean(findUp.sync(JS_CONFIG_FILENAME));
 }
 
+export function isCwdProjectDir (): boolean {
+  return Boolean(fs.existsSync(JS_CONFIG_FILENAME));
+}
+
 export function getUserConfigPath (): string | undefined {
   return findUp.sync(JS_CONFIG_FILENAME) ?? undefined;
 }

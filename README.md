@@ -47,6 +47,7 @@ git clone https://github.com/arufa-research/polar.git
 cd polar
 yarn install
 yarn build
+cd packages/polar
 yarn link
 chmod +x $HOME/.yarn/bin/polar
 ```

@@ -4,7 +4,6 @@ import { readdirSync } from "fs";
 import fs from "fs-extra";
 import path from "path";
 
-import { boolean } from "../../internal/core/params/argument-types";
 import {
   ARTIFACTS_DIR,
   assertDir,

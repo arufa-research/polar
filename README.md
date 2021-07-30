@@ -12,37 +12,11 @@ Polar is a development environment to compile, deploy, test, run them on differe
 
 ### Install dependencies
 
-1. Install Rust
+1. Setup Rust compiler
 
-More information about installing Rust can be found here: https://www.rust-lang.org/tools/install.
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
 ```
-
-2. Add rustup target wasm32 for both stable and nightly
-
-```bash
-rustup default stable
-rustup target list --installed
-rustup target add wasm32-unknown-unknown
-
-rustup install nightly
-rustup target add wasm32-unknown-unknown --toolchain nightly
-```
-
-3. If using linux, install the standard build tools:
-```bash
-apt install build-essential
-```
-
-4. Run cargo install cargo-generate
-
-Cargo generate is the tool you'll use to create a smart contract project (https://doc.rust-lang.org/cargo).
-
-```bash
-cargo install cargo-generate --features vendored-openssl
+    cd infrastructure
+    make setup-rust
 ```
 
 ## Install polar

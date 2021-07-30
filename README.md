@@ -15,8 +15,8 @@ Polar is a development environment to compile, deploy, test, run them on differe
 1. Setup Rust compiler
 
 ```
-    cd infrastructure
-    make setup-rust
+cd infrastructure
+make setup-rust
 ```
 
 ## Install polar

@@ -1,6 +1,6 @@
 # Polar
 
-Polar is a development environment to compile, deploy, test, run them on a different networks.
+Polar is a development environment to compile, deploy, test, run them on different networks.
 
 ## Setup
 
@@ -39,9 +39,12 @@ Cargo generate is the tool you'll use to create a smart contract project (https:
 cargo install cargo-generate --features vendored-openssl
 ```
 
-### Install polar
+## Install polar
 
-To setup `polar` on your system, follow steps below:
+### Installation from master.
+The master branch corresponds to the latest version.
+
+To use  `polar` on your system, follow steps below:
 ```bash
 git clone https://github.com/arufa-research/polar.git
 cd polar

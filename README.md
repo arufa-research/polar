@@ -2,6 +2,12 @@
 
 Polar is a development environment to compile, deploy, test, run them on a different networks.
 
+## Requirements
+
+- Node 14+
+- Yarn v1.22+ or NPM `v6.0+**
+- Connection to an Secret node. Follow our infrastructure README for instructions how to setup a private network.
+
 ## Setup
 
 To setup `polar` on your system, follow steps below:

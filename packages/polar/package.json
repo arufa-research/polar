@@ -1,8 +1,17 @@
 {
   "name": "polar",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "build/index.js",
-  "author": "Coco sha (https://github.com/coco-sha)",
+  "authors": [
+    {
+      "name": "Coco sha",
+      "url": "https://github.com/coco-sha"
+    },
+    {
+      "name": "Udit Gulati",
+      "url": "https://github.com/udit-gulati"
+    }
+  ],
   "license": "MIT",
   "scripts": {
     "build": "tsc --build .",

@@ -10,7 +10,9 @@
     "lint:fix": "eslint --fix --ext .js,.ts src",
     "lint:unix": "eslint --format unix --ext .js,.ts src",
     "build:watch": "tsc -w -p .",
-    "test": "mocha"
+    "test": "mocha",
+    "prepublish": "yarn build",
+    "publish": "yarn publish --access public"
   },
   "types": "dist/src/index.d.ts",
   "bin": {

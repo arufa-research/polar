@@ -39,10 +39,10 @@ chmod +x $HOME/.yarn/bin/polar
 ### Initialize a project
 
 ```bash
-polar init <project-name>
+polar init <project-directory>
 ```
 
-This will create a directory `<project-name>` with boiler-plate code inside the current directory.
+This will create a directory `secret-project` with boiler-plate code inside the given directory.
 
 ### Compile the project
 
@@ -52,10 +52,10 @@ Go to project directory:
 cd <project-name>
 ```
 
-Compile the project and generate `.wasm` and `.json` schema files:
+Compile the project and generate `.wasm` files:
 
 ```bash
-polar compile .
+polar compile
 ```
 
 ## Run tests

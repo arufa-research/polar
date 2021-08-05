@@ -180,6 +180,13 @@ Please check that the configured accounts are correct.`,
 
 Please check that the configured keypair are correct.`,
       shouldBeReported: false
+    },
+    INIT_INSIDE_PROJECT: {
+      number: 17,
+      message: "Polar project file was detected: '%clashingFile%'. Move the file or use an empty directory.",
+      title: "Directory contains a polar file",
+      description: `You are trying to run Polar in a directory that contains polar project file.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

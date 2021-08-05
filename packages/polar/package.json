@@ -1,7 +1,7 @@
 {
-  "name": "polar",
-  "version": "0.0.1",
-  "main": "build/index.js",
+  "name": "secret-polar",
+  "version": "0.0.2",
+  "main": "dist/src/index.js",
   "authors": [
     {
       "name": "Coco sha",

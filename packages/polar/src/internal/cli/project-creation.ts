@@ -25,7 +25,7 @@ function copySampleProject (location: string): void {
   const sampleProjDir = path.join(packageRoot, "sample-project");
 
   console.log(chalk.greenBright("Initializing new workspace in " + process.cwd() + "."));
-  console.log(sampleProjDir, location);
+
   fsExtra.copySync(sampleProjDir, location, {
     // User doesn't choose the directory so overwrite should be avoided
     overwrite: false,
@@ -54,11 +54,7 @@ function printSuggestedCommands (): void {
       : "npx ";
 
   console.log(`Try running some of the following tasks:`);
-  console.log(`  ${npx}${POLAR_NAME} accounts`);
   console.log(`  ${npx}${POLAR_NAME} compile`);
-  console.log(`  ${npx}${POLAR_NAME} test`);
-  console.log(`  ${npx}${POLAR_NAME} node`);
-  console.log(`  node scripts/sample-script.js`);
   console.log(`  ${npx}${POLAR_NAME} help`);
 }
 

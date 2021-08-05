@@ -49,7 +49,7 @@ export async function compile (
 
   for (const dir of contractDirs) {
     compileContract(dir, docker);
-    generateSchema(dir, docker);
+    // generateSchema(dir, docker);
   }
   createArtifacts(TARGET_DIR, SCHEMA_DIR, ARTIFACTS_DIR, docker);
 }
@@ -58,9 +58,8 @@ export function compileContract (contractDir: string, docker: boolean): void {
   const currDir = process.cwd();
   process.chdir(contractDir);
   console.log(`Compiling contract in directory: ${chalk.gray(contractDir)}`);
-
   // Compiles the contract and creates .wasm file alongside others
-  execSync(`cargo wasm`, { stdio: 'inherit' });
+  execSync(`RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown`, { stdio: 'inherit' });
 
   process.chdir(currDir);
 }

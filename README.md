@@ -20,6 +20,10 @@ make setup-rust
 ```
 
 ## Install polar
+### Installation from released version
+To install polar globally in your system you can use:
+  - Using Yarn: `yarn global add secret-polar`
+  - Using NPM: `npm install -g secret-polar`
 
 ### Installation from master.
 The master branch corresponds to the latest version.

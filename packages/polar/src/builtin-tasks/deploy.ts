@@ -21,3 +21,7 @@ export default function (): void {
       // store compress wasm in secret network container
     });
 }
+
+export interface TaskArgs {
+  network: string[]
+}

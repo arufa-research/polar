@@ -50,6 +50,7 @@ export const POLAR_PARAM_DEFINITIONS: ParamDefinitions = {
   },
   verbose: {
     name: "verbose",
+    shortName: "v",
     defaultValue: false,
     description: "Enables verbose logging",
     type: types.boolean,

@@ -53,7 +53,7 @@ function printSuggestedCommands (projectName: string): void {
   const currDir = process.cwd();
   const projectPath = path.join(currDir, projectName);
   console.log(`Success! Created project at ${chalk.greenBright(projectPath)}.`);
-  // console.log(`Inside that directory, you can run several commands:`);
+  // TODO: console.log(`Inside that directory, you can run several commands:`);
   // list commands and respective description
   const npx =
     getExecutionMode() === ExecutionMode.EXECUTION_MODE_GLOBAL_INSTALLATION

@@ -22,6 +22,7 @@ export const POLAR_PARAM_DEFINITIONS: ParamDefinitions = {
   },
   version: {
     name: "version",
+    shortName: "v",
     defaultValue: false,
     description: "Shows version and exit.",
     type: types.boolean,

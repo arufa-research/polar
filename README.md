@@ -43,10 +43,10 @@ chmod +x $HOME/.yarn/bin/polar
 ### Initialize a project
 
 ```bash
-polar init <project-directory>
+polar init <project-name>
 ```
 
-This will create a directory `secret-project` with boiler-plate code inside the given directory.
+This will create a directory <project-name> inside current directory with boiler-plate code.
 
 ### Compile the project
 

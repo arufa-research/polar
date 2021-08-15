@@ -20,13 +20,15 @@ async function printWelcomeMessage (): Promise<void> {
     chalk.cyan(`★ Welcome to ${POLAR_NAME} v${packageJson.version}`));
 }
 
-function copySampleProject (location: string): void {
+function copySampleProject (projectName: string): void {
   const packageRoot = getPackageRoot();
   const sampleProjDir = path.join(packageRoot, "sample-project");
 
-  console.log(chalk.greenBright("Initializing new workspace in " + process.cwd() + "."));
+  const currDir = process.cwd();
+  const projectPath = path.join(currDir, projectName);
+  console.log(chalk.greenBright("Initializing new project in " + projectPath + "."));
 
-  fsExtra.copySync(sampleProjDir, location, {
+  fsExtra.copySync(sampleProjDir, projectPath, {
     // User doesn't choose the directory so overwrite should be avoided
     overwrite: false,
     filter: (src: string, dest: string) => {
@@ -47,15 +49,21 @@ function copySampleProject (location: string): void {
   });
 }
 
-function printSuggestedCommands (): void {
+function printSuggestedCommands (projectName: string): void {
+  const currDir = process.cwd();
+  const projectPath = path.join(currDir, projectName);
+  console.log(`Success! Created project at ${chalk.greenBright(projectPath)}.`);
+  // TODO: console.log(`Inside that directory, you can run several commands:`);
+  // list commands and respective description
   const npx =
     getExecutionMode() === ExecutionMode.EXECUTION_MODE_GLOBAL_INSTALLATION
       ? ""
       : "npx ";
 
-  console.log(`Try running some of the following tasks:`);
-  console.log(`  ${npx}${POLAR_NAME} compile`);
+  console.log(`Begin by typing:`);
+  console.log(`  cd ${projectName}`);
   console.log(`  ${npx}${POLAR_NAME} help`);
+  console.log(`  ${npx}${POLAR_NAME} compile`);
 }
 
 async function printPluginInstallationInstructions (): Promise<void> {
@@ -68,12 +76,10 @@ async function printPluginInstallationInstructions (): Promise<void> {
   console.log(`  ${cmd.join(" ")}`);
 }
 
-export async function createProject (location: string): Promise<any> {
+export async function createProject (projectName: string): Promise<any> {
   await printWelcomeMessage();
-  if (location === undefined) { location = process.cwd(); }
 
-  location = path.join(location, "secret-project");
-  copySampleProject(location);
+  copySampleProject(projectName);
 
   let shouldShowInstallationInstructions = true;
 
@@ -109,7 +115,7 @@ export async function createProject (location: string): Promise<any> {
     console.log(``);
   }
 
-  printSuggestedCommands();
+  printSuggestedCommands(projectName);
 }
 
 function createConfirmationPrompt (name: string, message: string) { // eslint-disable-line @typescript-eslint/explicit-function-return-type

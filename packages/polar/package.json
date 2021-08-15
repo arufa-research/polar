@@ -54,6 +54,7 @@
     "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
+    "gunzip-file": "^0.1.1",
     "node-fetch": "^2.6.1",
     "secretjs": "^0.16.1",
     "semver": "^7.3.5"

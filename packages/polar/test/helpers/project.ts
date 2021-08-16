@@ -4,9 +4,8 @@ import path from "path";
 
 import { TASK_CLEAN } from "../../src/builtin-tasks/task-names";
 import { PolarRuntimeEnvironment } from "../../src/types";
+import { testFixtureOutputFile } from "./constants";
 import { useEnvironment } from "./environment";
-
-export const testFixtureOutputFile = "output.txt";
 
 /**
  * This helper adds mocha hooks to run the tests inside one of the projects

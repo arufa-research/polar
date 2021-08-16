@@ -17,12 +17,18 @@ import { BroadcastMode } from "secretjs";
 
 import * as types from "./internal/core/params/argument-types";
 
-export type PolarNetworkAccountsUserConfig = string[];
+export interface Account {
+  name: string
+  address: string
+  mnemonic: string
+}
+
+export type PolarNetworkAccountsUserConfig = Account[];
 
 export interface PolarNetworkUserConfig {
   endpoint: string
   httpHeaders?: Record<string, string>
-  accounts?: PolarNetworkAccountsUserConfig
+  accounts: PolarNetworkAccountsUserConfig
   gasLimit?: string | number
   seed?: Uint8Array
   broadCastMode?: BroadcastMode

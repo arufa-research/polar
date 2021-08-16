@@ -1,7 +1,6 @@
 import * as z from 'zod';
 
 import { parseZodError } from "../../util/zod-errors";
-//import { validateAccount } from "../../../lib/account";
 import type { NetworkConfig } from "../../../types";
 import CfgErrors from "./config-errors";
 import { PolarError } from '../errors';
@@ -64,7 +63,6 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
       for (let i = 0; i < (ncfg.accounts || []).length; ++i) {
         const a = ncfg.accounts[i];
         const p = errors.putter(net + ".accounts", i.toString());
-        //validateAccount(a, p);
         if ((j = accountsMap.get(a.name)) !== undefined) {
           const errorMessage: string = `Account name ${String(a.name)} already exists at index ${String(j)}`;
           p.push('name', errorMessage, 'string');

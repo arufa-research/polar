@@ -5,11 +5,11 @@ import { PolarContext } from "../../../../src/internal/context";
 import { loadConfigAndTasks } from "../../../../src/internal/core/config/config-loading";
 import { resolveProjectPaths } from "../../../../src/internal/core/config/config-resolution";
 import { resetPolarContext } from "../../../../src/internal/reset";
-import { HttpNetworkConfig, PolarNetworkAccountConfig, PolarNetworkConfig, PolarNetworkUserConfig, UserPaths } from "../../../../src/types";
+import { PolarNetworkUserConfig, UserPaths } from "../../../../src/types";
 import { useFixtureProject } from "../../../helpers/project";
 import { account } from "../../../mocks/account";
 
-describe("Config resolution", () => {
+describe("Config resolution", function () {
   beforeEach(() => {
     PolarContext.createPolarContext();
   });
@@ -38,7 +38,7 @@ describe("Config resolution", () => {
 
       it("should keep any unknown field", async () => {
         const config = await loadConfigAndTasks() as any;
-        assert.deepEqual(config.unknown, { asd: 123 });
+        assert.deepEqual(config.unknown, { asd: 12 });
       });
     });
   });

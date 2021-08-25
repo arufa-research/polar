@@ -14,15 +14,13 @@ Promise<void> {
   const env: PolarRuntimeEnvironment = await getEnv();
 
   it("Should create .wasm files if no hasErrors is false", async function () {
+    const projectPath: string = path.join(getFixtureProjectPath("compile-task-project"), projectName);
+    process.chdir(projectPath);
     if (!hasErrors) {
-      const projectPath: string = path.join(getFixtureProjectPath("compile-task-project"), projectName);
-      process.chdir(projectPath);
       await compile(false, sourceDir, false, env);
 
       assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project.wasm`));
     } else if (hasErrors) {
-      const projectPath: string = path.join(getFixtureProjectPath("compile-task-project"), projectName);
-      process.chdir(projectPath);
       // check for Exception
       // expect(
       //   async () => await compile(false, sourceDir, false, env)
@@ -31,6 +29,8 @@ Promise<void> {
       //   async() => ,
       //   Error
       // )
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      assert.throws(async () => await compile(false, sourceDir, false, env));
     }
 
     afterEach(() => {
@@ -44,6 +44,11 @@ describe("Compile task", () => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   describe("Compile simple contract", async function () {
     await assertCompile("testproject", [], false);
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  describe("Compile multi contract", async function () {
+    await assertCompile("multiproject", [], false);
   });
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises

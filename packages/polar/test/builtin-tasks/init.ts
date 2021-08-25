@@ -1,11 +1,10 @@
 import { assert, expect } from "chai";
-import * as child from "child_process";
 import fs from "fs-extra";
 
 import { createProject } from "../../src/internal/cli/project-creation";
 import { ERRORS } from "../../src/internal/core/errors-list";
 import { useEnvironment } from "../helpers/environment";
-import { expectPolarError, expectPolarErrorAsync } from "../helpers/errors";
+import { expectPolarErrorAsync } from "../helpers/errors";
 import { useFixtureProject } from "../helpers/project";
 
 function assertInit (projectName: string, dirExists: boolean): void {

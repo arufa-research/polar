@@ -13,24 +13,18 @@ import {
   TARGET_DIR
 } from "../../internal/core/project-structure";
 import { cmpStr } from "../../internal/util/strings";
-import type { PolarRuntimeEnvironment } from "../../types";
 
 export async function compile (
   docker: boolean,
   sourceDir: string[],
-  force: boolean,
-  env: PolarRuntimeEnvironment
+  force: boolean
 ): Promise<void> {
   await assertDir(CACHE_DIR);
-  const contractDirs: string[] = [];
+  let contractDirs: string[] = [];
 
   // Contract(s) path given
   if (sourceDir.length > 0) {
-    const currDir = process.cwd();
-    for (const dir of sourceDir) {
-      const contractAbsPath = path.resolve(currDir, dir);
-      contractDirs.push(contractAbsPath);
-    }
+    contractDirs = sourceDir;
   } else {
     const paths = readdirSync(CONTRACTS_DIR);
     // Only one contract in the contracts dir and compile in contracts dir only
@@ -38,10 +32,9 @@ export async function compile (
       contractDirs.push(CONTRACTS_DIR);
     } else {
       // Multiple contracts and each should be compiled by going inside each of them
-      for (const p of paths.sort(cmpStr)) {
-        const f = path.basename(p);
-        const contractAbsPath = path.resolve(CONTRACTS_DIR, f);
-        contractDirs.push(contractAbsPath);
+      for (const p of paths) {
+        const contractPath = path.join(CONTRACTS_DIR, path.basename(p));
+        contractDirs.push(contractPath);
       }
     }
   }

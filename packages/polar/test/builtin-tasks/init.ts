@@ -1,6 +1,6 @@
 import { assert, expect } from "chai";
 import * as child from "child_process";
-import * as fs from "fs";
+import fs from "fs-extra";
 
 import { createProject } from "../../src/internal/cli/project-creation";
 import { ERRORS } from "../../src/internal/core/errors-list";
@@ -30,7 +30,10 @@ describe("Init task", () => {
   useEnvironment();
 
   afterEach(() => {
-    child.execSync("rm -rf ./*");
+    const paths = fs.readdirSync("./");
+    for (const path of paths) {
+      fs.removeSync(path);
+    }
   });
 
   describe("When directory with same name doesn't exist", function () {

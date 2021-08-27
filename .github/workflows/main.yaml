@@ -27,6 +27,8 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
+      - name: Install
+        run: yarn install
       - name: Execute lint
         run: yarn lint
       - run: yarn build

@@ -197,7 +197,7 @@ Please check that the configured keypair are correct.`,
       shouldBeReported: false
     },
     NO_DEFAULT_EXPORT_IN_SCRIPT: {
-      number: 13,
+      number: 19,
       message: "Error. '%script%' doesn't have an exported default function.",
       title: "No exported default function",
       description: `Script doesn't export a default function.

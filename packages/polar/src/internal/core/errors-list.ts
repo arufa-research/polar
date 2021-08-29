@@ -187,6 +187,23 @@ Please check that the configured keypair are correct.`,
       title: "Directory contains a polar file",
       description: `You are trying to run Polar in a directory that contains polar project file.`,
       shouldBeReported: false
+    },
+    SCRIPT_LOAD_ERROR: {
+      number: 18,
+      message: "Error. Script '%script%' failed during load: %error%",
+      title: "Script can't load",
+      description: `Script failed during load.
+      Please check polar output for more details.`,
+      shouldBeReported: false
+    },
+    NO_DEFAULT_EXPORT_IN_SCRIPT: {
+      number: 13,
+      message: "Error. '%script%' doesn't have an exported default function.",
+      title: "No exported default function",
+      description: `Script doesn't export a default function.
+  
+  Please check polar output for more details.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {
@@ -839,6 +856,24 @@ or go to [solang](https://solang.readthedocs.io/en/latest/installing.html) to le
       message: `The contract names of %path1% and %path2% conflict.`,
       title: 'Ink duplicate contract name',
       description: `Rename contract name in Cargo.toml to fix this.`,
+      shouldBeReported: false
+    },
+    SCRIPTS_OUTSIDE_SCRIPTS_DIRECTORY: {
+      number: 612,
+      message: "Attempted to execute a script outside scripts directory: %scripts%.",
+      title: "Script is outside `scripts`",
+      description: `Tried to run scripts that was outside scripts directory %scripts%.
+  
+  Please double check your command parameters`,
+      shouldBeReported: false
+    },
+    RUN_FILES_NOT_FOUND: {
+      number: 613,
+      message: "Scripts don't exist: %scripts%.",
+      title: "Scripts don't exist.",
+      description: `Tried to use \`polar run\` to execute a non-existing script(s).
+  
+  Please double check your script's path`,
       shouldBeReported: false
     }
   },

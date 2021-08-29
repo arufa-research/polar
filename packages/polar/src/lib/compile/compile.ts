@@ -4,6 +4,8 @@ import { readdirSync } from "fs";
 import fs from "fs-extra";
 import path from "path";
 
+import { PolarError } from "../../internal/core/errors";
+import { ERRORS } from "../../internal/core/errors-list";
 import {
   ARTIFACTS_DIR,
   assertDir,
@@ -52,7 +54,15 @@ export function compileContract (contractDir: string, docker: boolean): void {
   process.chdir(contractDir);
   console.log(`Compiling contract in directory: ${chalk.gray(contractDir)}`);
   // Compiles the contract and creates .wasm file alongside others
-  execSync(`RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown`, { stdio: 'inherit' });
+  try {
+    execSync(`RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown`, { stdio: 'inherit' });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new PolarError(ERRORS.GENERAL.RUST_COMPILE_ERROR);
+    } else {
+      throw error;
+    }
+  }
 
   process.chdir(currDir);
 }

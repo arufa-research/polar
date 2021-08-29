@@ -18,7 +18,6 @@ export function filterNonExistent (scripts: string[]): string[] {
   return scripts.filter(script => !fsExtra.pathExistsSync(script));
 }
 
-// Function only accepts sorted scripts -- only this way it loads the state correctly.
 async function runScripts (
   runtimeEnv: PolarRuntimeEnvironment,
   scriptNames: string[],

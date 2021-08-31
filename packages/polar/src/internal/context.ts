@@ -12,7 +12,6 @@ export type GlobalWithPolarContext = NodeJS.Global & {
 export class PolarContext {
   public static isCreated (): boolean {
     const globalWithPolarContext = global as unknown as GlobalWithPolarContext;
-
     return globalWithPolarContext.__polarContext !== undefined;
   }
 
@@ -23,9 +22,7 @@ export class PolarContext {
 
     const globalWithPolarContext = global as unknown as GlobalWithPolarContext;
     const ctx = new PolarContext();
-
     globalWithPolarContext.__polarContext = ctx;
-
     return ctx;
   }
 
@@ -43,7 +40,7 @@ export class PolarContext {
   public static deletePolarContext (): void {
     const globalAsAny = global as any;
 
-    globalAsAny.__PolarContext = undefined;
+    globalAsAny.__polarContext = undefined;
   }
 
   public readonly tasksDSL = new TasksDSL();

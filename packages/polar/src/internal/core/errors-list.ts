@@ -187,6 +187,13 @@ Please check that the configured keypair are correct.`,
       title: "Directory contains a polar file",
       description: `You are trying to run Polar in a directory that contains polar project file.`,
       shouldBeReported: false
+    },
+    RUST_COMPILE_ERROR: {
+      number: 18,
+      message: "Rust compiler unable to compile contracts due to errors in contract code.",
+      title: "Rust compiler error",
+      description: `You are trying to compile rust contract that has errors.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

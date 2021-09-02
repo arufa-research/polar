@@ -10,7 +10,7 @@ import {
   CONTRACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
-import { Account, PolarRuntimeEnvironment } from "../../types";
+import { Account, ContractInfo, PolarRuntimeEnvironment } from "../../types";
 import { getClient, getSigningClient } from "../client";
 
 export class Contract {
@@ -23,6 +23,7 @@ export class Contract {
   signingClient: SigningCosmWasmClient | undefined = undefined;
 
   codeId: number;
+  contractCodeHash: string;
   contractAddress: string;
 
   constructor (contractName: string, env: PolarRuntimeEnvironment, account?: Account | undefined) {
@@ -49,7 +50,7 @@ export class Contract {
     }
   }
 
-  async deploy (): Promise<string> {
+  async deploy (): Promise<ContractInfo> {
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
     if (this.account === undefined) {
@@ -68,7 +69,10 @@ export class Contract {
 
     this.codeId = codeId;
 
-    return contractCodeHash;
+    return {
+      codeId: this.codeId,
+      contractCodeHash: this.contractCodeHash
+    };
   }
 
   // async deployed() {
@@ -78,7 +82,7 @@ export class Contract {
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string
-  ): Promise<string> {
+  ): Promise<ContractInfo> {
     if (this.account === undefined) {
       throw new PolarError(ERRORS.GENERAL.ACCOUNT_NOT_PASSED, {
         param: this.contractName
@@ -92,7 +96,11 @@ export class Contract {
     const contract = await this.signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
-    return contract.contractAddress;
+    return {
+      codeId: this.codeId,
+      contractCodeHash: this.contractCodeHash,
+      contractAddress: this.contractAddress
+    };
   }
 
   // TODO: replace query and execute with methods from schema json

@@ -194,6 +194,13 @@ Please check that the configured keypair are correct.`,
       title: "Rust compiler error",
       description: `You are trying to compile rust contract that has errors.`,
       shouldBeReported: false
+    },
+    ACCOUNT_NOT_PASSED: {
+      number: 19,
+      message: "No account was passed to the Contract object while initializing.",
+      title: "Account not passed",
+      description: `You are trying to deploy/init/execute %contractName% without an Account.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

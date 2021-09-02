@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient, SigningCosmWasmClient } from "secretjs";
@@ -13,57 +14,88 @@ import { Account, PolarRuntimeEnvironment } from "../../types";
 import { getClient, getSigningClient } from "../client";
 
 export class Contract {
-  readonly contract_path: string;
-  readonly schema_path: string;
+  readonly contractName: string;
+  readonly contractPath: string;
+  readonly schemaPath: string;
   readonly env: PolarRuntimeEnvironment;
+  readonly account: Account | undefined;
   readonly client: CosmWasmClient;
-  readonly signingClient: SigningCosmWasmClient;
+  signingClient: SigningCosmWasmClient | undefined = undefined;
 
   codeId: number;
   contractAddress: string;
 
-  constructor (contractName: string, account: Account, env: PolarRuntimeEnvironment) {
-    this.contract_path = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
-    this.schema_path = path.join(SCHEMA_DIR, `${contractName}.json`);
+  constructor (contractName: string, env: PolarRuntimeEnvironment, account?: Account | undefined) {
+    this.contractName = contractName;
+    this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
+    this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
 
     this.env = env;
     this.client = getClient(env.network);
-    this.signingClient = getSigningClient(env.network, account);
+    this.account = account;
 
-    if (!fs.existsSync(this.contract_path)) {
-      // throw new PolarError(ERRORS.ARGUMENTS.PARAM_NAME_INVALID_CASING, {
-      //   param: cLA
-      // });
+    if (account === undefined) {
+      console.log("Warning: Account not initialized for contract ", chalk.cyan(contractName));
     }
 
-    if (!fs.existsSync(this.schema_path)) {
-      // TODO: log a warning that schema does not exist for this contract
+    if (!fs.existsSync(this.contractPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.NOT_FOUND, {
+        param: this.contractName
+      });
+    }
+
+    if (!fs.existsSync(this.schemaPath)) {
+      console.log("Warning: Schema not found for contract ", chalk.cyan(contractName));
     }
   }
 
-  async deploy (): Promise<void> {
-    const wasmFileContent: Buffer = fs.readFileSync(this.contract_path);
+  async deploy (): Promise<string> {
+    const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
+    if (this.account === undefined) {
+      throw new PolarError(ERRORS.GENERAL.ACCOUNT_NOT_PASSED, {
+        param: this.contractName
+      });
+    }
+
+    if (this.signingClient === undefined) {
+      this.signingClient = await getSigningClient(this.env.network, (this.account));
+    }
     const uploadReceipt = await this.signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
       await this.signingClient.restClient.getCodeHashByCodeId(codeId);
 
     this.codeId = codeId;
+
+    return contractCodeHash;
   }
 
   // async deployed() {
 
   // }
 
-  async initiate (initArgs): Promise<void> {
-    const contract = await this.signingClient.instantiate(this.codeId, initArgs, `Counter: ${Math.ceil(Math.random() * 10000)}`);
-    console.log('contract: ', contract);
+  async instantiate (
+    initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
+    label: string
+  ): Promise<string> {
+    if (this.account === undefined) {
+      throw new PolarError(ERRORS.GENERAL.ACCOUNT_NOT_PASSED, {
+        param: this.contractName
+      });
+    }
 
-    const contractAddress: string = contract.contractAddress;
-    this.contractAddress = contractAddress;
+    if (this.signingClient === undefined) {
+      this.signingClient = await getSigningClient(this.env.network, (this.account));
+    }
+
+    const contract = await this.signingClient.instantiate(this.codeId, initArgs, label);
+    this.contractAddress = contract.contractAddress;
+
+    return contract.contractAddress;
   }
 
+  // TODO: replace query and execute with methods from schema json
   async query (methodName: string): Promise<void> {
     // Query the current count
     console.log('Querying contract for ', methodName);

@@ -108,4 +108,3 @@ function validateUrlname (str: string): boolean {
   return !!exp.test(str);
 }
 
-    

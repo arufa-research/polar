@@ -74,4 +74,4 @@ This project is forked from hardhat, and just base on the hardhat-core part then
 
 ## Thanks
 
-hardhat - Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. Get Solidity stack traces & console.log..
+hardhat - Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. Get Solidity stack traces & console.log.

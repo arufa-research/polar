@@ -1,6 +1,5 @@
 import path from "path";
-
-import type { NetworkConfig, ResolvedConfig, RuntimeArgs } from "../../../types";
+import type { ResolvedConfig, RuntimeArgs } from "../../../types";
 import { PolarContext } from "../../context";
 import { loadPluginFile } from "../plugins";
 import { getUserConfigPath } from "../project-structure";

@@ -1,8 +1,10 @@
+import { Bip39, Random } from "@iov/crypto";
+import {
+  encodeSecp256k1Pubkey,
+  pubkeyToAddress, Secp256k1Pen
+} from "secretjs";
+
 import { Account } from "../types";
-const {
-  Secp256k1Pen, pubkeyToAddress, encodeSecp256k1Pubkey
-} = import("secretjs");
-const { Bip39, Random } = import("@iov/crypto");
 
 export async function createAccounts (n: number): Promise<Account[]> {
   const accounts: Account[] = [];

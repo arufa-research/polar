@@ -3,6 +3,7 @@ import { replaceAll } from '../util/strings';
 import { ErrorDescriptor, ERRORS, getErrorCode } from './errors-list';
 
 export class PolarError extends Error {
+  // eslint-disable-next-line
   public static isPolarError (other: any): other is PolarError {
     return (
       other !== undefined && other !== null && other._isPolarError === true
@@ -10,6 +11,7 @@ export class PolarError extends Error {
   }
 
   public static isPolarErrorType (
+    // eslint-disable-next-line
     other: any,
     descriptor: ErrorDescriptor
   ): other is PolarError {
@@ -21,6 +23,7 @@ export class PolarError extends Error {
 
   public readonly errorDescriptor: ErrorDescriptor;
   public readonly number: number;
+  // eslint-disable-next-line
   public readonly messageArguments: Record<string, any>;
   public readonly parent?: Error;
 
@@ -28,6 +31,7 @@ export class PolarError extends Error {
 
   constructor (
     errorDescriptor: ErrorDescriptor,
+    // eslint-disable-next-line
     messageArguments: Record<string, any> = {},
     parentError?: Error
   ) {
@@ -57,6 +61,7 @@ export class PolarError extends Error {
  * This class is used to throw errors from polar plugins made by third parties.
  */
 export class PolarPluginError extends Error {
+  // eslint-disable-next-line
   public static isPolarPluginError (other: any): other is PolarPluginError {
     return (
       other !== undefined &&
@@ -101,6 +106,7 @@ export class PolarPluginError extends Error {
       this.parent = parent;
     } else {
       super(pluginNameOrMessage);
+      // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
       this.pluginName = getClosestCallerPackage()!;
       this.parent = messageOrParent;
     }
@@ -127,6 +133,7 @@ export class PolarPluginError extends Error {
  */
 export function applyErrorMessageTemplate (
   template: string,
+  // eslint-disable-next-line
   values: { [templateVar: string]: any }
 ): string {
   return _applyErrorMessageTemplate(template, values, false);
@@ -135,6 +142,7 @@ export function applyErrorMessageTemplate (
 /* eslint-disable sonarjs/cognitive-complexity */
 function _applyErrorMessageTemplate (
   template: string,
+  // eslint-disable-next-line
   values: { [templateVar: string]: any },
   isRecursiveCall: boolean
 ): string {

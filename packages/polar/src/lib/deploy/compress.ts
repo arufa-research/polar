@@ -6,12 +6,14 @@ import zlib from "zlib";
 
 import {
   ARTIFACTS_DIR,
+  // eslint-disable-next-line
   assertDir,
   CONTRACTS_DIR,
   CONTRACTS_OUT_DIR,
   multiImageVersion,
   singleImageVersion
 } from "../../internal/core/project-structure";
+// eslint-disable-next-line
 import { cmpStr } from "../../internal/util/strings";
 import type { PolarRuntimeEnvironment } from "../../types";
 
@@ -47,3 +49,4 @@ export async function compress (
     console.log(`Generated .wasm files in ${ARTIFACTS_DIR}`);
   }
 }
+

@@ -21,7 +21,6 @@ export interface Account {
   name: string
   address: string
   mnemonic: string
-  signingPen: any
 }
 
 export type PolarNetworkAccountsUserConfig = Account[];

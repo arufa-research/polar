@@ -24,8 +24,7 @@ export async function createAccounts (n: number): Promise<Account[]> {
     accounts.push({
       name: "account_" + i.toString(),
       address: accAddress,
-      mnemonic: mnemonic,
-      signingPen: signingPen
+      mnemonic: mnemonic
     });
   }
   return accounts;

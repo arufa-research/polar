@@ -9,7 +9,6 @@ describe("Create accounts", () => {
     assert.isDefined(res[0].address);
     assert.isDefined(res[0].name);
     assert.isDefined(res[0].mnemonic);
-    assert.isDefined(res[0].signingPen);
   });
 
   it("should create 3 accounts", async () => {
@@ -19,7 +18,6 @@ describe("Create accounts", () => {
       assert.isDefined(res[i].address);
       assert.isDefined(res[i].name);
       assert.isDefined(res[i].mnemonic);
-      assert.isDefined(res[i].signingPen);
     }
   });
 });

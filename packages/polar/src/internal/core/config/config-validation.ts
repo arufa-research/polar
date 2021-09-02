@@ -1,4 +1,5 @@
 import * as z from 'zod';
+
 import type { NetworkConfig } from "../../../types";
 import { parseZodError } from "../../util/zod-errors";
 import { PolarError } from '../errors';
@@ -107,5 +108,3 @@ const exp = new RegExp('^(https?:\\/\\/)?' + // protocol
 function validateUrlname (str: string): boolean {
   return !!exp.test(str);
 }
-
-    

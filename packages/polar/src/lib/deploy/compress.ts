@@ -49,4 +49,3 @@ export async function compress (
     console.log(`Generated .wasm files in ${ARTIFACTS_DIR}`);
   }
 }
-

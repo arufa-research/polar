@@ -331,4 +331,3 @@ export type PromiseAny = Promise<any>;
 export interface StrMap {
   [key: string]: string
 }
-

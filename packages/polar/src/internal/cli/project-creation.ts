@@ -259,4 +259,3 @@ async function npmInstallCmd (): Promise<string[]> {
 
   return [...npmInstall, "--save-dev", ...SAMPLE_PROJECT_DEPENDENCIES];
 }
-

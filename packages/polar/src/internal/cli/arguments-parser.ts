@@ -135,6 +135,7 @@ export class ArgumentsParser {
   _parseTaskParamArguments (
     taskDefinition: TaskDefinition,
     rawCLAs: string[]
+  // eslint-disable-next-line
   ): {paramArguments: Record<string, any>, rawPositionalArguments: string[]} {
     const paramArguments = {};
     const rawPositionalArguments: string[] = [];
@@ -291,3 +292,4 @@ export class ArgumentsParser {
     return args;
   }
 }
+

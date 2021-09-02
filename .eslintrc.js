@@ -20,7 +20,7 @@ module.exports = {
     "max-classes-per-file": 0,
     "max-len": ["error", { "code": 100, "ignoreTrailingComments": true, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true}],
     "no-underscore-dangle": 0,
-    "simple-import-sort/sort": "warn",
+    "simple-import-sort/sort": 0,
     "sort-imports": "off",
 
     "@typescript-eslint/consistent-type-assertions": "off",

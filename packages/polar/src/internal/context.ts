@@ -38,6 +38,7 @@ export class PolarContext {
   }
 
   public static deletePolarContext (): void {
+    // eslint-disable-next-line
     const globalAsAny = global as any;
 
     globalAsAny.__polarContext = undefined;

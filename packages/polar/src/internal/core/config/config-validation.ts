@@ -1,10 +1,9 @@
 import * as z from 'zod';
-
-import { parseZodError } from "../../util/zod-errors";
 import type { NetworkConfig } from "../../../types";
-import CfgErrors from "./config-errors";
+import { parseZodError } from "../../util/zod-errors";
 import { PolarError } from '../errors';
 import { ERRORS } from '../errors-list';
+import CfgErrors from "./config-errors";
 
 const AccountType = z.object({
   name: z.string(),
@@ -30,13 +29,13 @@ const ProjectPaths = z.object({
   artifacts: z.string().optional(),
   sources: z.string().optional(),
   tests: z.string().optional()
-}).nonstrict(); ;
+}).nonstrict();
 
 const Config = z.object({
   networks: NetworksType.optional(),
   paths: ProjectPaths.optional()
 }
-).nonstrict(); ;
+).nonstrict();
 
 /**
  * Validates the config, throwing a BuilderError if invalid.
@@ -64,6 +63,7 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
         const a = ncfg.accounts[i];
         const p = errors.putter(net + ".accounts", i.toString());
         if ((j = accountsMap.get(a.name)) !== undefined) {
+          // eslint-disable-next-line
           const errorMessage: string = `Account name ${String(a.name)} already exists at index ${String(j)}`;
           p.push('name', errorMessage, 'string');
         } else { accountsMap.set(a.name, i); }
@@ -107,3 +107,5 @@ const exp = new RegExp('^(https?:\\/\\/)?' + // protocol
 function validateUrlname (str: string): boolean {
   return !!exp.test(str);
 }
+
+    

@@ -18,26 +18,19 @@ export class Contract {
   readonly contractPath: string;
   readonly schemaPath: string;
   readonly env: PolarRuntimeEnvironment;
-  readonly account: Account | undefined;
   readonly client: CosmWasmClient;
-  signingClient: SigningCosmWasmClient | undefined = undefined;
 
   codeId: number;
   contractCodeHash: string;
   contractAddress: string;
 
-  constructor (contractName: string, env: PolarRuntimeEnvironment, account?: Account | undefined) {
+  constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = contractName;
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
     this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
 
     this.env = env;
     this.client = getClient(env.network);
-    this.account = account;
-
-    if (account === undefined) {
-      console.log("Warning: Account not initialized for contract ", chalk.cyan(contractName));
-    }
 
     if (!fs.existsSync(this.contractPath)) {
       throw new PolarError(ERRORS.ARTIFACTS.NOT_FOUND, {
@@ -50,29 +43,18 @@ export class Contract {
     }
   }
 
-  async deploy (): Promise<ContractInfo> {
+  async deploy (account: Account): Promise<string> {
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    if (this.account === undefined) {
-      throw new PolarError(ERRORS.GENERAL.ACCOUNT_NOT_PASSED, {
-        param: this.contractName
-      });
-    }
-
-    if (this.signingClient === undefined) {
-      this.signingClient = await getSigningClient(this.env.network, (this.account));
-    }
-    const uploadReceipt = await this.signingClient.upload(wasmFileContent, {});
+    const signingClient = await getSigningClient(this.env.network, (account));
+    const uploadReceipt = await signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
-      await this.signingClient.restClient.getCodeHashByCodeId(codeId);
+      await signingClient.restClient.getCodeHashByCodeId(codeId);
 
     this.codeId = codeId;
 
-    return {
-      codeId: this.codeId,
-      contractCodeHash: this.contractCodeHash
-    };
+    return contractCodeHash;
   }
 
   // async deployed() {
@@ -81,19 +63,12 @@ export class Contract {
 
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
-    label: string
+    label: string,
+    account: Account
   ): Promise<ContractInfo> {
-    if (this.account === undefined) {
-      throw new PolarError(ERRORS.GENERAL.ACCOUNT_NOT_PASSED, {
-        param: this.contractName
-      });
-    }
+    const signingClient = await getSigningClient(this.env.network, (account));
 
-    if (this.signingClient === undefined) {
-      this.signingClient = await getSigningClient(this.env.network, (this.account));
-    }
-
-    const contract = await this.signingClient.instantiate(this.codeId, initArgs, label);
+    const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
     return {

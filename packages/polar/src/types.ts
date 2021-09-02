@@ -26,7 +26,7 @@ export interface Account {
 export interface ContractInfo {
   codeId: number
   contractCodeHash: string
-  contractAddress?: string
+  contractAddress: string
 }
 
 export type PolarNetworkAccountsUserConfig = Account[];

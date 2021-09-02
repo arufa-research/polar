@@ -188,8 +188,15 @@ Please check that the configured keypair are correct.`,
       description: `You are trying to run Polar in a directory that contains polar project file.`,
       shouldBeReported: false
     },
-    SCRIPT_LOAD_ERROR: {
+     RUST_COMPILE_ERROR: {
       number: 18,
+      message: "Rust compiler unable to compile contracts due to errors in contract code.",
+      title: "Rust compiler error",
+      description: `You are trying to compile rust contract that has errors.`,
+      shouldBeReported: false
+    },
+    SCRIPT_LOAD_ERROR: {
+      number: 19,
       message: "Error. Script '%script%' failed during load: %error%",
       title: "Script can't load",
       description: `Script failed during load.
@@ -197,13 +204,13 @@ Please check that the configured keypair are correct.`,
       shouldBeReported: false
     },
     NO_DEFAULT_EXPORT_IN_SCRIPT: {
-      number: 19,
+      number: 20,
       message: "Error. '%script%' doesn't have an exported default function.",
       title: "No exported default function",
       description: `Script doesn't export a default function.
   
   Please check polar output for more details.`,
-      shouldBeReported: false
+       shouldBeReported: false
     }
   },
   NETWORK: {

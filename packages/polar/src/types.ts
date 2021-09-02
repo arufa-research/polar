@@ -325,9 +325,10 @@ export interface PolarRuntimeEnvironment {
   readonly run: RunTaskFunction
   readonly network: Network
 }
-
+// eslint-disable-next-line
 export type PromiseAny = Promise<any>;
 
 export interface StrMap {
   [key: string]: string
 }
+

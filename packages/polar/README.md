@@ -10,19 +10,6 @@ The minimum packages/requirements are as follows:
 - Yarn v1.22+ or NPM `v6.0+**
 - Connection to an Secret node. 
 
-Follow our infrastructure README for instructions how to setup a private network.
-
-## Setup
-
-### Install dependencies
-
-1. Setup Rust compiler
-
-```
-cd infrastructure
-make setup-rust
-```
-
 ## Install polar
 
 ### Installation from released version
@@ -73,11 +60,3 @@ polar compile
 ```bash
 yarn run test
 ```
-
-## License
-
-This project is forked from hardhat, and just base on the hardhat-core part then modify it under MIT license.
-
-## Thanks
-
-hardhat - Hardhat is a development environment to compile, deploy, test, and debug your Ethereum software. Get Solidity stack traces & console.log.

@@ -1,12 +1,16 @@
 # Polar
 
-Polar is a development environment to compile, deploy, test, run them on different networks.
+Polar is a development environment to compile, deploy, test, run scrt contracts on different networks efficiently with an enhanced user friendly experience.
 
 ## Requirements
 
+The minimum packages/requirements are as follows:
+ 
 - Node 14+
 - Yarn v1.22+ or NPM `v6.0+**
-- Connection to an Secret node. Follow our infrastructure README for instructions how to setup a private network.
+- Connection to an Secret node. 
+
+Follow our infrastructure README for instructions how to setup a private network.
 
 ## Setup
 
@@ -20,6 +24,7 @@ make setup-rust
 ```
 
 ## Install polar
+
 ### Installation from released version
 To install polar globally in your system you can use:
   - Using Yarn: `yarn global add secret-polar`
@@ -28,7 +33,8 @@ To install polar globally in your system you can use:
 ### Installation from master.
 The master branch corresponds to the latest version.
 
-To use  `polar` on your system, follow steps below:
+To use  `polar` on your system, follow the steps below:
+
 ```bash
 git clone https://github.com/arufa-research/polar.git
 cd polar

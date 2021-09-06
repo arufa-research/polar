@@ -28,8 +28,8 @@ jobs:
             ${{ runner.OS }}-node-
             ${{ runner.OS }}-
       - name: Install
-        run: yarn install |
-        cd infrastructure && make setup-rust
+        run: yarn install
+        run: cd infrastructure && make setup-rust
       - name: Execute lint
         run: yarn lint
       - run: yarn build

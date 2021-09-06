@@ -23,6 +23,12 @@ export interface Account {
   mnemonic: string
 }
 
+export interface ContractInfo {
+  codeId: number
+  contractCodeHash: string
+  contractAddress: string
+}
+
 export type PolarNetworkAccountsUserConfig = Account[];
 
 export interface PolarNetworkUserConfig {

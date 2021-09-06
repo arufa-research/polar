@@ -207,9 +207,15 @@ Please check that the configured keypair are correct.`,
       number: 20,
       message: "Error. '%script%' doesn't have an exported default function.",
       title: "No exported default function",
-      description: `Script doesn't export a default function.
-  
-  Please check polar output for more details.`,
+      description: `Script doesn't export a default function.   
+      Please check polar output for more details.`,
+      shouldBeReported: false
+    },
+    ACCOUNT_NOT_PASSED: {
+      number: 21,
+      message: "No account was passed to the Contract object while initializing.",
+      title: "Account not passed",
+      description: `You are trying to deploy/init/execute %contractName% without an Account.`,
       shouldBeReported: false
     }
   },

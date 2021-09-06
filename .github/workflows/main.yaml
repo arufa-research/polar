@@ -1,0 +1,51 @@
+name: Run tests on push
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14.15.4'
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - name: Install
+        run: yarn install
+      - run: |
+          cd infrastructure
+          curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh
+          export PATH="${HOME}/.cargo/bin:${PATH}"
+        
+          rustup default stable
+          rustup target list --installed
+          rustup target add wasm32-unknown-unknown
+        
+          rustup install nightly
+          rustup target add wasm32-unknown-unknown --toolchain nightly
+        
+          sudo apt install build-essential
+      - name: Execute lint
+        run: yarn lint
+      - run: yarn build
+      - name: Execute tests
+        run: yarn run test
+
+

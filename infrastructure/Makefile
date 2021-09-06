@@ -9,7 +9,7 @@ setup-rust:
 	rustup install nightly
 	rustup target add wasm32-unknown-unknown --toolchain nightly
 
-	apt install build-essential
+	sudo apt install build-essential
 
 start-server: # CTRL+C to stop
 	docker run -it --rm \

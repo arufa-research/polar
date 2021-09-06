@@ -1,13 +1,12 @@
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient, SigningCosmWasmClient } from "secretjs";
+import { CosmWasmClient } from "secretjs";
 
 import { PolarError } from "../../internal/core/errors";
 import { ERRORS } from "../../internal/core/errors-list";
 import {
   ARTIFACTS_DIR,
-  CONTRACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
 import { Account, ContractInfo, PolarRuntimeEnvironment } from "../../types";
@@ -20,12 +19,15 @@ export class Contract {
   readonly env: PolarRuntimeEnvironment;
   readonly client: CosmWasmClient;
 
-  codeId: number;
-  contractCodeHash: string;
-  contractAddress: string;
+  private codeId: number;
+  private readonly contractCodeHash: string;
+  private contractAddress: string;
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = contractName;
+    this.codeId = 0;
+    this.contractCodeHash = "mock_hash";
+    this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
     this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
 

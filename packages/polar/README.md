@@ -17,20 +17,6 @@ To install polar globally in your system you can use:
   - Using Yarn: `yarn global add secret-polar`
   - Using NPM: `npm install -g secret-polar`
 
-### Installation from master.
-The master branch corresponds to the latest version.
-
-To use  `polar` on your system, follow the steps below:
-
-```bash
-git clone https://github.com/arufa-research/polar.git
-cd polar
-yarn install
-yarn build
-cd packages/polar
-yarn link
-chmod +x $HOME/.yarn/bin/polar
-```
 ## Usage
 
 ### Initialize a project

@@ -2,5 +2,3 @@
 
 This template contains polar tests.
 
-
-

@@ -23,6 +23,12 @@ export interface Account {
   mnemonic: string
 }
 
+export interface ContractInfo {
+  codeId: number
+  contractCodeHash: string
+  contractAddress: string
+}
+
 export type PolarNetworkAccountsUserConfig = Account[];
 
 export interface PolarNetworkUserConfig {
@@ -325,7 +331,7 @@ export interface PolarRuntimeEnvironment {
   readonly run: RunTaskFunction
   readonly network: Network
 }
-
+// eslint-disable-next-line
 export type PromiseAny = Promise<any>;
 
 export interface StrMap {

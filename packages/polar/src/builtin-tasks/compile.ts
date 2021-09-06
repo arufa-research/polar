@@ -31,7 +31,7 @@ function compileTask (
     process.exit(1);
   }
 
-  return compile(docker, sourceDir, force, env);
+  return compile(docker, sourceDir, force);
 }
 
 function canCompile (env: PolarRuntimeEnvironment): boolean {

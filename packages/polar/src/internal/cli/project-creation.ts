@@ -75,7 +75,7 @@ async function printPluginInstallationInstructions (): Promise<void> {
 
   console.log(`  ${cmd.join(" ")}`);
 }
-
+// eslint-disable-next-line
 export async function createProject (projectName: string): Promise<any> {
   await printWelcomeMessage();
 

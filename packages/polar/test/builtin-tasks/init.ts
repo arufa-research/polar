@@ -35,10 +35,7 @@ describe("Init task", () => {
   });
 
   it("When directory with same name exists", async function () {
-    beforeEach(() => {
-      fs.mkdirSync("./testproject");
-    });
-    await createProject("testproject");
+    fs.mkdirSync("./testproject");
 
     await expectPolarErrorAsync(
       async () => await createProject("testproject"),

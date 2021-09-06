@@ -14,10 +14,12 @@ export function getClosestCallerPackage (): string | undefined {
   Error.prepareStackTrace = (e, s) => s;
 
   const error = new Error();
+  // eslint-disable-next-line
   const stack: NodeJS.CallSite[] = error.stack as any;
 
   Error.prepareStackTrace = previousPrepareStackTrace;
 
+  // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
   const currentPackage = findClosestPackageJson(__filename)!;
 
   for (const callSite of stack) {

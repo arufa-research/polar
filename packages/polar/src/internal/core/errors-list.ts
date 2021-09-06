@@ -207,8 +207,7 @@ Please check that the configured keypair are correct.`,
       number: 20,
       message: "Error. '%script%' doesn't have an exported default function.",
       title: "No exported default function",
-      description: `Script doesn't export a default function.
-      
+      description: `Script doesn't export a default function.   
       Please check polar output for more details.`,
       shouldBeReported: false
     },

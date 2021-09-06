@@ -14,6 +14,7 @@ async function nodeInfo (_taskArgs: TaskArguments, env: PolarRuntimeEnvironment)
   console.log("ChainId:", await client.getChainId());
   console.log("Block height:", await client.getHeight());
   const nodeInfo = await client.restClient.nodeInfo()
+  // eslint-disable-next-line
     .catch((err) => { throw new Error(`Could not fetch node info: ${err}`); });
   console.log('Node Info: ', nodeInfo);
 }

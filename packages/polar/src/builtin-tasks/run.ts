@@ -41,6 +41,7 @@ async function runScripts (
 async function executeRunTask (
   { scripts }: Input,
   runtimeEnv: PolarRuntimeEnvironment
+  // eslint-disable-next-line
 ): Promise<any> {
   const logDebugTag = "polar:tasks:run";
 

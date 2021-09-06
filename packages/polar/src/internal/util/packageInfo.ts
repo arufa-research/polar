@@ -3,6 +3,7 @@ import fsExtra from 'fs-extra';
 import path from 'path';
 
 export function getPackageJsonPath (): string {
+  // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
   return findClosestPackageJson(__filename)!;
 }
 
@@ -26,7 +27,7 @@ export function findClosestPackageJson (file: string): string | null {
 
 export async function getPackageJson (): Promise<PackageJson> {
   const root = getPackageRoot();
-
+  // eslint-disable-next-line
   return await fsExtra.readJSON(path.join(root, 'package.json'));
 }
 

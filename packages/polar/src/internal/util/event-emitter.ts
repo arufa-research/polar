@@ -17,13 +17,14 @@ export class EventEmitterWrapper implements EventEmitter {
 
   public addListener (
     event: string | symbol,
+    // eslint-disable-next-line
     listener: (...args: any[]) => void
   ): this {
     this._wrapped.addListener(event, listener);
 
     return this;
   }
-
+  // eslint-disable-next-line
   public on (event: string | symbol, listener: (...args: any[]) => void): this {
     this._wrapped.on(event, listener);
 
@@ -32,6 +33,7 @@ export class EventEmitterWrapper implements EventEmitter {
 
   public once (
     event: string | symbol,
+    // eslint-disable-next-line
     listener: (...args: any[]) => void
   ): this {
     this._wrapped.once(event, listener);
@@ -41,6 +43,7 @@ export class EventEmitterWrapper implements EventEmitter {
 
   public prependListener (
     event: string | symbol,
+    // eslint-disable-next-line
     listener: (...args: any[]) => void
   ): this {
     this._wrapped.prependListener(event, listener);
@@ -50,6 +53,7 @@ export class EventEmitterWrapper implements EventEmitter {
 
   public prependOnceListener (
     event: string | symbol,
+    // eslint-disable-next-line
     listener: (...args: any[]) => void
   ): this {
     this._wrapped.prependOnceListener(event, listener);
@@ -59,13 +63,14 @@ export class EventEmitterWrapper implements EventEmitter {
 
   public removeListener (
     event: string | symbol,
+    // eslint-disable-next-line
     listener: (...args: any[]) => void
   ): this {
     this._wrapped.removeListener(event, listener);
 
     return this;
   }
-
+  // eslint-disable-next-line
   public off (event: string | symbol, listener: (...args: any[]) => void): this {
     this._wrapped.off(event, listener);
 
@@ -95,7 +100,7 @@ export class EventEmitterWrapper implements EventEmitter {
   public rawListeners (event: string | symbol): Function[] {
     return this._wrapped.rawListeners(event);
   }
-
+  // eslint-disable-next-line
   public emit (event: string | symbol, ...args: any[]): boolean {
     return this._wrapped.emit(event, ...args);
   }

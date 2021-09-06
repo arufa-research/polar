@@ -6,7 +6,7 @@ import { PolarError } from "../core/errors";
 import { ERRORS } from "../core/errors-list";
 
 const log = debug("polar:core:scripts-runner");
-
+// eslint-disable-next-line
 async function loadScript (relativeScriptPath: string): Promise<any> {
   const absoluteScriptPath = path.join(process.cwd(), relativeScriptPath);
   try {
@@ -24,6 +24,7 @@ async function loadScript (relativeScriptPath: string): Promise<any> {
  * @param scriptPath relative path to script where error occured
  */
 function attachLineNumbertoScriptPath (
+  // eslint-disable-next-line
   error: Error | PolarError | any, scriptPath: string
 ): string {
   const stackTraces = error.stack.split('\n');
@@ -36,7 +37,7 @@ function attachLineNumbertoScriptPath (
   }
   return scriptPath;
 }
-
+// eslint-disable-next-line
 function displayErr (error: Error | PolarError | any, relativeScriptPath: string): void {
   if (error instanceof PolarError) {
     throw error;

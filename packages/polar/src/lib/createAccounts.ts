@@ -1,7 +1,8 @@
-const {
-  Secp256k1Pen, pubkeyToAddress, encodeSecp256k1Pubkey
-} = require("secretjs");
-const { Bip39, Random } = require("@iov/crypto");
+import { Bip39, Random } from "@iov/crypto";
+import {
+  encodeSecp256k1Pubkey,
+  pubkeyToAddress, Secp256k1Pen
+} from "secretjs";
 
 import { Account } from "../types";
 

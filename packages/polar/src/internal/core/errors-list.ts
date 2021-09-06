@@ -188,7 +188,7 @@ Please check that the configured keypair are correct.`,
       description: `You are trying to run Polar in a directory that contains polar project file.`,
       shouldBeReported: false
     },
-     RUST_COMPILE_ERROR: {
+    RUST_COMPILE_ERROR: {
       number: 18,
       message: "Rust compiler unable to compile contracts due to errors in contract code.",
       title: "Rust compiler error",
@@ -208,9 +208,16 @@ Please check that the configured keypair are correct.`,
       message: "Error. '%script%' doesn't have an exported default function.",
       title: "No exported default function",
       description: `Script doesn't export a default function.
-  
-  Please check polar output for more details.`,
-       shouldBeReported: false
+      
+      Please check polar output for more details.`,
+      shouldBeReported: false
+    },
+    ACCOUNT_NOT_PASSED: {
+      number: 21,
+      message: "No account was passed to the Contract object while initializing.",
+      title: "Account not passed",
+      description: `You are trying to deploy/init/execute %contractName% without an Account.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

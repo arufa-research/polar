@@ -1,4 +1,4 @@
-import { assert, expect } from "chai";
+import { assert } from "chai";
 import fs from "fs-extra";
 
 import { createProject } from "../../src/internal/cli/project-creation";
@@ -7,23 +7,6 @@ import { useEnvironment } from "../helpers/environment";
 import { expectPolarErrorAsync } from "../helpers/errors";
 import { useFixtureProject } from "../helpers/project";
 
-function assertInit (projectName: string, dirExists: boolean): void {
-  it("Should create project directory if not present", async function () {
-    if (!dirExists) {
-      await createProject(projectName);
-
-      assert.isTrue(fs.existsSync(`./${projectName}`));
-      assert.isTrue(fs.existsSync(`./${projectName}/polar.config.js`));
-    } else if (dirExists) {
-      // check for Exception
-      await expectPolarErrorAsync(
-        async () => await createProject(projectName),
-        ERRORS.GENERAL.INIT_INSIDE_PROJECT
-      );
-    }
-  });
-}
-
 describe("Init task", () => {
   useFixtureProject("init-task-project");
   useEnvironment();
@@ -31,23 +14,35 @@ describe("Init task", () => {
   afterEach(() => {
     const paths = fs.readdirSync("./");
     for (const path of paths) {
-      fs.removeSync(path);
+      if (path !== "README.md") { fs.removeSync(path); }
     }
   });
 
-  describe("When directory with same name doesn't exist", function () {
-    assertInit("testproject", false);
+  it("When directory with same name doesn't exist", async function () {
+    const projectName = "testproject";
+    await createProject(projectName);
+
+    assert.isTrue(fs.existsSync(`./${projectName}`));
+    assert.isTrue(fs.existsSync(`./${projectName}/polar.config.js`));
   });
 
-  describe("When directory name has special character", function () {
-    assertInit("test-project", false);
+  it("When directory name has special character", async function () {
+    const projectName = "test-project";
+    await createProject(projectName);
+
+    assert.isTrue(fs.existsSync(`./${projectName}`));
+    assert.isTrue(fs.existsSync(`./${projectName}/polar.config.js`));
   });
 
-  describe("When directory with same name exists", function () {
+  it("When directory with same name exists", async function () {
     beforeEach(() => {
       fs.mkdirSync("./testproject");
     });
+    await createProject("testproject");
 
-    assertInit("testproject", true);
+    await expectPolarErrorAsync(
+      async () => await createProject("testproject"),
+      ERRORS.GENERAL.INIT_INSIDE_PROJECT
+    );
   });
 });

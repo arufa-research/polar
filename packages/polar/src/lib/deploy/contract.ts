@@ -9,7 +9,8 @@ import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
-import { Account, ContractInfo, PolarRuntimeEnvironment } from "../../types";
+import { Account, Checkpoints, DeployInfo, InstantiateInfo, PolarRuntimeEnvironment } from "../../types";
+import { loadCheckpoint } from "../checkpoints";
 import { getClient, getSigningClient } from "../client";
 
 export class Contract {
@@ -20,16 +21,19 @@ export class Contract {
   readonly client: CosmWasmClient;
 
   private codeId: number;
-  private readonly contractCodeHash: string;
   private contractAddress: string;
+  private checkpointData: Checkpoints;
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = contractName;
-    this.codeId = 0;
-    this.contractCodeHash = "mock_hash";
-    this.contractAddress = "mock_address";
+    this.codeId = -1;
+    this.contractAddress = "mockAddress";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
     this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
+
+    // Load checkpoints
+    const checkpointPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.yaml`);
+    this.checkpointData = loadCheckpoint(checkpointPath);
 
     this.env = env;
     this.client = getClient(env.network);
@@ -55,29 +59,38 @@ export class Contract {
       await signingClient.restClient.getCodeHashByCodeId(codeId);
 
     this.codeId = codeId;
+    const deployInfo: DeployInfo = {
+      codeId: codeId,
+      contractCodeHash: contractCodeHash,
+      deployTimestamp: String(new Date())
+    };
+    this.checkpointData[this.env.network.name] =
+      { ...this.checkpointData[this.env.network.name], deployInfo };
 
     return contractCodeHash;
   }
-
-  // async deployed() {
-
-  // }
 
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,
     account: Account
-  ): Promise<ContractInfo> {
+  ): Promise<InstantiateInfo> {
+    // check if contract is present in checkpoints
+    // checkpoints will be loaded with env
+    // structure yaml file with map
     const signingClient = await getSigningClient(this.env.network, (account));
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
-    return {
-      codeId: this.codeId,
-      contractCodeHash: this.contractCodeHash,
-      contractAddress: this.contractAddress
+    const instantiateInfo: InstantiateInfo = {
+      contractAddress: this.contractAddress,
+      instantiateTimestamp: String(new Date())
     };
+
+    this.checkpointData[this.env.network.name] =
+      { ...this.checkpointData[this.env.network.name], instantiateInfo };
+    return instantiateInfo;
   }
 
   // TODO: replace query and execute with methods from schema json

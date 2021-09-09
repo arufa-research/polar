@@ -23,10 +23,25 @@ export interface Account {
   mnemonic: string
 }
 
-export interface ContractInfo {
+export interface Checkpoints {
+  [network: string]: CheckpointInfo
+}
+
+export interface CheckpointInfo {
+  deployInfo?: DeployInfo
+  instantiateInfo?: InstantiateInfo
+  metadata?: Map<string, string>
+}
+
+export interface InstantiateInfo {
+  contractAddress: string
+  instantiateTimestamp: string
+}
+
+export interface DeployInfo {
   codeId: number
   contractCodeHash: string
-  contractAddress: string
+  deployTimestamp: string
 }
 
 export type PolarNetworkAccountsUserConfig = Account[];

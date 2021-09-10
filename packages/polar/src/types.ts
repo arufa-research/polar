@@ -337,3 +337,41 @@ export type PromiseAny = Promise<any>;
 export interface StrMap {
   [key: string]: string
 }
+
+// schema related types
+
+export type AnyJson =
+  string | number | boolean | null | undefined | AnyJson[] | { [index: string]: AnyJson };
+
+export type AnyFunction = (...args: any[]) => any;
+
+export type AnyNumber = bigint | Uint8Array | number | string; // late add BN if big number is req
+
+export type AnyString = string | string;
+
+export type AnyU8a = Uint8Array | number[] | string;
+
+// export type TransactionParams = (CodecArg | Partial<CallOverrides>)[];
+export type ContractFunction<T = any> = (
+  ...args: any[]
+) => Promise<T>;
+
+// export interface ContractCallOutcome {
+//   // debugMessage: Text;
+//   // gasConsumed: u64;
+//   // gasRequired: u64;
+//   // output: Codec | null;
+//   // result: ContractExecResultResult;
+// }
+
+// export interface TransactionResponse {
+//   from: string;
+//   txHash?: string;
+//   blockHash?: string;
+//   // error?: {
+//   //   message?: any;
+//   //   data?: any;
+//   // };
+//   // result: SubmittableResult;
+//   // events?: DecodedEvent[];
+// }

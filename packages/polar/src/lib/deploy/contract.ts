@@ -9,13 +9,48 @@ import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
-import { Account, ContractInfo, PolarRuntimeEnvironment } from "../../types";
+import type {
+  Account,
+  AnyJson,
+  ContractFunction,
+  ContractInfo,
+  PolarRuntimeEnvironment
+} from "../../types";
 import { getClient, getSigningClient } from "../client";
+import { Abi, AbiParam } from "./abi";
+
+function buildCall (
+  contract: Contract,
+  msgName: string,
+  argNames: AbiParam[]
+): ContractFunction<any> {
+  return async function (
+    ...args: any[]
+  ): Promise<any> {
+    if (args.length !== argNames.length) {
+      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
+      return;
+    }
+
+    const msgArgs: any = {};
+    argNames.forEach((abiParam, i) => {
+      msgArgs[abiParam.name] = args[i];
+    });
+
+    // Query the current count
+    return contract.queryMsg(msgName, msgArgs);
+  };
+}
 
 export class Contract {
   readonly contractName: string;
   readonly contractPath: string;
-  readonly schemaPath: string;
+  readonly initSchemaPath: string;
+  readonly querySchemaPath: string;
+  readonly executeSchemaPath: string;
+  readonly initAbi: Abi;
+  readonly queryAbi: Abi;
+  readonly executeAbi: Abi;
   readonly env: PolarRuntimeEnvironment;
   readonly client: CosmWasmClient;
 
@@ -23,13 +58,34 @@ export class Contract {
   private readonly contractCodeHash: string;
   private contractAddress: string;
 
+  public query: {
+    [name: string]: ContractFunction<any>
+  };
+
+  public tx: {
+    [name: string]: ContractFunction<any>
+  };
+
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = contractName;
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
-    this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
+
+    this.initSchemaPath = path.join(SCHEMA_DIR, contractName, "init_msg.json");
+    this.querySchemaPath = path.join(SCHEMA_DIR, contractName, "query_msg.json");
+    this.executeSchemaPath = path.join(SCHEMA_DIR, contractName, "handle_msg.json");
+
+    const initSchemaJson: AnyJson = fs.readJsonSync(this.initSchemaPath);
+    const querySchemaJson: AnyJson = fs.readJsonSync(this.querySchemaPath);
+    const executeSchemaJson: AnyJson = fs.readJsonSync(this.executeSchemaPath);
+    this.initAbi = new Abi(initSchemaJson);
+    this.queryAbi = new Abi(querySchemaJson);
+    this.executeAbi = new Abi(executeSchemaJson);
+
+    this.query = {};
+    this.tx = {};
 
     this.env = env;
     this.client = getClient(env.network);
@@ -40,9 +96,41 @@ export class Contract {
       });
     }
 
-    if (!fs.existsSync(this.schemaPath)) {
-      console.log("Warning: Schema not found for contract ", chalk.cyan(contractName));
+    if (!fs.existsSync(this.initSchemaPath)) {
+      console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
     }
+
+    if (!fs.existsSync(this.querySchemaPath)) {
+      console.log("Warning: Query schema not found for contract ", chalk.cyan(contractName));
+    }
+
+    if (!fs.existsSync(this.executeSchemaPath)) {
+      console.log("Warning: Execute schema not found for contract ", chalk.cyan(contractName));
+    }
+  }
+
+  async parseSchema (): Promise<void> {
+    await this.initAbi.parseSchema();
+    await this.queryAbi.parseSchema();
+    await this.executeAbi.parseSchema();
+
+    for (const message of this.queryAbi.messages) {
+      const msgName: string = message.identifier;
+      const args: AbiParam[] = message.args;
+
+      if (this.query[msgName] == null) {
+        this.query[msgName] = buildCall(this, msgName, args);
+      }
+    }
+
+    // for (const message in this.executeAbi.messages) {
+    //   const msgName: string = message.msgName;
+    //   const args: string[] = message.args;
+
+    //   // if (this.tx[msgName] == null) {
+    //   //   this.tx[msgName] = buildSend(this, msgName, args);
+    //   // }
+    // }
   }
 
   async deploy (account: Account): Promise<string> {
@@ -80,16 +168,16 @@ export class Contract {
     };
   }
 
-  // TODO: replace query and execute with methods from schema json
-  async query (methodName: string): Promise<void> {
+  async queryMsg (
+    methodName: string,
+    callArgs: object // eslint-disable-line @typescript-eslint/ban-types
+  ): Promise<void> {
     // Query the current count
     console.log('Querying contract for ', methodName);
-    const response = await this.client.queryContractSmart(this.contractAddress, { methodName: {} });
-
-    // console.log(`Count=${response.count}`);
+    return await this.client.queryContractSmart(this.contractAddress, { methodName: callArgs });
   }
 
-  async execute (methodName: string): Promise<void> {
+  async executeMsg (methodName: string): Promise<void> {
     // Increment the counter with a multimessage
     const handleMsg = { increment: {} };
 

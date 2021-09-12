@@ -9,6 +9,7 @@ import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
+import { compress } from "../../lib/deploy/compress";
 import type {
   Account,
   AnyJson,
@@ -16,7 +17,7 @@ import type {
   ContractInfo,
   PolarRuntimeEnvironment
 } from "../../types";
-import { getClient, getSigningClient, ExecuteResult } from "../client";
+import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
 function buildCall (
@@ -89,7 +90,7 @@ export class Contract {
   readonly client: CosmWasmClient;
 
   private codeId: number;
-  private readonly contractCodeHash: string;
+  private contractCodeHash: string;
   private contractAddress: string;
 
   public query: {
@@ -104,18 +105,13 @@ export class Contract {
     this.contractName = contractName.replace('-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
-    this.contractAddress = "mock_address";
-    this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}.wasm`);
+    this.contractAddress = "secret15l3z73lvy0357qrnyhcfpcxhdrxc209wpvkayl";
+    this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
     this.querySchemaPath = path.join(SCHEMA_DIR, this.contractName, "query_msg.json");
     this.executeSchemaPath = path.join(SCHEMA_DIR, this.contractName, "handle_msg.json");
 
-    if (!fs.existsSync(this.contractPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.NOT_FOUND, {
-        param: contractName
-      });
-    }
     if (!fs.existsSync(this.initSchemaPath)) {
       console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
     }
@@ -164,15 +160,18 @@ export class Contract {
   }
 
   async deploy (account: Account): Promise<string> {
+    await compress(this.contractName);
+
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    const signingClient = await getSigningClient(this.env.network, (account));
+    const signingClient = await getSigningClient(this.env.network, account);
     const uploadReceipt = await signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
       await signingClient.restClient.getCodeHashByCodeId(codeId);
 
     this.codeId = codeId;
+    this.contractCodeHash = contractCodeHash;
 
     return contractCodeHash;
   }
@@ -204,7 +203,10 @@ export class Contract {
   ): Promise<any> {
     // Query the contract
     console.log('Querying contract for ', methodName);
-    return await this.client.queryContractSmart(this.contractAddress, { methodName: callArgs });
+    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    msgData[methodName] = callArgs;
+    console.log(this.contractAddress, msgData);
+    return await this.client.queryContractSmart(this.contractAddress, msgData);
   }
 
   async executeMsg (
@@ -215,10 +217,13 @@ export class Contract {
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, (account));
 
+    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    msgData[methodName] = callArgs;
+    console.log(this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
     return await signingClient.execute(
       this.contractAddress,
-      callArgs
+      msgData
     );
   }
 }

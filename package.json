@@ -44,7 +44,7 @@
     "typescript": "^4.2.4"
   },
   "lint-staged": {
-    "**/{src,test,scripts}/**/*.{ts,js}": [
+    "**/{src,test}/**/*.{ts,js}": [
       "eslint --format stylish --fix"
     ]
   }

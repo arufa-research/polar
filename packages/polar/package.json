@@ -15,9 +15,9 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --build .",
-    "lint": "eslint --ext .js,.ts src",
-    "lint:fix": "eslint --fix --ext .js,.ts src",
-    "lint:unix": "eslint --format unix --ext .js,.ts src",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "eslint --fix --ext .ts src",
+    "lint:unix": "eslint --format unix --ext .ts src",
     "build:watch": "tsc -w -p .",
     "test": "mocha",
     "prepublish": "yarn build",

@@ -72,7 +72,7 @@ function buildSend (
       msgArgs[abiParam.name] = args[i];
     });
 
-    // Query the current count
+    // Execute function (write)
     return contract.executeMsg(msgName, msgArgs, account);
   };
 }

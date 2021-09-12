@@ -1,5 +1,5 @@
 import { info } from "console";
-import { CosmWasmClient, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
+import { CosmWasmClient, Secp256k1Pen, SigningCosmWasmClient, ExecuteResult } from "secretjs";
 
 import { Account, Network } from "../types";
 
@@ -25,3 +25,5 @@ export async function getSigningClient (
     network.config.broadCastMode
   );
 }
+
+export { ExecuteResult };

@@ -1,5 +1,5 @@
 import { info } from "console";
-import { CosmWasmClient, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
+import { CosmWasmClient, ExecuteResult, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
 
 import { Account, Network } from "../types";
 
@@ -14,7 +14,7 @@ export async function getSigningClient (
   network: Network,
   account: Account
 ): Promise<SigningCosmWasmClient> {
-  info(`Creating client for network: ${network.name}`);
+  info(`Creating signing client for network: ${network.name}`);
   const signingPen = await Secp256k1Pen.fromMnemonic(account.mnemonic);
   return new SigningCosmWasmClient(
     network.config.endpoint,
@@ -25,3 +25,5 @@ export async function getSigningClient (
     network.config.broadCastMode
   );
 }
+
+export { ExecuteResult };

@@ -38,7 +38,7 @@ function buildCall (
       msgArgs[abiParam.name] = args[i];
     });
 
-    // Query the current count
+    // Query function
     return contract.queryMsg(msgName, msgArgs);
   };
 }

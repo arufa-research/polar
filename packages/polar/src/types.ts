@@ -355,23 +355,3 @@ export type AnyU8a = Uint8Array | number[] | string;
 export type ContractFunction<T = any> = (
   ...args: any[]
 ) => Promise<T>;
-
-// export interface ContractCallOutcome {
-//   // debugMessage: Text;
-//   // gasConsumed: u64;
-//   // gasRequired: u64;
-//   // output: Codec | null;
-//   // result: ContractExecResultResult;
-// }
-
-// export interface TransactionResponse {
-//   from: string;
-//   txHash?: string;
-//   blockHash?: string;
-//   // error?: {
-//   //   message?: any;
-//   //   data?: any;
-//   // };
-//   // result: SubmittableResult;
-//   // events?: DecodedEvent[];
-// }

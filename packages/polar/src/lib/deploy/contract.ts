@@ -176,10 +176,6 @@ export class Contract {
     return contractCodeHash;
   }
 
-  // async deployed() {
-
-  // }
-
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,

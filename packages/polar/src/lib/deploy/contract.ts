@@ -55,7 +55,11 @@ function buildSend (
       return;
     }
 
-    if (args[args.length - 1].address === undefined || args[args.length - 1].name === undefined || args[args.length - 1].mnemonic === undefined ) {
+    if (
+      args[args.length - 1].address === undefined ||
+      args[args.length - 1].name === undefined ||
+      args[args.length - 1].mnemonic === undefined
+    ) {
       console.error(`Invalid ${msgName} call. Last argument should be an account object.`);
       return;
     }
@@ -214,7 +218,7 @@ export class Contract {
     // Send the same handleMsg to increment multiple times
     return await signingClient.execute(
       this.contractAddress,
-      callArgs,
+      callArgs
     );
   }
 }

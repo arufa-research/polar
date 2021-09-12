@@ -66,7 +66,7 @@ export function checkEnv (
   if (!cargoCurrVersion) {
     console.log(`Error: rustc not installed.`);
     return false;
-  } else if (!cargoCurrVersion || semver.lt(cargoCurrVersion, cargoVersion)) {
+  } else if (semver.lt(cargoCurrVersion, cargoVersion)) {
     if (cargoCurrVersion) {
       console.log(`Error: cargo version ${chalk.green(cargoCurrVersion)} installed, required ${chalk.green(cargoVersion)}.`);
     }

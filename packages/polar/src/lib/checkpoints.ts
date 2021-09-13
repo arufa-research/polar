@@ -7,7 +7,7 @@ import { Checkpoints } from "../types";
 export function loadCheckpoint (checkpointName: string): Checkpoints {
   const checkpoints = loadFromYamlFileSilent(checkpointName, { mapAsMap: false });
   for (const k of Object.keys(checkpoints)) {
-    checkpoints[k].metadata = toMap(checkpoints[k].metadata);
+    if (checkpoints[k]?.metadata) { checkpoints[k].metadata = toMap(checkpoints[k].metadata); }
   }
   return checkpoints;
 }

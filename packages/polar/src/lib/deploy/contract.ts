@@ -174,8 +174,9 @@ export class Contract {
   }
 
   async deploy (account: Account): Promise<DeployInfo> {
-    const info = this.checkpointData[this.env.network.name].deployInfo;
+    const info = this.checkpointData[this.env.network.name]?.deployInfo;
     if (info) {
+      console.log("Warning: contract already deployed, using checkpoints");
       return info;
     }
     await compress(this.contractName);
@@ -207,8 +208,9 @@ export class Contract {
     label: string,
     account: Account
   ): Promise<InstantiateInfo> {
-    const info = this.checkpointData[this.env.network.name].instantiateInfo;
+    const info = this.checkpointData[this.env.network.name]?.instantiateInfo;
     if (info) {
+      console.log("Warning: contract already instantiated, using checkpoints");
       return info;
     }
     const signingClient = await getSigningClient(this.env.network, (account));

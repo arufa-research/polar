@@ -25,7 +25,7 @@ export async function compress (
   }
   const paths = readdirSync(CONTRACTS_DIR);
   if (paths.includes("Cargo.toml")) { // Only one contract in the contracts dir and compile in contracts dir only
-    const dockerCmd = `docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
+    const dockerCmd = `sudo docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/code/target \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
                   cosmwasm/rust-optimizer:${singleImageVersion}`;
@@ -37,7 +37,7 @@ export async function compress (
     fs.rmdirSync(path.join(CONTRACTS_DIR, "artifacts"), { recursive: true });
     console.log(`Created file ${path.join(CONTRACTS_OUT_DIR, `${contractName}.wasm`)}`);
   } else { // Multiple contracts and each should be compiled by going inside each of them
-    const dockerCmd = `docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
+    const dockerCmd = `sudo docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/code/target \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
                   cosmwasm/workspace-optimizer:${multiImageVersion}`;

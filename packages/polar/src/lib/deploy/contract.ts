@@ -138,7 +138,7 @@ export class Contract {
     this.tx = {};
 
     // Load checkpoints
-    this.checkpointPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}.yaml`);
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
     // file exist load it else create new checkpoint
     if (fs.existsSync(this.checkpointPath)) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);

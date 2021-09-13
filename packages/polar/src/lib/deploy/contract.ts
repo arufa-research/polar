@@ -105,7 +105,7 @@ export class Contract {
     this.contractName = contractName.replace('-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
-    this.contractAddress = "secret15l3z73lvy0357qrnyhcfpcxhdrxc209wpvkayl";
+    this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
@@ -191,6 +191,11 @@ export class Contract {
     label: string,
     account: Account
   ): Promise<ContractInfo> {
+    if (this.contractCodeHash === "mock_hash") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_DEPLOYED, {
+        param: this.contractName
+      });
+    }
     const signingClient = await getSigningClient(this.env.network, (account));
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
@@ -207,6 +212,11 @@ export class Contract {
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
   ): Promise<any> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Query the contract
     console.log('Querying contract for ', methodName);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
@@ -220,6 +230,11 @@ export class Contract {
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     account: Account
   ): Promise<ExecuteResult> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, (account));
 

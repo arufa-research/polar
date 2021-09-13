@@ -217,6 +217,20 @@ Please check that the configured keypair are correct.`,
       title: "Account not passed",
       description: `You are trying to deploy/init/execute %contractName% without an Account.`,
       shouldBeReported: false
+    },
+    CONTRACT_NOT_DEPLOYED: {
+      number: 22,
+      message: "Contract %contractName% is not deployed on given network.",
+      title: "Contract not deployed",
+      description: `You are trying to init/execute/query %contractName% without deploying first.`,
+      shouldBeReported: false
+    },
+    CONTRACT_NOT_INSTANTIATED: {
+      number: 23,
+      message: "Contract %contractName% is not instantiated on given network.",
+      title: "Contract not instantiated",
+      description: `You are trying to execute/query %contractName% without instantiating first.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

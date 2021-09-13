@@ -137,6 +137,16 @@ export class Contract {
   }
 
   async parseSchema (): Promise<void> {
+    if (!fs.existsSync(this.querySchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
+    if (!fs.existsSync(this.executeSchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
     await this.queryAbi.parseSchema();
     await this.executeAbi.parseSchema();
 

@@ -44,7 +44,7 @@ export async function compile (
     compileContract(dir, docker);
     generateSchema(dir, docker);
     createArtifacts(
-      path.join(dir, TARGET_DIR), SCHEMA_DIR, path.join(ARTIFACTS_DIR, dir), docker
+      path.join(dir, TARGET_DIR), path.join(ARTIFACTS_DIR, "schema"), path.join(ARTIFACTS_DIR, dir), path.join(dir, "schema"), docker
     );
   }
 }
@@ -82,6 +82,7 @@ export function createArtifacts (
   targetDir: string,
   schemaDir: string,
   artifactsDir: string,
+  sourceSchemaDir: string,
   docker: boolean
 ): void {
   const paths = fs.readdirSync(targetDir);
@@ -106,7 +107,6 @@ export function createArtifacts (
     fs.copyFileSync(sourcePath, destPath);
   }
 
-  const sourceSchemaDir = "contracts/schema";
   const schemaPaths = fs.readdirSync(sourceSchemaDir);
 
   for (const p of schemaPaths) {

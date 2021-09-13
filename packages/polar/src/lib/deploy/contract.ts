@@ -19,7 +19,7 @@ import type {
   InstantiateInfo,
   PolarRuntimeEnvironment
 } from "../../types";
-import { loadCheckpoint } from "../checkpoints";
+import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
@@ -96,6 +96,7 @@ export class Contract {
   private contractCodeHash: string;
   private contractAddress: string;
   private checkpointData: Checkpoints;
+  private readonly checkpointPath: string;
 
   public query: {
     [name: string]: ContractFunction<any>
@@ -109,7 +110,7 @@ export class Contract {
     this.contractName = contractName.replace('-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
-    this.contractAddress = "secret15l3z73lvy0357qrnyhcfpcxhdrxc209wpvkayl";
+    this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
@@ -137,8 +138,13 @@ export class Contract {
     this.tx = {};
 
     // Load checkpoints
-    const checkpointPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.yaml`);
-    this.checkpointData = loadCheckpoint(checkpointPath);
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}.yaml`);
+    // file exist load it else create new checkpoint
+    if (fs.existsSync(this.checkpointPath)) {
+      this.checkpointData = loadCheckpoint(this.checkpointPath);
+    } else {
+      this.checkpointData = {};
+    }
 
     this.env = env;
     this.client = getClient(env.network);
@@ -167,7 +173,11 @@ export class Contract {
     }
   }
 
-  async deploy (account: Account): Promise<string> {
+  async deploy (account: Account): Promise<DeployInfo> {
+    const info = this.checkpointData[this.env.network.name].deployInfo;
+    if (info) {
+      return info;
+    }
     await compress(this.contractName);
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
@@ -187,8 +197,9 @@ export class Contract {
     this.checkpointData[this.env.network.name] =
       { ...this.checkpointData[this.env.network.name], deployInfo };
     this.contractCodeHash = contractCodeHash;
+    persistCheckpoint(this.checkpointPath, this.checkpointData);
 
-    return contractCodeHash;
+    return deployInfo;
   }
 
   async instantiate (
@@ -196,9 +207,10 @@ export class Contract {
     label: string,
     account: Account
   ): Promise<InstantiateInfo> {
-    // check if contract is present in checkpoints
-    // checkpoints will be loaded with env
-    // structure yaml file with map
+    const info = this.checkpointData[this.env.network.name].instantiateInfo;
+    if (info) {
+      return info;
+    }
     const signingClient = await getSigningClient(this.env.network, (account));
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
@@ -211,6 +223,7 @@ export class Contract {
 
     this.checkpointData[this.env.network.name] =
       { ...this.checkpointData[this.env.network.name], instantiateInfo };
+    persistCheckpoint(this.checkpointPath, this.checkpointData);
     return instantiateInfo;
   }
 

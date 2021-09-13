@@ -1,5 +1,7 @@
 import { CosmWasmClient } from "secretjs";
 
+import { PolarError } from "../internal/core/errors";
+import { ERRORS } from "../internal/core/errors-list";
 import { Account, PolarRuntimeEnvironment, UserAccount } from "../types";
 import { getClient } from "./client";
 
@@ -40,12 +42,12 @@ export class UserAccountI implements UserAccount {
 export function getAccountByName (name: string, env: PolarRuntimeEnvironment): UserAccount {
   console.log(env.network);
   if (env.network.config.accounts === undefined) {
-    throw new Error("Aakdkh");
+    throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
   }
   for (const value of env.network.config.accounts) {
     if (value.name === name) {
       return new UserAccountI(value, env);
     }
   }
-  throw new Error("sfd");
+  throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
 }

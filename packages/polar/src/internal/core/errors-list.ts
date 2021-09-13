@@ -217,6 +217,13 @@ Please check that the configured keypair are correct.`,
       title: "Account not passed",
       description: `You are trying to deploy/init/execute %contractName% without an Account.`,
       shouldBeReported: false
+    },
+    ACCOUNT_DOES_NOT_EXIST: {
+      number: 22,
+      message: "Account with %name% doesn't exist in polar.config.js.",
+      title: "Account doesn't exist",
+      description: `Account not present in polar config.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

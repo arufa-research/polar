@@ -14,8 +14,6 @@ import {
   SCHEMA_DIR,
   TARGET_DIR
 } from "../../internal/core/project-structure";
-// eslint-disable-next-line
-import { cmpStr } from "../../internal/util/strings";
 
 export async function compile (
   docker: boolean,

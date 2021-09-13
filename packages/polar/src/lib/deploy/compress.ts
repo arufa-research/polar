@@ -5,8 +5,6 @@ import path from "path";
 
 import {
   ARTIFACTS_DIR,
-  // eslint-disable-next-line
-  assertDir,
   CONTRACTS_DIR,
   CONTRACTS_OUT_DIR,
   multiImageVersion,

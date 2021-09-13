@@ -23,6 +23,11 @@ export interface Account {
   mnemonic: string
 }
 
+export interface UserAccount {
+  account: Account
+  getBalance: () => Promise<any>
+}
+
 export interface ContractInfo {
   codeId: number
   contractCodeHash: string

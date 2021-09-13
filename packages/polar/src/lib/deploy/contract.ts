@@ -9,27 +9,132 @@ import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
-import { Account, Checkpoints, DeployInfo, InstantiateInfo, PolarRuntimeEnvironment } from "../../types";
+import { compress } from "../../lib/deploy/compress";
+import type {
+  Account,
+  AnyJson,
+  Checkpoints,
+  ContractFunction,
+  DeployInfo,
+  InstantiateInfo,
+  PolarRuntimeEnvironment
+} from "../../types";
 import { loadCheckpoint } from "../checkpoints";
-import { getClient, getSigningClient } from "../client";
+import { ExecuteResult, getClient, getSigningClient } from "../client";
+import { Abi, AbiParam } from "./abi";
+
+function buildCall (
+  contract: Contract,
+  msgName: string,
+  argNames: AbiParam[]
+): ContractFunction<any> {
+  return async function (
+    ...args: any[]
+  ): Promise<any> {
+    if (args.length !== argNames.length) {
+      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
+      return;
+    }
+
+    const msgArgs: any = {};
+    argNames.forEach((abiParam, i) => {
+      msgArgs[abiParam.name] = args[i];
+    });
+
+    // Query function
+    return contract.queryMsg(msgName, msgArgs);
+  };
+}
+
+function buildSend (
+  contract: Contract,
+  msgName: string,
+  argNames: AbiParam[]
+): ContractFunction<any> {
+  return async function (
+    ...args: any[]
+  ): Promise<any> {
+    if (args.length !== argNames.length + 1) {
+      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length + 1}`);
+      return;
+    }
+
+    if (
+      args[args.length - 1].address === undefined ||
+      args[args.length - 1].name === undefined ||
+      args[args.length - 1].mnemonic === undefined
+    ) {
+      console.error(`Invalid ${msgName} call. Last argument should be an account object.`);
+      return;
+    }
+
+    const account: Account = (args[args.length - 1] as Account);
+
+    const msgArgs: any = {};
+    argNames.forEach((abiParam, i) => {
+      msgArgs[abiParam.name] = args[i];
+    });
+
+    // Execute function (write)
+    return contract.executeMsg(msgName, msgArgs, account);
+  };
+}
 
 export class Contract {
   readonly contractName: string;
   readonly contractPath: string;
-  readonly schemaPath: string;
+  readonly initSchemaPath: string;
+  readonly querySchemaPath: string;
+  readonly executeSchemaPath: string;
+  readonly initAbi: Abi;
+  readonly queryAbi: Abi;
+  readonly executeAbi: Abi;
   readonly env: PolarRuntimeEnvironment;
   readonly client: CosmWasmClient;
 
   private codeId: number;
+  private contractCodeHash: string;
   private contractAddress: string;
   private checkpointData: Checkpoints;
 
+  public query: {
+    [name: string]: ContractFunction<any>
+  };
+
+  public tx: {
+    [name: string]: ContractFunction<any>
+  };
+
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
-    this.contractName = contractName;
-    this.codeId = -1;
-    this.contractAddress = "mockAddress";
-    this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.wasm`);
-    this.schemaPath = path.join(SCHEMA_DIR, `${contractName}.json`);
+    this.contractName = contractName.replace('-', '_');
+    this.codeId = 0;
+    this.contractCodeHash = "mock_hash";
+    this.contractAddress = "secret15l3z73lvy0357qrnyhcfpcxhdrxc209wpvkayl";
+    this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
+
+    this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
+    this.querySchemaPath = path.join(SCHEMA_DIR, this.contractName, "query_msg.json");
+    this.executeSchemaPath = path.join(SCHEMA_DIR, this.contractName, "handle_msg.json");
+
+    if (!fs.existsSync(this.initSchemaPath)) {
+      console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
+    }
+    if (!fs.existsSync(this.querySchemaPath)) {
+      console.log("Warning: Query schema not found for contract ", chalk.cyan(contractName));
+    }
+    if (!fs.existsSync(this.executeSchemaPath)) {
+      console.log("Warning: Execute schema not found for contract ", chalk.cyan(contractName));
+    }
+
+    const initSchemaJson: AnyJson = fs.readJsonSync(this.initSchemaPath);
+    const querySchemaJson: AnyJson = fs.readJsonSync(this.querySchemaPath);
+    const executeSchemaJson: AnyJson = fs.readJsonSync(this.executeSchemaPath);
+    this.initAbi = new Abi(initSchemaJson);
+    this.queryAbi = new Abi(querySchemaJson);
+    this.executeAbi = new Abi(executeSchemaJson);
+
+    this.query = {};
+    this.tx = {};
 
     // Load checkpoints
     const checkpointPath = path.join(ARTIFACTS_DIR, "contracts", `${contractName}.yaml`);
@@ -37,22 +142,37 @@ export class Contract {
 
     this.env = env;
     this.client = getClient(env.network);
+  }
 
-    if (!fs.existsSync(this.contractPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.NOT_FOUND, {
-        param: this.contractName
-      });
+  async parseSchema (): Promise<void> {
+    await this.queryAbi.parseSchema();
+    await this.executeAbi.parseSchema();
+
+    for (const message of this.queryAbi.messages) {
+      const msgName: string = message.identifier;
+      const args: AbiParam[] = message.args;
+
+      if (this.query[msgName] == null) {
+        this.query[msgName] = buildCall(this, msgName, args);
+      }
     }
 
-    if (!fs.existsSync(this.schemaPath)) {
-      console.log("Warning: Schema not found for contract ", chalk.cyan(contractName));
+    for (const message of this.executeAbi.messages) {
+      const msgName: string = message.identifier;
+      const args: AbiParam[] = message.args;
+
+      if (this.tx[msgName] == null) {
+        this.tx[msgName] = buildSend(this, msgName, args);
+      }
     }
   }
 
   async deploy (account: Account): Promise<string> {
+    await compress(this.contractName);
+
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    const signingClient = await getSigningClient(this.env.network, (account));
+    const signingClient = await getSigningClient(this.env.network, account);
     const uploadReceipt = await signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
@@ -66,6 +186,7 @@ export class Contract {
     };
     this.checkpointData[this.env.network.name] =
       { ...this.checkpointData[this.env.network.name], deployInfo };
+    this.contractCodeHash = contractCodeHash;
 
     return contractCodeHash;
   }
@@ -93,32 +214,33 @@ export class Contract {
     return instantiateInfo;
   }
 
-  // TODO: replace query and execute with methods from schema json
-  async query (methodName: string): Promise<void> {
-    // Query the current count
+  async queryMsg (
+    methodName: string,
+    callArgs: object // eslint-disable-line @typescript-eslint/ban-types
+  ): Promise<any> {
+    // Query the contract
     console.log('Querying contract for ', methodName);
-    const response = await this.client.queryContractSmart(this.contractAddress, { methodName: {} });
-
-    // console.log(`Count=${response.count}`);
+    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    msgData[methodName] = callArgs;
+    console.log(this.contractAddress, msgData);
+    return await this.client.queryContractSmart(this.contractAddress, msgData);
   }
 
-  async execute (methodName: string): Promise<void> {
-    // Increment the counter with a multimessage
-    const handleMsg = { increment: {} };
+  async executeMsg (
+    methodName: string,
+    callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
+    account: Account
+  ): Promise<ExecuteResult> {
+    // Send execute msg to the contract
+    const signingClient = await getSigningClient(this.env.network, (account));
 
+    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    msgData[methodName] = callArgs;
+    console.log(this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
-    // const response = await this.signingClient.multiExecute(
-    //   [
-    //     {
-    //       this.contractAddress,
-    //       handleMsg
-    //     },
-    //     {
-    //       this.contractAddress,
-    //       handleMsg
-    //     },
-    //   ]
-    // );
-    // console.log('response: ', response);
+    return await signingClient.execute(
+      this.contractAddress,
+      msgData
+    );
   }
 }

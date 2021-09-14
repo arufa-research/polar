@@ -142,6 +142,12 @@ export class Contract {
     // file exist load it else create new checkpoint
     if (fs.existsSync(this.checkpointPath)) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
+      const contractHash = this.checkpointData[env.network.name].deployInfo?.contractCodeHash;
+      const contractCodeId = this.checkpointData[env.network.name].deployInfo?.codeId;
+      const contractAddr = this.checkpointData[env.network.name].instantiateInfo?.contractAddress;
+      this.contractCodeHash = contractHash ?? "mock_hash";
+      this.codeId = contractCodeId ?? 0;
+      this.contractAddress = contractAddr ?? "mock_address";
     } else {
       this.checkpointData = {};
     }

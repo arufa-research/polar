@@ -224,6 +224,13 @@ Please check that the configured keypair are correct.`,
       title: "Account doesn't exist",
       description: `Account not present in polar config.`,
       shouldBeReported: false
+    },
+    BALANCE_UNDEFINED: {
+      number: 23,
+      message: "Balance with account %name% is undefined",
+      title: "Balance Undefined",
+      description: `You are trying to fetch balance from an account with undefined balance.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

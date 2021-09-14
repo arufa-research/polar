@@ -4,6 +4,7 @@ import type { AnyJson } from '../../types';
 
 export interface AbiParam {
   name: string
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   type: any
 }
 
@@ -12,6 +13,7 @@ export interface AbiMessage {
   docs?: string[]
   identifier: string
   isConstructor?: boolean
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   returnType?: any
 }
 
@@ -26,7 +28,7 @@ export class Abi {
 
   async parseSchema (): Promise<void> {
     const parseExecuteMsg = async (schema: ParseSchema): Promise<AbiMessage[]> => {
-      const tree: ExecuteMsgNode = (await parseSchema(schema)) as ExecuteMsgNode;
+      const tree: ExecuteMsgNode = (await parseSchema(schema));
 
       const messages: AbiMessage[] = [];
       tree.value.variants.forEach((variant) => {

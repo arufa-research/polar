@@ -1,8 +1,9 @@
 import { CosmWasmClient } from "secretjs";
+import { PubKey } from "secretjs/types/types";
 
 import { PolarError } from "../internal/core/errors";
 import { ERRORS } from "../internal/core/errors-list";
-import { Account, PolarRuntimeEnvironment, UserAccount } from "../types";
+import { Account, Coin, PolarRuntimeEnvironment, UserAccount } from "../types";
 import { getClient } from "./client";
 
 export class UserAccountI implements UserAccount {
@@ -13,36 +14,40 @@ export class UserAccountI implements UserAccount {
     this.account = account;
     this.client = getClient(env.network);
   }
-  // eslint-disable-next-line
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   async getAccountInfo (): Promise<any> {
     return await this.client.getAccount(this.account.address);
   }
-  // eslint-disable-next-line
-  async getBalance (): Promise<any> {
+
+  async getBalance (): Promise<readonly Coin[]> {
     const info = await this.client.getAccount(this.account.address);
     if (info?.balance === undefined) {
       throw new PolarError(ERRORS.GENERAL.BALANCE_UNDEFINED);
     }
     return info?.balance;
   }
-  // eslint-disable-next-line
-  async getPublicKey (): Promise<any> {
+
+  async getPublicKey (): Promise<PubKey | undefined> {
     const info = await this.client.getAccount(this.account.address);
     return info?.pubkey;
   }
-  // eslint-disable-next-line
-  async getAccountNumber (): Promise<any> {
+
+  async getAccountNumber (): Promise<number | undefined> {
     const info = await this.client.getAccount(this.account.address);
     return info?.accountNumber;
   }
-  // eslint-disable-next-line
-  async getSequence (): Promise<any> {
+
+  async getSequence (): Promise<number | undefined> {
     const info = await this.client.getAccount(this.account.address);
     return info?.sequence;
   }
 }
 
-export function getAccountByName (name: string, env: PolarRuntimeEnvironment): (Account | UserAccount) {
+export function getAccountByName (
+  name: string,
+  env: PolarRuntimeEnvironment
+): (Account | UserAccount) {
   if (env.network.config.accounts === undefined) {
     throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
   }

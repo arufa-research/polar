@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient } from "secretjs";
 
-import { PolarError } from "../../internal/core/errors";
-import { ERRORS } from "../../internal/core/errors-list";
+import { PolarError } from "../../internal/core/errors";// eslint-disable-line @typescript-eslint/no-unused-vars
+import { ERRORS } from "../../internal/core/errors-list";// eslint-disable-line @typescript-eslint/no-unused-vars
 import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
@@ -24,15 +24,16 @@ function buildCall (
   contract: Contract,
   msgName: string,
   argNames: AbiParam[]
-): ContractFunction<any> {
+): ContractFunction<string> {
   return async function (
-    ...args: any[]
+    ...args: string[]
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (args.length !== argNames.length) {
       console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
       return;
     }
-
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const msgArgs: any = {};
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
@@ -47,9 +48,10 @@ function buildSend (
   contract: Contract,
   msgName: string,
   argNames: AbiParam[]
-): ContractFunction<any> {
+): ContractFunction<string> {
   return async function (
-    ...args: any[]
+    ...args: string[]
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (args.length !== argNames.length + 1) {
       console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length + 1}`);
@@ -66,7 +68,7 @@ function buildSend (
     }
 
     const account: Account = (args[args.length - 1] as Account);
-
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const msgArgs: any = {};
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
@@ -94,11 +96,11 @@ export class Contract {
   private contractAddress: string;
 
   public query: {
-    [name: string]: ContractFunction<any>
+    [name: string]: ContractFunction<string>
   };
 
   public tx: {
-    [name: string]: ContractFunction<any>
+    [name: string]: ContractFunction<string>
   };
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
@@ -196,7 +198,7 @@ export class Contract {
   async queryMsg (
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     // Query the contract
     console.log('Querying contract for ', methodName);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types

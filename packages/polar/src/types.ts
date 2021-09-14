@@ -23,10 +23,14 @@ export interface Account {
   mnemonic: string
 }
 
+export interface Coin {
+  readonly denom: string
+  readonly amount: string
+}
+
 export interface UserAccount {
   account: Account
-  // eslint-disable-next-line
-  getBalance: () => Promise<any>
+  getBalance: () => Promise<readonly Coin[]>
 }
 
 export interface ContractInfo {
@@ -358,8 +362,6 @@ export type AnyString = string | string;
 export type AnyU8a = Uint8Array | number[] | string;
 
 // export type TransactionParams = (CodecArg | Partial<CallOverrides>)[];
-// eslint-disable-next-line
-export type ContractFunction<T = any> = (
-  // eslint-disable-next-line
-  ...args: any[]
+export type ContractFunction<T = string> = (
+  ...args: string[]
 ) => Promise<T>;

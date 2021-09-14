@@ -2,6 +2,7 @@ import { ExecuteMsgNode, ParseNode, ParseSchema, parseSchema, rustRepr } from "p
 
 import type { AnyJson } from '../../types';
 
+// TODO: add types here when rust types parsing is added later
 export interface AbiParam {
   name: string
   type: any

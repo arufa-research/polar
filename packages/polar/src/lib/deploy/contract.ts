@@ -151,6 +151,16 @@ export class Contract {
   }
 
   async parseSchema (): Promise<void> {
+    if (!fs.existsSync(this.querySchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
+    if (!fs.existsSync(this.executeSchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
     await this.queryAbi.parseSchema();
     await this.executeAbi.parseSchema();
 
@@ -208,6 +218,11 @@ export class Contract {
     label: string,
     account: Account
   ): Promise<InstantiateInfo> {
+    if (this.contractCodeHash === "mock_hash") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_DEPLOYED, {
+        param: this.contractName
+      });
+    }
     const info = this.checkpointData[this.env.network.name]?.instantiateInfo;
     if (info) {
       console.log("Warning: contract already instantiated, using checkpoints");
@@ -233,6 +248,11 @@ export class Contract {
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
   ): Promise<any> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Query the contract
     console.log('Querying contract for ', methodName);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
@@ -246,6 +266,11 @@ export class Contract {
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     account: Account
   ): Promise<ExecuteResult> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, (account));
 

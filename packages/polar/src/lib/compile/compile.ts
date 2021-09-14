@@ -14,8 +14,6 @@ import {
   SCHEMA_DIR,
   TARGET_DIR
 } from "../../internal/core/project-structure";
-// eslint-disable-next-line
-import { cmpStr } from "../../internal/util/strings";
 
 export async function compile (
   docker: boolean,
@@ -44,10 +42,18 @@ export async function compile (
 
   for (const dir of contractDirs) {
     compileContract(dir, docker);
+    generateSchema(dir, docker);
+    const contractName = readContractName(path.join(dir, "Cargo.toml"));
     createArtifacts(
-      path.join(dir, TARGET_DIR), SCHEMA_DIR, path.join(ARTIFACTS_DIR, dir), docker
+      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, dir), path.join(dir, "schema"), docker
     );
   }
+}
+
+export function readContractName (tomlFilePath: string): string {
+  const tomlFileContent: string = fs.readFileSync(tomlFilePath, 'utf-8');
+
+  return tomlFileContent.split('\n')[1].split("\"")[1].replace('-', '_');
 }
 
 export function compileContract (contractDir: string, docker: boolean): void {
@@ -74,7 +80,7 @@ export function generateSchema (contractDir: string, docker: boolean): void {
   console.log(`Creating schema for contract in directory: ${chalk.gray(contractDir)}`);
 
   // Creates schema .json files
-  execSync(`cargo schema`, { stdio: 'inherit' });
+  execSync(`cargo run --example schema`, { stdio: 'inherit' });
 
   process.chdir(currDir);
 }
@@ -83,9 +89,18 @@ export function createArtifacts (
   targetDir: string,
   schemaDir: string,
   artifactsDir: string,
+  sourceSchemaDir: string,
   docker: boolean
 ): void {
   const paths = fs.readdirSync(targetDir);
+
+  // create nested dirs if not present
+  if (!fs.existsSync(artifactsDir)) {
+    fs.mkdirSync(artifactsDir, { recursive: true });
+  }
+  if (!fs.existsSync(schemaDir)) {
+    fs.mkdirSync(schemaDir, { recursive: true });
+  }
 
   for (const p of paths) {
     const filename = path.basename(p);
@@ -95,26 +110,23 @@ export function createArtifacts (
 
     console.log(`Copying file ${filename} from ${chalk.gray(targetDir)} to ${chalk.gray(artifactsDir)}`);
     const sourcePath = path.resolve(targetDir, filename);
-    // create nested dirs if not present
-    if (!fs.existsSync(artifactsDir)) {
-      fs.mkdirSync(artifactsDir, { recursive: true });
-    }
     const destPath = path.resolve(artifactsDir, filename);
     fs.copyFileSync(sourcePath, destPath);
   }
 
-  // const schemaPaths = fs.readdirSync(schemaDir);
+  const schemaPaths = fs.readdirSync(sourceSchemaDir);
 
-  /* for (const p of schemaPaths) {
+  for (const p of schemaPaths) {
     const filename = path.basename(p);
     if (filename.split('.')[filename.split('.').length - 1] !== "json") {
       continue;
     }
 
     console.log(
-      `Copying file ${filename} from ${chalk.gray(schemaDir)}to ${chalk.gray(artifactsDir)}`);
-    const sourcePath = path.resolve(schemaDir, filename);
-    const destPath = path.resolve(artifactsDir, filename);
+      `Copying file ${filename} from ${chalk.gray(sourceSchemaDir)} to ${chalk.gray(schemaDir)}`
+    );
+    const sourcePath = path.resolve(sourceSchemaDir, filename);
+    const destPath = path.resolve(schemaDir, filename);
     fs.copyFileSync(sourcePath, destPath);
-  } */
+  }
 }

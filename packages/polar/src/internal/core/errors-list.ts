@@ -217,6 +217,20 @@ Please check that the configured keypair are correct.`,
       title: "Account not passed",
       description: `You are trying to deploy/init/execute %contractName% without an Account.`,
       shouldBeReported: false
+    },
+    CONTRACT_NOT_DEPLOYED: {
+      number: 22,
+      message: "Contract %contractName% is not deployed on given network.",
+      title: "Contract not deployed",
+      description: `You are trying to init/execute/query %contractName% without deploying first.`,
+      shouldBeReported: false
+    },
+    CONTRACT_NOT_INSTANTIATED: {
+      number: 23,
+      message: "Contract %contractName% is not instantiated on given network.",
+      title: "Contract not instantiated",
+      description: `You are trying to execute/query %contractName% without instantiating first.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {
@@ -923,6 +937,24 @@ Please use the fully qualified name of the contract to disambiguate it.`,
 
 Polar's artifact resolution is case sensitive to ensure projects are portable across different operating systems.`,
       shouldBeReported: true
+    },
+    QUERY_SCHEMA_NOT_FOUND: {
+      number: 703,
+      message: 'Query msg schema file for contract "%contractName%" not found.',
+      title: 'Query msg schema not found',
+      description: `Tried to parse a non-existing schema.
+
+Please double check that schema have been generated.`,
+      shouldBeReported: false
+    },
+    EXEC_SCHEMA_NOT_FOUND: {
+      number: 704,
+      message: 'Execute msg schema file for contract "%contractName%" not found.',
+      title: 'Execute msg schema not found',
+      description: `Tried to parse a non-existing schema.
+
+Please double check that schema have been generated.`,
+      shouldBeReported: false
     }
   },
   PLUGINS: {

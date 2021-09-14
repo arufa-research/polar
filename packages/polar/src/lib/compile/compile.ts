@@ -43,10 +43,17 @@ export async function compile (
   for (const dir of contractDirs) {
     compileContract(dir, docker);
     generateSchema(dir, docker);
+    const contractName = readContractName(path.join(dir, "Cargo.toml"));
     createArtifacts(
-      path.join(dir, TARGET_DIR), path.join(ARTIFACTS_DIR, "schema"), path.join(ARTIFACTS_DIR, dir), path.join(dir, "schema"), docker
+      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, dir), path.join(dir, "schema"), docker
     );
   }
+}
+
+export function readContractName (tomlFilePath: string): string {
+  const tomlFileContent: string = fs.readFileSync(tomlFilePath, 'utf-8');
+
+  return tomlFileContent.split('\n')[1].split("\"")[1].replace('-', '_');
 }
 
 export function compileContract (contractDir: string, docker: boolean): void {

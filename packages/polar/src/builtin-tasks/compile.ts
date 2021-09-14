@@ -11,7 +11,7 @@ export default function (): void {
     .addOptionalVariadicPositionalParam(
       "sourceDir",
       "Path for a specific contract to compile",
-      [] // yaha pr empty string
+      []
     )
     .addFlag("force", "recompile even if the source file didn't change")
     .setAction(compileTask);
@@ -19,7 +19,7 @@ export default function (): void {
 
 export interface TaskArgs {
   docker: boolean
-  sourceDir: string[] // bss string hi dio
+  sourceDir: string[]
   force: boolean
 }
 

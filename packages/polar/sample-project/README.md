@@ -8,6 +8,10 @@ The contract is created with a parameter for the initial count and allows subseq
 Use this command to compile your contracts: 
 `polar compile`
 
+# Run script
+
+`polar run scripts/sample-script.js`
+
 # Deploying contracts
 
 In `scripts`:

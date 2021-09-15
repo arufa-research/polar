@@ -109,7 +109,6 @@ export class Contract {
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = replaceAll(contractName, '-', '_');
-    console.log(this.contractName);
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";

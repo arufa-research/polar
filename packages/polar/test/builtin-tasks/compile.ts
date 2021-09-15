@@ -23,7 +23,6 @@ describe("Compile task", () => {
   describe("Compile multi contract", function () {
     useFixtureProject("multiproject");
     it("Should create .wasm files for  each contract", async function () {
-      console.log("compile-------------->");
       await compile(false, [], false);
 
       assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project.wasm`));

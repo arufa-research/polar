@@ -53,7 +53,8 @@ function buildSend (
   argNames: AbiParam[]
 ): ContractFunction<string> {
   return async function (
-    ...args: string[]
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    ...args: any[]
     // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   ): Promise<any> {
     if (args.length !== argNames.length + 1) {

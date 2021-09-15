@@ -9,6 +9,7 @@ import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
 } from "../../internal/core/project-structure";
+import { replaceAll } from "../../internal/util/strings";
 import { compress } from "../../lib/deploy/compress";
 import type {
   Account,
@@ -107,7 +108,7 @@ export class Contract {
   };
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
-    this.contractName = contractName.replace('-', '_');
+    this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";

@@ -13,8 +13,8 @@ export const TARGET_DIR = "target/wasm32-unknown-unknown/release/";
 export const SCHEMA_DIR = "artifacts/schema";
 export const SCRIPTS_DIR = "scripts";
 
-export const singleImageVersion = "0.11.5";
-export const multiImageVersion = "0.11.5";
+export const singleImageVersion = "0.12.0";
+export const multiImageVersion = "0.12.0";
 
 export function isCwdInsideProject (): boolean {
   return Boolean(findUp.sync(JS_CONFIG_FILENAME));

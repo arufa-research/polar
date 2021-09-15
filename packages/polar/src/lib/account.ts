@@ -1,4 +1,4 @@
-import { CosmWasmClient } from "secretjs";
+import { Account as WasmAccount, CosmWasmClient } from "secretjs";
 import { PubKey } from "secretjs/types/types";
 
 import { PolarError } from "../internal/core/errors";
@@ -15,8 +15,7 @@ export class UserAccountI implements UserAccount {
     this.client = getClient(env.network);
   }
 
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  async getAccountInfo (): Promise<any> {
+  async getAccountInfo (): Promise<WasmAccount | undefined> {
     return await this.client.getAccount(this.account.address);
   }
 

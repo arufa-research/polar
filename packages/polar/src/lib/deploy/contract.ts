@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient } from "secretjs";
 
-import { PolarError } from "../../internal/core/errors";// eslint-disable-line @typescript-eslint/no-unused-vars
-import { ERRORS } from "../../internal/core/errors-list";// eslint-disable-line @typescript-eslint/no-unused-vars
+import { PolarError } from "../../internal/core/errors";
+import { ERRORS } from "../../internal/core/errors-list";
 import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
@@ -28,17 +28,15 @@ function buildCall (
   contract: Contract,
   msgName: string,
   argNames: AbiParam[]
-): ContractFunction<string> {
+): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
-    ...args: string[]
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+    ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (args.length !== argNames.length) {
       console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
       return;
     }
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    const msgArgs: any = {};
+    const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
     });
@@ -52,12 +50,10 @@ function buildSend (
   contract: Contract,
   msgName: string,
   argNames: AbiParam[]
-): ContractFunction<string> {
+): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    ...args: any[]
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+    ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (args.length !== argNames.length + 1) {
       console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length + 1}`);
       return;
@@ -73,8 +69,7 @@ function buildSend (
     }
 
     const account: Account = (args[args.length - 1] as Account);
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    const msgArgs: any = {};
+    const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
     });
@@ -103,11 +98,11 @@ export class Contract {
   private readonly checkpointPath: string;
 
   public query: {
-    [name: string]: ContractFunction<string>
+    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
   public tx: {
-    [name: string]: ContractFunction<string>
+    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
@@ -257,7 +252,7 @@ export class Contract {
   async queryMsg (
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
-  ): Promise<string> {
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
         param: this.contractName

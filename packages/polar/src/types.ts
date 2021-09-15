@@ -372,16 +372,15 @@ export interface StrMap {
 
 export type AnyJson =
   string | number | boolean | null | undefined | AnyJson[] | { [index: string]: AnyJson };
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export type AnyFunction = (...args: any[]) => any;
 
-export type AnyNumber = bigint | Uint8Array | number | string; // late add BN if big number is req
+export type AnyFunction = (...args: any[]) => any; // eslint-disable-line  @typescript-eslint/no-explicit-any
+
+export type AnyNumber = bigint | Uint8Array | number | string; // later add BN if big number is req
 
 export type AnyString = string | string;
 
 export type AnyU8a = Uint8Array | number[] | string;
 
-// export type TransactionParams = (CodecArg | Partial<CallOverrides>)[];
-export type ContractFunction<T = string> = (
-  ...args: string[]
+export type ContractFunction<T = any> = ( // eslint-disable-line  @typescript-eslint/no-explicit-any
+  ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
 ) => Promise<T>;

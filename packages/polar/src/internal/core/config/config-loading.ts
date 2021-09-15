@@ -5,7 +5,7 @@ import { PolarContext } from "../../context";
 import { loadPluginFile } from "../plugins";
 import { getUserConfigPath } from "../project-structure";
 import { resolveConfig } from "./config-resolution";
-// import { validateConfig } from "./config-validation";
+import { validateConfig } from "./config-validation";
 
 function importCsjOrEsModule (filePath: string): any { // eslint-disable-line @typescript-eslint/no-explicit-any
   const imported = require(filePath); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -40,7 +40,7 @@ export async function loadConfigAndTasks (
   loadPluginFile(path.join(__dirname, "..", "tasks", "builtin-tasks"));
   const defaultConfig = importCsjOrEsModule("./default-config");
   const userConfig = configPath !== undefined ? importCsjOrEsModule(configPath) : defaultConfig;
-  // validateConfig(userConfig);
+  validateConfig(userConfig);
 
   // To avoid bad practices we remove the previously exported stuff
   Object.keys(configEnv).forEach((key) => (globalAsAny[key] = undefined));

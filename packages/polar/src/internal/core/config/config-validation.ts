@@ -84,11 +84,6 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
         }
       }
 
-      // const url = ncfg.endpoint;
-      // if (typeof url !== "string" || url === "" || !validateUrlname(url)) {
-      //   errors.push(net, "host", url, "hostname string (eg: http://example.com)");
-      // }
-
       try {
         HttpNetworkType.parse(ncfg);
       } catch (e) {

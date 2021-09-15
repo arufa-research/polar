@@ -105,15 +105,6 @@ describe("Config validation", function () {
       });
 
       describe("HTTP network config", function () {
-        describe("Endpoint field", function () {
-          it("Should fail if no endpoint is set for custom networks", function () {
-            expectPolarError(
-              () => validateConfig({ networks: { custom: {} } }),
-              ERRORS.GENERAL.INVALID_CONFIG
-            );
-          });
-        });
-
         describe("Accounts field", function () {
           it("Shouldn't work with invalid types", function () {
             expectPolarError(

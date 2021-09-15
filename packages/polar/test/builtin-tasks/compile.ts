@@ -1,13 +1,11 @@
-import { assert, expect } from "chai";
+import { assert } from "chai";
 import fs from "fs-extra";
 import path from "path";
 
 import { ERRORS } from "../../src/internal/core/errors-list";
 import { compile } from "../../src/lib/compile/compile";
-import { PolarRuntimeEnvironment } from "../../src/types";
-import { getEnv, useEnvironment } from "../helpers/environment";
-import { expectErrorAsync, expectPolarErrorAsync } from "../helpers/errors";
-import { getFixtureProjectPath, useFixtureProject } from "../helpers/project";
+import { expectPolarErrorAsync } from "../helpers/errors";
+import { useFixtureProject } from "../helpers/project";
 
 describe("Compile task", () => {
   useFixtureProject("compile-task-project");
@@ -29,10 +27,8 @@ describe("Compile task", () => {
       process.chdir("./multiproject");
       await compile(false, [], false);
 
-      for (const contract of fs.readdirSync("./contracts")) {
-        const contractName = path.basename(contract);
-        assert.isTrue(fs.existsSync(`./artifacts/contracts/${contractName}/sample_project.wasm`));
-      }
+      assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project.wasm`));
+      assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project_1.wasm`));
     }).timeout(200000);
   });
 

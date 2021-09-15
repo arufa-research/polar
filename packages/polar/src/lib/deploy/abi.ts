@@ -5,7 +5,7 @@ import type { AnyJson } from '../../types';
 // TODO: add types here when rust types parsing is added later
 export interface AbiParam {
   name: string
-  type: any
+  type: any // eslint-disable-line  @typescript-eslint/no-explicit-any
 }
 
 export interface AbiMessage {
@@ -13,7 +13,7 @@ export interface AbiMessage {
   docs?: string[]
   identifier: string
   isConstructor?: boolean
-  returnType?: any
+  returnType?: any // eslint-disable-line  @typescript-eslint/no-explicit-any
 }
 
 export class Abi {

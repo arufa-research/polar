@@ -22,6 +22,21 @@ export interface Account {
   address: string
   mnemonic: string
 }
+export interface Coin {
+  readonly denom: string
+  readonly amount: string
+}
+
+export interface UserAccount {
+  account: Account
+  getBalance: () => Promise<readonly Coin[]>
+}
+
+export interface ContractInfo {
+  codeId: number
+  contractCodeHash: string
+  deployTimestamp: string
+}
 
 export interface Checkpoints {
   [network: string]: CheckpointInfo
@@ -358,15 +373,14 @@ export interface StrMap {
 export type AnyJson =
   string | number | boolean | null | undefined | AnyJson[] | { [index: string]: AnyJson };
 
-export type AnyFunction = (...args: any[]) => any;
+export type AnyFunction = (...args: any[]) => any; // eslint-disable-line  @typescript-eslint/no-explicit-any
 
-export type AnyNumber = bigint | Uint8Array | number | string; // late add BN if big number is req
+export type AnyNumber = bigint | Uint8Array | number | string; // later add BN if big number is req
 
 export type AnyString = string | string;
 
 export type AnyU8a = Uint8Array | number[] | string;
 
-// export type TransactionParams = (CodecArg | Partial<CallOverrides>)[];
-export type ContractFunction<T = any> = (
-  ...args: any[]
+export type ContractFunction<T = any> = ( // eslint-disable-line  @typescript-eslint/no-explicit-any
+  ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
 ) => Promise<T>;

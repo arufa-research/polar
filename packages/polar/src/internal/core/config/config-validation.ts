@@ -9,14 +9,12 @@ import CfgErrors from "./config-errors";
 const AccountType = z.object({
   name: z.string(),
   address: z.string(),
-  mnenomic: z.string()
+  mnemonic: z.string()
 });
-
-const HttpHeaders = z.record(z.string());
 
 const HttpNetworkType = z.object({
   accounts: z.array(AccountType).optional(),
-  endpoint: HttpHeaders.optional(),
+  endpoint: z.string().optional(),
   nodeId: z.string().optional(),
   chainId: z.string().optional(),
   keyringBackend: z.string().optional()
@@ -63,16 +61,25 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
       for (let i = 0; i < (ncfg.accounts || []).length; ++i) {
         const a = ncfg.accounts[i];
         const p = errors.putter(net + ".accounts", i.toString());
+        if (a.name === undefined) {
+          const errorMessage = `Account with index ${i} does not have name specified`;
+          p.push('name', errorMessage, 'string');
+        }
+        if (a.address === undefined) {
+          const errorMessage = `Account with index ${i} does not have address specified`;
+          p.push('address', errorMessage, 'string');
+        }
+        if (a.mnemonic === undefined) {
+          const errorMessage = `Account with index ${i} does not have mnemonic specified`;
+          p.push('mnemonic', errorMessage, 'string');
+        }
         if ((j = accountsMap.get(a.name)) !== undefined) {
           // eslint-disable-next-line
           const errorMessage: string = `Account name ${String(a.name)} already exists at index ${String(j)}`;
           p.push('name', errorMessage, 'string');
-        } else { accountsMap.set(a.name, i); }
-      }
-
-      const url = ncfg.endpoint;
-      if (typeof url !== "string" || url === "" || !validateUrlname(url)) {
-        errors.push(net, "host", url, "hostname string (eg: http://example.com)");
+        } else {
+          accountsMap.set(a.name, i);
+        }
       }
 
       try {
@@ -104,7 +111,3 @@ const exp = new RegExp('^(https?:\\/\\/)?' + // protocol
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
   '(localhost)|' + // localhost
   '((\\d{1,3}\\.){3}\\d{1,3}))'); // OR ip (v4) address
-
-function validateUrlname (str: string): boolean {
-  return !!exp.test(str);
-}

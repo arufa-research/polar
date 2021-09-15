@@ -14,6 +14,7 @@ import {
   SCHEMA_DIR,
   TARGET_DIR
 } from "../../internal/core/project-structure";
+import { replaceAll } from "../../internal/util/strings";
 
 export async function compile (
   docker: boolean,
@@ -53,7 +54,7 @@ export async function compile (
 export function readContractName (tomlFilePath: string): string {
   const tomlFileContent: string = fs.readFileSync(tomlFilePath, 'utf-8');
 
-  return tomlFileContent.split('\n')[1].split("\"")[1].replace('-', '_');
+  return replaceAll(tomlFileContent.split('\n')[1].split("\"")[1], '-', '_');
 }
 
 export function compileContract (contractDir: string, docker: boolean): void {

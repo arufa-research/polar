@@ -13,10 +13,13 @@ import { compress } from "../../lib/deploy/compress";
 import type {
   Account,
   AnyJson,
+  Checkpoints,
   ContractFunction,
-  ContractInfo,
+  DeployInfo,
+  InstantiateInfo,
   PolarRuntimeEnvironment
 } from "../../types";
+import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
@@ -94,6 +97,8 @@ export class Contract {
   private codeId: number;
   private contractCodeHash: string;
   private contractAddress: string;
+  private checkpointData: Checkpoints;
+  private readonly checkpointPath: string;
 
   public query: {
     [name: string]: ContractFunction<string>
@@ -107,7 +112,7 @@ export class Contract {
     this.contractName = contractName.replace('-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
-    this.contractAddress = "secret15l3z73lvy0357qrnyhcfpcxhdrxc209wpvkayl";
+    this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
@@ -134,11 +139,36 @@ export class Contract {
     this.query = {};
     this.tx = {};
 
+    // Load checkpoints
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
+    // file exist load it else create new checkpoint
+    if (fs.existsSync(this.checkpointPath)) {
+      this.checkpointData = loadCheckpoint(this.checkpointPath);
+      const contractHash = this.checkpointData[env.network.name].deployInfo?.contractCodeHash;
+      const contractCodeId = this.checkpointData[env.network.name].deployInfo?.codeId;
+      const contractAddr = this.checkpointData[env.network.name].instantiateInfo?.contractAddress;
+      this.contractCodeHash = contractHash ?? "mock_hash";
+      this.codeId = contractCodeId ?? 0;
+      this.contractAddress = contractAddr ?? "mock_address";
+    } else {
+      this.checkpointData = {};
+    }
+
     this.env = env;
     this.client = getClient(env.network);
   }
 
   async parseSchema (): Promise<void> {
+    if (!fs.existsSync(this.querySchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
+    if (!fs.existsSync(this.executeSchemaPath)) {
+      throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
+        param: this.contractName
+      });
+    }
     await this.queryAbi.parseSchema();
     await this.executeAbi.parseSchema();
 
@@ -161,7 +191,12 @@ export class Contract {
     }
   }
 
-  async deploy (account: Account): Promise<string> {
+  async deploy (account: Account): Promise<DeployInfo> {
+    const info = this.checkpointData[this.env.network.name]?.deployInfo;
+    if (info) {
+      console.log("Warning: contract already deployed, using checkpoints");
+      return info;
+    }
     await compress(this.contractName);
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
@@ -173,32 +208,59 @@ export class Contract {
       await signingClient.restClient.getCodeHashByCodeId(codeId);
 
     this.codeId = codeId;
+    const deployInfo: DeployInfo = {
+      codeId: codeId,
+      contractCodeHash: contractCodeHash,
+      deployTimestamp: String(new Date())
+    };
+    this.checkpointData[this.env.network.name] =
+      { ...this.checkpointData[this.env.network.name], deployInfo };
     this.contractCodeHash = contractCodeHash;
+    persistCheckpoint(this.checkpointPath, this.checkpointData);
 
-    return contractCodeHash;
+    return deployInfo;
   }
 
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,
     account: Account
-  ): Promise<ContractInfo> {
+  ): Promise<InstantiateInfo> {
+    if (this.contractCodeHash === "mock_hash") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_DEPLOYED, {
+        param: this.contractName
+      });
+    }
+    const info = this.checkpointData[this.env.network.name]?.instantiateInfo;
+    if (info) {
+      console.log("Warning: contract already instantiated, using checkpoints");
+      return info;
+    }
     const signingClient = await getSigningClient(this.env.network, (account));
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
-    return {
-      codeId: this.codeId,
-      contractCodeHash: this.contractCodeHash,
-      contractAddress: this.contractAddress
+    const instantiateInfo: InstantiateInfo = {
+      contractAddress: this.contractAddress,
+      instantiateTimestamp: String(new Date())
     };
+
+    this.checkpointData[this.env.network.name] =
+      { ...this.checkpointData[this.env.network.name], instantiateInfo };
+    persistCheckpoint(this.checkpointPath, this.checkpointData);
+    return instantiateInfo;
   }
 
   async queryMsg (
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
-  ): Promise<Record<string, unknown>> {
+  ): Promise<string> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Query the contract
     console.log('Querying contract for ', methodName);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
@@ -212,6 +274,11 @@ export class Contract {
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     account: Account
   ): Promise<ExecuteResult> {
+    if (this.contractAddress === "mock_address") {
+      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
+        param: this.contractName
+      });
+    }
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, (account));
 

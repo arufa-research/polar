@@ -22,7 +22,6 @@ export interface Account {
   address: string
   mnemonic: string
 }
-
 export interface Coin {
   readonly denom: string
   readonly amount: string
@@ -36,7 +35,28 @@ export interface UserAccount {
 export interface ContractInfo {
   codeId: number
   contractCodeHash: string
+  deployTimestamp: string
+}
+
+export interface Checkpoints {
+  [network: string]: CheckpointInfo
+}
+
+export interface CheckpointInfo {
+  deployInfo?: DeployInfo
+  instantiateInfo?: InstantiateInfo
+  metadata?: Map<string, string>
+}
+
+export interface InstantiateInfo {
   contractAddress: string
+  instantiateTimestamp: string
+}
+
+export interface DeployInfo {
+  codeId: number
+  contractCodeHash: string
+  deployTimestamp: string
 }
 
 export type PolarNetworkAccountsUserConfig = Account[];

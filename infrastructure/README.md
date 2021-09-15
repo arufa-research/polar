@@ -2,14 +2,14 @@
 
 # Requirements
 
- -Install docker for your environment
+ - Install docker
 
 # Usage
 
 ## To setup rust in your system use
-   -make setup-rust
+  `make setup-rust`
 
 ## To start secret network in your system use
-   -make start-server
+  `make start-server`
 
   This will start a local SecretNetwork full-node.

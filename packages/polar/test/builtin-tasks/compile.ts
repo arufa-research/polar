@@ -21,7 +21,7 @@ describe("Compile task", () => {
       await compile(false, [], false);
 
       assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project.wasm`));
-    }).timeout(100000);
+    }).timeout(200000);
   });
 
   describe("Compile multi contract", function () {
@@ -33,7 +33,7 @@ describe("Compile task", () => {
         const contractName = path.basename(contract);
         assert.isTrue(fs.existsSync(`./artifacts/contracts/${contractName}/sample_project.wasm`));
       }
-    }).timeout(100000);
+    }).timeout(200000);
   });
 
   describe("Compile by providing sourceDir", function () {
@@ -42,7 +42,7 @@ describe("Compile task", () => {
       await compile(false, ["contracts/"], false);
 
       assert.isTrue(fs.existsSync(`./artifacts/contracts/sample_project.wasm`));
-    }).timeout(100000);
+    }).timeout(200000);
   });
 
   describe("Compile fail when contract has compile errors", function () {
@@ -53,6 +53,6 @@ describe("Compile task", () => {
         async () => await compile(false, [], false),
         ERRORS.GENERAL.RUST_COMPILE_ERROR
       );
-    }).timeout(100000);
+    }).timeout(200000);
   });
 });

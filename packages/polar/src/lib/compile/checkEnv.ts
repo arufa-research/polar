@@ -53,22 +53,26 @@ export function checkEnv (
 
   const wasmInstalled: boolean = getWebAssemblyInstalled();
 
-  if (!rustcCurrVersion || semver.lt(rustcCurrVersion, rustcVersion)) {
+  if (!rustcCurrVersion) {
+    console.log(`Error: rustc not installed.`);
+    return false;
+  } else if (semver.lt(rustcCurrVersion, rustcVersion)) {
     if (rustcCurrVersion) {
       console.log(`Error: rustc version ${chalk.green(rustcCurrVersion)} installed, required ${chalk.green(rustcVersion)}.`);
-    } else {
-      console.log(`Error: rustc not installed.`);
     }
     return false;
   }
-  if (!cargoCurrVersion || semver.lt(cargoCurrVersion, cargoVersion)) {
+
+  if (!cargoCurrVersion) {
+    console.log(`Error: rustc not installed.`);
+    return false;
+  } else if (semver.lt(cargoCurrVersion, cargoVersion)) {
     if (cargoCurrVersion) {
       console.log(`Error: cargo version ${chalk.green(cargoCurrVersion)} installed, required ${chalk.green(cargoVersion)}.`);
-    } else {
-      console.log(`Error: cargo not installed.`);
     }
     return false;
   }
+
   if (!wasmInstalled) {
     return false;
   }

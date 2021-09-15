@@ -2,6 +2,7 @@ import { ExecuteMsgNode, ParseNode, ParseSchema, parseSchema, rustRepr } from "p
 
 import type { AnyJson } from '../../types';
 
+// TODO: add types here when rust types parsing is added later
 export interface AbiParam {
   name: string
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -28,7 +29,7 @@ export class Abi {
 
   async parseSchema (): Promise<void> {
     const parseExecuteMsg = async (schema: ParseSchema): Promise<AbiMessage[]> => {
-      const tree: ExecuteMsgNode = (await parseSchema(schema));
+      const tree: ExecuteMsgNode = await parseSchema(schema);
 
       const messages: AbiMessage[] = [];
       tree.value.variants.forEach((variant) => {

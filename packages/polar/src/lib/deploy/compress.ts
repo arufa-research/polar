@@ -5,8 +5,6 @@ import path from "path";
 
 import {
   ARTIFACTS_DIR,
-  // eslint-disable-next-line
-  assertDir,
   CONTRACTS_DIR,
   CONTRACTS_OUT_DIR,
   multiImageVersion,
@@ -37,13 +35,20 @@ export async function compress (
     fs.rmdirSync(path.join(CONTRACTS_DIR, "artifacts"), { recursive: true });
     console.log(`Created file ${path.join(CONTRACTS_OUT_DIR, `${contractName}.wasm`)}`);
   } else { // Multiple contracts and each should be compiled by going inside each of them
-    const dockerCmd = `sudo docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
+    const paths = readdirSync(CONTRACTS_DIR);
+    const contractPath = path.join(CONTRACTS_DIR, path.basename(paths[0]));
+
+    const dockerCmd = `sudo docker run --rm -v ${path.resolve(contractPath)}:/code \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/code/target \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
-                  cosmwasm/workspace-optimizer:${multiImageVersion}`;
+                  cosmwasm/rust-optimizer:${singleImageVersion}`;
 
     console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/workspace-optimizer:${multiImageVersion}...`));
     execSync(dockerCmd, { stdio: 'inherit' });
-    console.log(`Generated .wasm files in ${ARTIFACTS_DIR}`);
+
+    for (const p of paths) {
+      fs.copyFileSync(sourcePath, destPath);
+      fs.rmdirSync(path.join(contractPath, "artifacts"), { recursive: true });
+    }
   }
 }

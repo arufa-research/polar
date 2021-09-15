@@ -45,7 +45,7 @@ export async function compile (
     generateSchema(dir, docker);
     const contractName = readContractName(path.join(dir, "Cargo.toml"));
     createArtifacts(
-      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, dir), path.join(dir, "schema"), docker
+      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker
     );
   }
 }

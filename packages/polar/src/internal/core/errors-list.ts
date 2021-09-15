@@ -231,6 +231,20 @@ Please check that the configured keypair are correct.`,
       title: "Contract not instantiated",
       description: `You are trying to execute/query %contractName% without instantiating first.`,
       shouldBeReported: false
+    },
+    ACCOUNT_DOES_NOT_EXIST: {
+      number: 24,
+      message: "Account with %name% doesn't exist in polar.config.js.",
+      title: "Account doesn't exist",
+      description: `Account not present in polar config.`,
+      shouldBeReported: false
+    },
+    BALANCE_UNDEFINED: {
+      number: 25,
+      message: "Balance with account %name% is undefined",
+      title: "Balance Undefined",
+      description: `You are trying to fetch balance from an account with undefined balance.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

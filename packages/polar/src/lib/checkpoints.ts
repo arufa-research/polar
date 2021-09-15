@@ -19,8 +19,7 @@ export function toMap <T> (obj: {[name: string]: T}): Map<string, T> {
   return mp;
 }
 
-// eslint-disable-line @typescript-eslint/no-explicit-any
-export function loadFromYamlFileSilent (filePath: string, options?: YAML.Options): any {
+export function loadFromYamlFileSilent (filePath: string, options?: YAML.Options): any { // eslint-disable-line @typescript-eslint/no-explicit-any
   // Try-catch is the way:
   // https://nodejs.org/docs/latest/api/fs.html#fs_fs_stat_path_options_callback
   // Instead, user code should open/read/write the file directly and
@@ -32,16 +31,13 @@ export function loadFromYamlFileSilent (filePath: string, options?: YAML.Options
   }
 }
 
-// eslint-disable-line @typescript-eslint/no-explicit-any
-function readYAML (filePath: string, options?: YAML.Options): any {
+function readYAML (filePath: string, options?: YAML.Options): any { // eslint-disable-line @typescript-eslint/no-explicit-any
   return YAML.parse(fs.readFileSync(filePath).toString(), options);
 }
 
-// eslint-disable-line @typescript-eslint/no-explicit-any
-function defaultYamlValue (options?: YAML.Options): any {
+function defaultYamlValue (options?: YAML.Options): any { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (options?.mapAsMap) {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
-    return new Map<string, any>();
+    return new Map<string, any>(); // eslint-disable-line @typescript-eslint/no-explicit-any
   }
   return {};
 }

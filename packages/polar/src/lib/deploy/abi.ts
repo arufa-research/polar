@@ -29,7 +29,7 @@ export class Abi {
 
   async parseSchema (): Promise<void> {
     const parseExecuteMsg = async (schema: ParseSchema): Promise<AbiMessage[]> => {
-      const tree: ExecuteMsgNode = await parseSchema(schema) as ExecuteMsgNode;
+      const tree: ExecuteMsgNode = await parseSchema(schema);
 
       const messages: AbiMessage[] = [];
       tree.value.variants.forEach((variant) => {

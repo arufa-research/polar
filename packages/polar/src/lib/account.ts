@@ -46,7 +46,7 @@ export class UserAccountI implements UserAccount {
 export function getAccountByName (
   name: string,
   env: PolarRuntimeEnvironment
-): (Account | UserAccount) {
+): UserAccount {
   if (env.network.config.accounts === undefined) {
     throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
   }

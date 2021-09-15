@@ -18,7 +18,8 @@ import type {
   ContractFunction,
   DeployInfo,
   InstantiateInfo,
-  PolarRuntimeEnvironment
+  PolarRuntimeEnvironment,
+  UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
@@ -59,16 +60,18 @@ function buildSend (
       return;
     }
 
+    const accountVal = args[args.length - 1].account !== undefined
+      ? args[args.length - 1].account : args[args.length - 1];
     if (
-      args[args.length - 1].address === undefined ||
-      args[args.length - 1].name === undefined ||
-      args[args.length - 1].mnemonic === undefined
+      accountVal.address === undefined ||
+      accountVal.name === undefined ||
+      accountVal.mnemonic === undefined
     ) {
       console.error(`Invalid ${msgName} call. Last argument should be an account object.`);
       return;
     }
 
-    const account: Account = (args[args.length - 1] as Account);
+    const account: Account = accountVal as Account;
     const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
@@ -188,7 +191,9 @@ export class Contract {
     }
   }
 
-  async deploy (account: Account): Promise<DeployInfo> {
+  async deploy (account: Account | UserAccount): Promise<DeployInfo> {
+    const accountVal: Account = (account as UserAccount).account !== undefined
+      ? (account as UserAccount).account : (account as Account);
     const info = this.checkpointData[this.env.network.name]?.deployInfo;
     if (info) {
       console.log("Warning: contract already deployed, using checkpoints");
@@ -198,7 +203,7 @@ export class Contract {
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    const signingClient = await getSigningClient(this.env.network, account);
+    const signingClient = await getSigningClient(this.env.network, accountVal);
     const uploadReceipt = await signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
@@ -221,8 +226,10 @@ export class Contract {
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,
-    account: Account
+    account: Account | UserAccount
   ): Promise<InstantiateInfo> {
+    const accountVal: Account = (account as UserAccount).account !== undefined
+      ? (account as UserAccount).account : (account as Account);
     if (this.contractCodeHash === "mock_hash") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_DEPLOYED, {
         param: this.contractName
@@ -233,7 +240,7 @@ export class Contract {
       console.log("Warning: contract already instantiated, using checkpoints");
       return info;
     }
-    const signingClient = await getSigningClient(this.env.network, (account));
+    const signingClient = await getSigningClient(this.env.network, accountVal);
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
@@ -269,15 +276,17 @@ export class Contract {
   async executeMsg (
     methodName: string,
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
-    account: Account
+    account: Account | UserAccount
   ): Promise<ExecuteResult> {
+    const accountVal: Account = (account as UserAccount).account !== undefined
+      ? (account as UserAccount).account : (account as Account);
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
         param: this.contractName
       });
     }
     // Send execute msg to the contract
-    const signingClient = await getSigningClient(this.env.network, (account));
+    const signingClient = await getSigningClient(this.env.network, accountVal);
 
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
     msgData[methodName] = callArgs;

@@ -12,8 +12,6 @@ const AccountType = z.object({
   mnemonic: z.string()
 });
 
-const HttpHeaders = z.record(z.string());
-
 const HttpNetworkType = z.object({
   accounts: z.array(AccountType).optional(),
   endpoint: z.string().optional(),
@@ -113,7 +111,3 @@ const exp = new RegExp('^(https?:\\/\\/)?' + // protocol
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
   '(localhost)|' + // localhost
   '((\\d{1,3}\\.){3}\\d{1,3}))'); // OR ip (v4) address
-
-function validateUrlname (str: string): boolean {
-  return !!exp.test(str);
-}

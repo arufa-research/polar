@@ -47,10 +47,8 @@ async function startConsole (runtimeEnv: PolarRuntimeEnvironment): Promise<void>
 
 export default function (): void {
   task(TASK_REPL, "Opens polar console")
-    .addFlag("noCompile", "Don't compile before running this task")
     .setAction(
       async (
-        { noCompile }: { noCompile: boolean },
         runtimeEnv: PolarRuntimeEnvironment
       ) => {
         if (!runtimeEnv.config.paths) {

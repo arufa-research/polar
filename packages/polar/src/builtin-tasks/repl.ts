@@ -26,7 +26,7 @@ async function evaluate (code: string, context: Record<string, unknown>, filenam
 
 async function startConsole (runtimeEnv: PolarRuntimeEnvironment): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    console.log("★", chalk.blueBright(" Welcome to polar console"), "★");
+    console.log("★★★", chalk.blueBright(" Welcome to polar REPL"), "★★★");
     console.log(chalk.green('Try typing: config\n'));
 
     const server = repl.start({

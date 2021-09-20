@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient } from "secretjs";
 
-import { PolarError } from "../../internal/core/errors";// eslint-disable-line @typescript-eslint/no-unused-vars
-import { ERRORS } from "../../internal/core/errors-list";// eslint-disable-line @typescript-eslint/no-unused-vars
+import { PolarError } from "../../internal/core/errors";
+import { ERRORS } from "../../internal/core/errors-list";
 import {
   ARTIFACTS_DIR,
   SCHEMA_DIR
@@ -259,7 +259,7 @@ export class Contract {
   async queryMsg (
     methodName: string,
     callArgs: object // eslint-disable-line @typescript-eslint/ban-types
-  ): Promise<string> {
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
         param: this.contractName

@@ -40,7 +40,7 @@ const Config = z.object({
  * Validates the config, throwing a BuilderError if invalid.
  * @param config
  */
-export function validateConfig(config: any) { // eslint-disable-line  
+export function validateConfig (config: any) { // eslint-disable-line  
   const errors = getValidationErrors(config);
 
   if (errors.isEmpty()) {
@@ -51,7 +51,7 @@ export function validateConfig(config: any) { // eslint-disable-line
   throw new PolarError(ERRORS.GENERAL.INVALID_CONFIG, { errors: errorList });
 }
 
-export function getValidationErrors (config: any): CfgErrors { // eslint-disable-line 
+export function getValidationErrors (config: any): CfgErrors { // eslint-disable-line  
   const errors = new CfgErrors();
 
   if (config !== undefined && typeof config.networks === "object") {

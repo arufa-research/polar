@@ -101,11 +101,11 @@ export class Contract {
   private readonly checkpointPath: string;
 
   public query: {
-    [name: string]: ContractFunction<string>
+    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
   public tx: {
-    [name: string]: ContractFunction<string>
+    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {

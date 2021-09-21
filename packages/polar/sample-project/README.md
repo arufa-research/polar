@@ -1,6 +1,6 @@
 # Secret Contracts Counter Example
 
-This template contains counter example contracts.
+This template contains simple counter contracts.
 The contract is created with a parameter for the initial count and allows subsequent incrementing.
 
 # Contract Functions
@@ -19,7 +19,7 @@ Use this command to compile your contracts:
 
 # Deploying contracts
 
-In `scripts`:
+In `scripts` folder:
 
 First of all you need to create an instance of your contract using contract name.
 ```js
@@ -36,7 +36,7 @@ Note: You can check out your contract information in `deploy_response`.
 
 # Interact with contracts
 
-`polar` will load functions using schema, you can call contract functions using `contract.tx`(for write operations) and `contract.query`(for read operations)
+`polar` will load functions using schema, you can call contract functions using `contract.tx`(to execute transactions) and `contract.query`(to query from contract)
 ```js
 // To interact with your contract
 // Execute contract function

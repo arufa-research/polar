@@ -3,16 +3,14 @@ import { replaceAll } from '../util/strings';
 import { ErrorDescriptor, ERRORS, getErrorCode } from './errors-list';
 
 export class PolarError extends Error {
-  // eslint-disable-next-line
-  public static isPolarError (other: any): other is PolarError {
+  public static isPolarError (other: any): other is PolarError { // eslint-disable-line  
     return (
       other !== undefined && other !== null && other._isPolarError === true
     );
   }
 
   public static isPolarErrorType (
-    // eslint-disable-next-line
-    other: any,
+    other: any, // eslint-disable-line  
     descriptor: ErrorDescriptor
   ): other is PolarError {
     return (
@@ -23,16 +21,14 @@ export class PolarError extends Error {
 
   public readonly errorDescriptor: ErrorDescriptor;
   public readonly number: number;
-  // eslint-disable-next-line
-  public readonly messageArguments: Record<string, any>;
+  public readonly messageArguments: Record<string, any>; // eslint-disable-line  @typescript-eslint/no-explicit-any
   public readonly parent?: Error;
 
   private readonly _isPolarError: boolean;
 
   constructor (
     errorDescriptor: ErrorDescriptor,
-    // eslint-disable-next-line
-    messageArguments: Record<string, any> = {},
+    messageArguments: Record<string, any> = {}, // eslint-disable-line  @typescript-eslint/no-explicit-any
     parentError?: Error
   ) {
     const prefix = `${getErrorCode(errorDescriptor)}: `;
@@ -61,8 +57,7 @@ export class PolarError extends Error {
  * This class is used to throw errors from polar plugins made by third parties.
  */
 export class PolarPluginError extends Error {
-  // eslint-disable-next-line
-  public static isPolarPluginError (other: any): other is PolarPluginError {
+  public static isPolarPluginError (other: any): other is PolarPluginError { // eslint-disable-line  
     return (
       other !== undefined &&
       other !== null &&

@@ -60,8 +60,8 @@ export function readContractName (tomlFilePath: string): string {
 export function compileContract (contractDir: string, docker: boolean): void {
   const currDir = process.cwd();
   process.chdir(contractDir);
-  chalk.blue(`🛠 Compiling your contract in directory: ${chalk.gray(contractDir)}`);
-  chalk.blue("===========================================");
+  console.log(`🛠 Compiling your contract in directory: ${chalk.gray(contractDir)}`);
+  console.log("===========================================");
   // Compiles the contract and creates .wasm file alongside others
   try {
     execSync(`RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown`, { stdio: 'inherit' });

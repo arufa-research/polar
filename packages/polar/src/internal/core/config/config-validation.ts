@@ -40,7 +40,7 @@ const Config = z.object({
  * Validates the config, throwing a BuilderError if invalid.
  * @param config
  */
-export function validateConfig(config: any) { // eslint-disable-line
+export function validateConfig (config: any) { // eslint-disable-line  
   const errors = getValidationErrors(config);
 
   if (errors.isEmpty()) {
@@ -51,7 +51,7 @@ export function validateConfig(config: any) { // eslint-disable-line
   throw new PolarError(ERRORS.GENERAL.INVALID_CONFIG, { errors: errorList });
 }
 
-export function getValidationErrors(config: any): CfgErrors {  // eslint-disable-line
+export function getValidationErrors (config: any): CfgErrors { // eslint-disable-line  
   const errors = new CfgErrors();
 
   if (config !== undefined && typeof config.networks === "object") {
@@ -74,8 +74,7 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
           p.push('mnemonic', errorMessage, 'string');
         }
         if ((j = accountsMap.get(a.name)) !== undefined) {
-          // eslint-disable-next-line
-          const errorMessage: string = `Account name ${String(a.name)} already exists at index ${String(j)}`;
+          const errorMessage = `Account name ${String(a.name)} already exists at index ${String(j)}`;
           p.push('name', errorMessage, 'string');
         } else {
           accountsMap.set(a.name, i);
@@ -107,6 +106,7 @@ export function getValidationErrors(config: any): CfgErrors {  // eslint-disable
 }
 
 // Reference: https://stackoverflow.com/questions/5717093
+// eslint-disable-next-line
 const exp = new RegExp('^(https?:\\/\\/)?' + // protocol
   '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
   '(localhost)|' + // localhost

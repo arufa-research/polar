@@ -43,6 +43,8 @@ To compile it, type:
 
 `polar compile`
 
+![start4](https://user-images.githubusercontent.com/85037852/134698176-991cff30-c2f1-4acc-b53f-2878a69b414c.png)
+
 # Deploying your contracts
 
 In sample-project we have `scripts/sample-script.js`, It demonstrates how to deploy and interact with contract:
@@ -61,6 +63,10 @@ const contract_info = await contract.instantiate({"count": 102}, "deploy test", 
 ```
 
 Deploy and instantiate your contract.
+
+![start5](https://user-images.githubusercontent.com/85037852/134698417-f3168013-8cbd-4aa2-a895-d8f665156823.png)
+
+![start6](https://user-images.githubusercontent.com/85037852/134698425-d4b5e44e-2696-41e1-8f63-0dc7b9bf3098.png)
 
 # Interact with your contracts
 

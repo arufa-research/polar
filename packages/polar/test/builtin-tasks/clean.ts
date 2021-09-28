@@ -32,9 +32,19 @@ describe("Clean task", () => {
     );
   });
 
+  // it("When contract name specified is incorrect", async function () {
+  //   await compile(false, [], false);
+
+  //   await expectPolarErrorAsync(
+  //     async () => await this.env.run(TASK_CLEAN, { contractName: "sample-project1" }),
+  //     ERRORS.GENERAL.INCORRECT_CONTRACT_NAME
+  //   );
+  // });
+
   it("When contract name is specified", async function () {
     await compile(false, [], false);
     await this.env.run(TASK_CLEAN, { contractName: "sample-project" });
+    const contractName = 'sample-project';
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/contracts/sample-project.wasm`));
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/schema/sample-project`));
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/checkpoints/sample-project.yaml`));

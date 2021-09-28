@@ -252,6 +252,13 @@ Please check that the configured keypair are correct.`,
       title: "Artifacts Directory Not Found",
       description: `There is no artifacts directory possibly due to error in compilation.`,
       shouldBeReported: false
+    },
+    INCORRECT_CONTRACT_NAME: {
+      number: 27,
+      message: "Contract name not found",
+      title: "Incorrect contract name",
+      description: `There is no contract with the name specified.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

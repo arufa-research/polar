@@ -35,7 +35,6 @@ describe("Clean task", () => {
   it("When contract name is specified", async function () {
     await compile(false, [], false);
     await this.env.run(TASK_CLEAN, { contractName: "sample-project" });
-    assert.isTrue(fs.existsSync(`./${ARTIFACTS_DIR}`));
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/contracts/sample-project.wasm`));
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/schema/sample-project`));
     assert.isFalse(fs.existsSync(`./${ARTIFACTS_DIR}/checkpoints/sample-project.yaml`));

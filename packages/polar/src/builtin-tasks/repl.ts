@@ -5,7 +5,7 @@ import { runInNewContext } from "vm";
 import * as polar from "../index";
 import { task } from "../internal/core/config/config-env";
 import { isRecoverableError, preprocess } from "../internal/util/repl";
-import { PolarRuntimeEnvironment } from "../types";
+import { PolarRuntimeEnvironment, TaskArguments } from "../types";
 import { TASK_REPL } from "./task-names";
 
 // handles top level await by preprocessing input and awaits the output before returning
@@ -49,6 +49,7 @@ export default function (): void {
   task(TASK_REPL, "Opens polar console")
     .setAction(
       async (
+        _taskArgs: TaskArguments,
         runtimeEnv: PolarRuntimeEnvironment
       ) => {
         if (!runtimeEnv.config.paths) {

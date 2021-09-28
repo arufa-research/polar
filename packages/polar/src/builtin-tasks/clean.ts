@@ -36,8 +36,6 @@ export default function (): void {
         await fsExtra.remove(comp);
         await fsExtra.remove('./artifacts/schema/' + contractName + '/');
         await fsExtra.remove('./artifacts/checkpoints/' + contractName + '.yaml}');
-      } else if (contractName.length !== 0 && !(fsExtra.existsSync(comp))) {
-        throw new PolarError(ERRORS.GENERAL.INCORRECT_CONTRACT_NAME);
       } else {
         const artifactsAbsPath = path.resolve(process.cwd(), ARTIFACTS_DIR);
         console.log(`Cleaning Artifacts directory: ${chalk.gray(artifactsAbsPath)}`);

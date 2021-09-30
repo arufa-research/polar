@@ -1,10 +1,10 @@
 import { execSync } from "child_process";
 
 import { task } from "../internal/core/config/config-env";
-import { TASK_SETUP } from "./task-names";
+import { TASK_INSTALL } from "./task-names";
 
 export default function (): void {
-  task(TASK_SETUP, "Setup rust compiler")
+  task(TASK_INSTALL, "Setup rust compiler")
     .setAction(setupRust);
 }
 

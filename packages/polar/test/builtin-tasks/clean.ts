@@ -32,14 +32,14 @@ describe("Clean task", () => {
     );
   });
 
-  // it("When contract name specified is incorrect", async function () {
-  //   await compile(false, [], false);
+  it("When contract name specified is incorrect", async function () {
+    await compile(false, [], false);
 
-  //   await expectPolarErrorAsync(
-  //     async () => await this.env.run(TASK_CLEAN, { contractName: "sample-project1" }),
-  //     ERRORS.GENERAL.INCORRECT_CONTRACT_NAME
-  //   );
-  // });
+    await expectPolarErrorAsync(
+      async () => await this.env.run(TASK_CLEAN, { contractName: "sample-project1" }),
+      ERRORS.GENERAL.INCORRECT_CONTRACT_NAME
+    );
+  });
 
   it("When contract name is specified", async function () {
     await compile(false, [], false);

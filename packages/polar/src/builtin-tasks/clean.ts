@@ -24,20 +24,21 @@ export default function (): void {
       { contractName }: TaskCleanArg,
       env: PolarRuntimeEnvironment
     ) => {
-      const comp = './artifacts/contracts/' + contractName + '.wasm';
+      const contractNameNew = contractName.toString().replace(/-/g, '_');
+      const comp = './artifacts/contracts/' + contractNameNew + '.wasm';
       if (!isCwdProjectDir()) {
         console.log(`Not in a valid polar project repo, exiting`);
         process.exit(1);
       } else if (!fsExtra.existsSync(`./${ARTIFACTS_DIR}`)) {
         throw new PolarError(ERRORS.GENERAL.ARTIFACTS_NOT_FOUND);
-      } else if (contractName.length !== 0 && fsExtra.existsSync(comp)) {
+      } else if (contractNameNew.length !== 0 && fsExtra.existsSync(comp)) {
         const artifactsAbsPath = path.resolve(process.cwd(), ARTIFACTS_DIR);
         console.log(`Cleaning Artifacts directory: ${chalk.gray(artifactsAbsPath)}`);
         await fsExtra.remove(comp);
-        await fsExtra.remove('./artifacts/schema/' + contractName + '/');
-        await fsExtra.remove('./artifacts/checkpoints/' + contractName + '.yaml}');
-      // } else if (contractName.length !== 0 && !(fsExtra.existsSync(comp))) {
-      //   throw new PolarError(ERRORS.GENERAL.INCORRECT_CONTRACT_NAME);
+        await fsExtra.remove('./artifacts/schema/' + contractNameNew + '/');
+        await fsExtra.remove('./artifacts/checkpoints/' + contractNameNew + '.yaml}');
+      } else if (contractNameNew.length !== 0 && !(fsExtra.existsSync(comp))) {
+        throw new PolarError(ERRORS.GENERAL.INCORRECT_CONTRACT_NAME);
       } else {
         const artifactsAbsPath = path.resolve(process.cwd(), ARTIFACTS_DIR);
         console.log(`Cleaning Artifacts directory: ${chalk.gray(artifactsAbsPath)}`);

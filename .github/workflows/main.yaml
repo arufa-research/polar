@@ -32,9 +32,7 @@ jobs:
       - name: Execute lint
         run: yarn lint
       - run: yarn build
-      - run: cd packages/polar && yarn link
-      - run: yarn link secret-polar
-      - run: yarn run polar install
+      - run: cd packages/polar && dist/src/internal/cli/cli.js install
       - name: Execute tests
         run: yarn run test
 

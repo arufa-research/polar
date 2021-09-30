@@ -16,6 +16,7 @@ async function setupRust (): Promise<boolean> {
   execSync(`rustup target add wasm32-unknown-unknown`);
   execSync(`rustup install nightly`);
   execSync(`rustup target add wasm32-unknown-unknown --toolchain nightly`);
+  console.log(navigator);
   if (navigator.userAgent.match(/Linux/i) ?? navigator.userAgent.match(/Windows/i)) { execSync(`sudo apt install build-essential`); }
 
   return true;

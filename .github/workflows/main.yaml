@@ -32,7 +32,7 @@ jobs:
       - name: Execute lint
         run: yarn lint
       - run: yarn build
-      - run: cd packages/polar && chmod +x dist/src/internal/cli/cli.js && dist/src/internal/cli/cli.js install
+      - run: cd packages/polar/sample-project && chmod +x ../dist/src/internal/cli/cli.js && ../dist/src/internal/cli/cli.js install
       - name: Execute tests
         run: yarn run test
 

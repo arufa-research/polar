@@ -16,16 +16,16 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2-beta
       with:
-      node-version: '14.15.4'
+        node-version: '14.15.4'
     - name: Cache Node.js modules
       uses: actions/cache@v2
       with:
-      # npm cache files are stored in `~/.npm` on Linux/macOS
-      path: ~/.npm
-      key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-      restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
     - name: Install polar
       run: npm i -g secret-polar
     - name: Run commands

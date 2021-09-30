@@ -9,7 +9,7 @@ export default function (): void {
 }
 
 async function setupRust (): Promise<boolean> {
-  execSync(`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`);
+  execSync(`curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh`);
   execSync(`export PATH="${process.env.HOME}/.cargo/bin:${process.env.PATH}"`); // eslint-disable-line  @typescript-eslint/restrict-template-expressions
   execSync(`rustup default stable`);
   execSync(`rustup target list --installed`);

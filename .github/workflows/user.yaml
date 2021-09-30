@@ -30,3 +30,6 @@ jobs:
       run: npm i -g secret-polar
     - name: Run commands
       run: polar help
+    - run: polar Install
+    - run: polar init blue
+    - run: cd blue && polar compile

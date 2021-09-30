@@ -29,6 +29,7 @@ jobs:
             ${{ runner.OS }}-
       - name: Install
         run: yarn install
+        run: cd packages/polar && yarn link
       - run: yarn run polar install
       - name: Execute lint
         run: yarn lint

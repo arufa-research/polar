@@ -1,3 +1,16 @@
+const accounts = [
+  {
+    name: 'account_0',
+    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
+    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+  },
+  {
+    name: 'account_1',
+    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
+    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
+  }
+];
+
 module.exports = {
   networks: {
     default: {
@@ -12,11 +25,11 @@ module.exports = {
     },
     // Holodeck Testnet
     testnet: {
-      endpoint: 'http://bootstrap.secrettestnet.io:26657',
+      endpoint: 'http://bootstrap.secrettestnet.io',
       chainId: 'holodeck-2',
       trustNode: true,
       keyringBackend: 'test',
-      accounts: ['a', 'b'],
+      accounts: accounts,
       types: {}
     }
   },

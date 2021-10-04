@@ -245,6 +245,20 @@ Please check that the configured keypair are correct.`,
       title: "Balance Undefined",
       description: `You are trying to fetch balance from an account with undefined balance.`,
       shouldBeReported: false
+    },
+    ARTIFACTS_NOT_FOUND: {
+      number: 26,
+      message: "No artifacts directory found",
+      title: "Artifacts Directory Not Found",
+      description: `There is no artifacts directory possibly due to error in compilation.`,
+      shouldBeReported: false
+    },
+    INCORRECT_CONTRACT_NAME: {
+      number: 27,
+      message: "Contract name not found",
+      title: "Incorrect contract name",
+      description: `There is no contract with the name specified.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

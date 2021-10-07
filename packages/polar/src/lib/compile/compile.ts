@@ -23,17 +23,33 @@ export async function compile (
 ): Promise<void> {
   await assertDir(CACHE_DIR);
   let contractDirs: string[] = [];
-
+  const toml = "Cargo.toml";
   // Contract(s) path given
   if (sourceDir.length > 0) {
     contractDirs = sourceDir;
   } else {
     const paths = readdirSync(CONTRACTS_DIR);
     // Only one contract in the contracts dir and compile in contracts dir only
-    if (paths.includes("Cargo.toml")) {
+    if (paths.includes(toml)) {
       contractDirs.push(CONTRACTS_DIR);
     } else {
       // Multiple contracts and each should be compiled by going inside each of them
+      // Check for similar contract names before compiling contracts.
+      // For contract with same names raise an error.
+      const contractNames = [];
+      const newset = new Set();
+      for (const p of paths) {
+        const contractPath = path.join(CONTRACTS_DIR, path.basename(p));
+        contractNames.push(readContractName(path.join(contractPath, toml)));
+        newset.add(readContractName(path.join(contractPath, toml)));
+      }
+
+      const contractNamesSet = Array.from(newset);
+
+      if (contractNames.length !== contractNamesSet.length) {
+        throw new PolarError(ERRORS.GENERAL.SAME_CONTRACT_NAMES);
+      }
+
       for (const p of paths) {
         const contractPath = path.join(CONTRACTS_DIR, path.basename(p));
         contractDirs.push(contractPath);
@@ -44,7 +60,7 @@ export async function compile (
   for (const dir of contractDirs) {
     compileContract(dir, docker);
     generateSchema(dir, docker);
-    const contractName = readContractName(path.join(dir, "Cargo.toml"));
+    const contractName = readContractName(path.join(dir, toml));
     createArtifacts(
       path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker
     );

@@ -30,6 +30,16 @@ describe("Compile task", () => {
     }).timeout(200000);
   });
 
+  describe("Compile multi contract with same name", function () {
+    useFixtureProject("multiproject2");
+    it("Should give an error of same contract names", async function () {
+      await expectPolarErrorAsync(
+        async () => await compile(false, [], false),
+        ERRORS.GENERAL.SAME_CONTRACT_NAMES
+      );
+    }).timeout(200000);
+  });
+
   describe("Compile by providing sourceDir", function () {
     useFixtureProject("testproject");
     it("Should create .wasm files of only given contract in sourceDir", async function () {

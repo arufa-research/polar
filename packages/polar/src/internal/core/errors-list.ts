@@ -259,6 +259,13 @@ Please check that the configured keypair are correct.`,
       title: "Incorrect contract name",
       description: `There is no contract with the name specified.`,
       shouldBeReported: false
+    },
+    SAME_CONTRACT_NAMES: {
+      number: 28,
+      message: "Same contract names found",
+      title: "Multiple contracts with same name",
+      description: `Multiple contracts with same name.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

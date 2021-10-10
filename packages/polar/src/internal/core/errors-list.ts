@@ -262,7 +262,7 @@ Please check that the configured keypair are correct.`,
     },
     SAME_CONTRACT_NAMES: {
       number: 28,
-      message: "Same contract names found",
+      message: "Same contract names found with name %val% ",
       title: "Multiple contracts with same name",
       description: `Multiple contracts with same name.`,
       shouldBeReported: false

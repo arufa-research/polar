@@ -34,25 +34,20 @@ export async function compile (
       contractDirs.push(CONTRACTS_DIR);
     } else {
       // Multiple contracts and each should be compiled by going inside each of them
-      // Check for similar contract names before compiling contracts.
-      // For contract with same names raise an error.
-      const contractNames = [];
-      const newset = new Set();
+
+      const contractNames = new Set();
       for (const p of paths) {
         const contractPath = path.join(CONTRACTS_DIR, path.basename(p));
-        contractNames.push(readContractName(path.join(contractPath, toml)));
-        newset.add(readContractName(path.join(contractPath, toml)));
-      }
+        const val = readContractName(path.join(contractPath, toml));
 
-      const contractNamesSet = Array.from(newset);
-
-      if (contractNames.length !== contractNamesSet.length) {
-        throw new PolarError(ERRORS.GENERAL.SAME_CONTRACT_NAMES);
-      }
-
-      for (const p of paths) {
-        const contractPath = path.join(CONTRACTS_DIR, path.basename(p));
-        contractDirs.push(contractPath);
+        // Check for similar contract names before compiling contracts.
+        // For contract with same names raise an error.
+        if (contractNames.has(val)) {
+          throw new PolarError(ERRORS.GENERAL.SAME_CONTRACT_NAMES);
+        } else {
+          contractNames.add(readContractName(path.join(contractPath, toml)));
+          contractDirs.push(contractPath);
+        }
       }
     }
   }

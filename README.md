@@ -1,6 +1,6 @@
 # Polar
 
-Polar is development framework for building secret contracts. The aim of the project is to make Secret contracts development process simple, efficient and scalable. User can focus on logic of secret contract and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment and contract testing framework.
+Polar is a development framework for building secret contracts. The aim of the project is to make Secret contracts development process simple, efficient and scalable. User can focus on logic of secret contract and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment, Interacting with contracts using schema and contract testing framework.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ The minimum packages/requirements are as follows:
 Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed with the help of polar in just a command.
 
 ```bash
-polar setup
+polar install
 ```
 
 ## Install polar
@@ -61,7 +61,7 @@ Follow our infrastructure README for instructions how to setup a private network
 polar init <project-name>
 ```
 
-This will create a directory <project-name> inside current directory with boiler-plate code. The contracts/ directory has all the rust files for the contract logic. scripts/ directory can contain  .js and .ts scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. test/ directory can contain .js and .ts scripts to run tests for the deployed contracts.
+This will create a directory <project-name> inside current directory with boiler-plate code. The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory contains  `.js` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory contains `.js` scripts to run tests for the deployed contracts.
 
 ### Listing Tasks
 

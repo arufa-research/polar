@@ -61,7 +61,7 @@ Follow our infrastructure README for instructions how to setup a private network
 polar init <project-name>
 ```
 
-This will create a directory <project-name> inside current directory with boiler-plate code. The contracts/ directory has all the rust files for the contract logic. scripts/ directory can contain  .js and .ts scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. test/ directory can contain .js and .ts scripts to run tests for the deployed contracts.
+This will create a directory <project-name> inside current directory with boiler-plate code. The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory contains  `.js` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory contains `.js` scripts to run tests for the deployed contracts.
 
 ### Listing Tasks
 

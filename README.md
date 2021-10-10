@@ -15,7 +15,7 @@ The minimum packages/requirements are as follows:
 Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed with the help of polar in just a command.
 
 ```bash
-polar setup
+polar install
 ```
 
 ## Install polar

@@ -43,7 +43,9 @@ export async function compile (
         // Check for similar contract names before compiling contracts.
         // For contract with same names raise an error.
         if (contractNames.has(val)) {
-          throw new PolarError(ERRORS.GENERAL.SAME_CONTRACT_NAMES);
+          throw new PolarError(ERRORS.GENERAL.SAME_CONTRACT_NAMES, {
+            val
+          });
         } else {
           contractNames.add(readContractName(path.join(contractPath, toml)));
           contractDirs.push(contractPath);

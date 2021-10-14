@@ -1,1 +1,0 @@
-/home/goku/polar/Examples/hu/contracts/target/debug/examples/schema: /home/goku/polar/Examples/hu/contracts/examples/schema.rs /home/goku/polar/Examples/hu/contracts/src/contract.rs /home/goku/polar/Examples/hu/contracts/src/lib.rs /home/goku/polar/Examples/hu/contracts/src/msg.rs /home/goku/polar/Examples/hu/contracts/src/state.rs

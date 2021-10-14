@@ -2,7 +2,7 @@ const { Contract, getAccountByName } = require("secret-polar");
 
 async function run (runtimeEnv) {
   const contract_owner = getAccountByName("account_0", runtimeEnv);
-  const contract = new Contract('sample-project', runtimeEnv);
+  const contract = new Contract('hello-world', runtimeEnv);
   await contract.parseSchema();
 
   const deploy_response = await contract.deploy(contract_owner);

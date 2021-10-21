@@ -26,16 +26,10 @@ export function getCargoVersion (cargoVersion: string): string | null {
 
 export function getWebAssemblyInstalled (): boolean {
   try {
-    const nightlyVersionData = execSync(`rustup target list --installed --toolchain nightly`);
-    const nightlyVersion: string[] = nightlyVersionData.toString().split(/\n/) || [];
-
     const stableVersionData = execSync(`rustup target list --installed --toolchain stable`);
     const stableVersion: string[] = stableVersionData.toString().split(/\n/) || [];
 
-    if (!nightlyVersion.includes('wasm32-unknown-unknown')) {
-      console.log(`wasm nightly compiler not installed. Try ${chalk.grey('rustup target add wasm32-unknown-unknown --toolchain nightly')}`);
-      return false;
-    } else if (!stableVersion.includes('wasm32-unknown-unknown')) {
+    if (!stableVersion.includes('wasm32-unknown-unknown')) {
       console.log(`wasm stable compiler not installed. Try ${chalk.grey('rustup target add wasm32-unknown-unknown --toolchain stable')}`);
       return false;
     }

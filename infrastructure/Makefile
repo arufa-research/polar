@@ -6,9 +6,6 @@ setup-rust:
 	rustup target list --installed
 	rustup target add wasm32-unknown-unknown
 
-	rustup install nightly
-	rustup target add wasm32-unknown-unknown --toolchain nightly
-
 	sudo apt install build-essential
 
 start-server: # CTRL+C to stop

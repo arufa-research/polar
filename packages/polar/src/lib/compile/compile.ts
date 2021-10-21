@@ -127,6 +127,8 @@ export function createArtifacts (
     const sourcePath = path.resolve(targetDir, filename);
     const destPath = path.resolve(artifactsDir, filename);
     fs.copyFileSync(sourcePath, destPath);
+    const pathRem = CONTRACTS_DIR + '/target';
+    fs.rmSync(pathRem, { recursive: true, force: true });
   }
 
   const schemaPaths = fs.readdirSync(sourceSchemaDir);
@@ -143,5 +145,9 @@ export function createArtifacts (
     const sourcePath = path.resolve(sourceSchemaDir, filename);
     const destPath = path.resolve(schemaDir, filename);
     fs.copyFileSync(sourcePath, destPath);
+    // eslint-disable-next-line
+    fs.unlink(sourcePath);
+    // eslint-disable-next-line
+    fs.rmdir(sourceSchemaDir);
   }
 }

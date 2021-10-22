@@ -49,16 +49,6 @@ describe("Compile task", () => {
     }).timeout(200000);
   });
 
-  describe("rustc or cargo version outdated", function () {
-    useFixtureProject("compiler-version-project");
-    it("Should raise error in case of outdated rustc or cargo version", async function () {
-      await expectPolarErrorAsync(
-        async () => await compile(false, [], false),
-        ERRORS.GENERAL.RUST_VERSION_ERROR
-      );
-    }).timeout(200000);
-  });
-
   describe("Compile fail when contract has compile errors", function () {
     useFixtureProject("errorproject");
     it("Should raise Polar error", async function () {

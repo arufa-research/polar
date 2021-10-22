@@ -45,7 +45,8 @@ export function resolveConfig (
   const resolved: ResolvedConfig = {
     ...config,
     paths,
-    networks: config.networks ?? {}
+    networks: config.networks ?? {},
+    compiler: config.compiler ?? {}
   };
 
   for (const extender of configExtenders) {

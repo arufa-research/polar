@@ -70,6 +70,10 @@ export interface PolarNetworkUserConfig {
   broadCastMode?: BroadcastMode
 }
 
+export interface PolarCompilerUserConfig {
+  version: string
+}
+
 export interface NetworksUserConfig {
   [networkName: string]: NetworkUserConfig | undefined
 }
@@ -78,10 +82,16 @@ export type NetworkUserConfig = PolarNetworkUserConfig;
 
 export type PolarNetworkConfig = PolarNetworkUserConfig;
 
+export type PolarCompilerConfig = PolarCompilerUserConfig;
+
 export type NetworkConfig = PolarNetworkConfig;
 
 export interface Networks {
   [networkName: string]: PolarNetworkConfig
+}
+
+export interface Compiler {
+  [compiler: string]: PolarCompilerConfig
 }
 
 export type PolarNetworkAccountsConfig =
@@ -233,6 +243,7 @@ export interface Network {
 export interface ResolvedConfig extends PolarUserConfig {
   paths?: ProjectPathsConfig
   networks: Networks
+  compiler: Compiler
 }
 
 /**

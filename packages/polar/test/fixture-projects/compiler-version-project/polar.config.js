@@ -14,7 +14,7 @@ const accounts = [
 module.exports = {
   compiler: {
     rustc: {
-      version: '1.15.0',
+      version: '20.15.0',
     },
     cargo: {
       version: '1.15.0'

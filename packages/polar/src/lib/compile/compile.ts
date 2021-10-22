@@ -127,8 +127,6 @@ export function createArtifacts (
     const sourcePath = path.resolve(targetDir, filename);
     const destPath = path.resolve(artifactsDir, filename);
     fs.copyFileSync(sourcePath, destPath);
-    const pathRem = CONTRACTS_DIR + '/target';
-    fs.rmSync(pathRem, { recursive: true, force: true });
   }
 
   const schemaPaths = fs.readdirSync(sourceSchemaDir);

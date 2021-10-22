@@ -1,0 +1,9 @@
+{
+  "name": "sample-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "secret-polar": "^0.2.0"
+  }
+}

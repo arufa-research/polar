@@ -35,5 +35,7 @@ function compileTask (
 }
 
 function canCompile (env: PolarRuntimeEnvironment): boolean {
-  return checkEnv({ rustcVersion: '1.50.0', cargoVersion: '1.50.0' });
+  const rustcVersion = env.config.compiler.rustc.version;
+  const cargoVersion = env.config.compiler.cargo.version;
+  return checkEnv({ rustcVersion, cargoVersion });
 }

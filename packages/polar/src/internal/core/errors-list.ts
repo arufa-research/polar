@@ -266,13 +266,6 @@ Please check that the configured keypair are correct.`,
       title: "Multiple contracts with same name",
       description: `Multiple contracts with same name.`,
       shouldBeReported: false
-    },
-    RUST_VERSION_ERROR: {
-      number: 29,
-      message: "Rustc version outdated",
-      title: "Update rustc",
-      description: `rustc version update required`,
-      shouldBeReported: false
     }
   },
   NETWORK: {

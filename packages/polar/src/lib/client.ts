@@ -16,14 +16,10 @@ export async function getSigningClient (
 ): Promise<SigningCosmWasmClient> {
   info(`Creating signing client for network: ${network.name}`);
   const signingPen = await Secp256k1Pen.fromMnemonic(account.mnemonic);
-  // Get the public key
-  const pubkey = encodeSecp256k1Pubkey(signingPen.pubkey);
-  // get the wallet address
-  const accAddress = pubkeyToAddress(pubkey, 'secret');
   const txEncryptionSeed = EnigmaUtils.GenerateNewSeed();
   return new SigningCosmWasmClient(
     network.config.endpoint,
-    accAddress,
+    account.address,
     (signBytes) => signingPen.sign(signBytes),
     network.config.seed ?? txEncryptionSeed,
     network.config.fees,

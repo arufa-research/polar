@@ -1,5 +1,5 @@
 import { info } from "console";
-import { CosmWasmClient, ExecuteResult, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
+import { CosmWasmClient, encodeSecp256k1Pubkey, EnigmaUtils, ExecuteResult, pubkeyToAddress, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
 
 import { Account, Network } from "../types";
 
@@ -16,12 +16,17 @@ export async function getSigningClient (
 ): Promise<SigningCosmWasmClient> {
   info(`Creating signing client for network: ${network.name}`);
   const signingPen = await Secp256k1Pen.fromMnemonic(account.mnemonic);
+  // Get the public key
+  const pubkey = encodeSecp256k1Pubkey(signingPen.pubkey);
+  // get the wallet address
+  const accAddress = pubkeyToAddress(pubkey, 'secret');
+  const txEncryptionSeed = EnigmaUtils.GenerateNewSeed();
   return new SigningCosmWasmClient(
     network.config.endpoint,
-    account.address,
+    accAddress,
     (signBytes) => signingPen.sign(signBytes),
-    network.config.seed,
-    undefined,
+    network.config.seed ?? txEncryptionSeed,
+    network.config.fees,
     network.config.broadCastMode
   );
 }

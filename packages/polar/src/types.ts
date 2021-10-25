@@ -68,6 +68,7 @@ export interface PolarNetworkUserConfig {
   gasLimit?: string | number
   seed?: Uint8Array
   broadCastMode?: BroadcastMode
+  fees?: Record<string, unknown>
 }
 
 export interface NetworksUserConfig {

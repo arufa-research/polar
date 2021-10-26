@@ -1,5 +1,5 @@
 import { info } from "console";
-import { CosmWasmClient, encodeSecp256k1Pubkey, EnigmaUtils, ExecuteResult, pubkeyToAddress, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
+import { CosmWasmClient, EnigmaUtils, ExecuteResult, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
 
 import { Account, Network } from "../types";
 

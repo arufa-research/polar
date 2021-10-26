@@ -48,12 +48,12 @@ export function getAccountByName (
   env: PolarRuntimeEnvironment
 ): (Account | UserAccount) {
   if (env.network.config.accounts === undefined) {
-    throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
+    throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });
   }
   for (const value of env.network.config.accounts) {
     if (value.name === name) {
       return new UserAccountI(value, env);
     }
   }
-  throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST);
+  throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });
 }

@@ -143,9 +143,5 @@ export function createArtifacts (
     const sourcePath = path.resolve(sourceSchemaDir, filename);
     const destPath = path.resolve(schemaDir, filename);
     fs.copyFileSync(sourcePath, destPath);
-    // eslint-disable-next-line
-    fs.unlink(sourcePath);
-    // eslint-disable-next-line
-    fs.rmdir(sourceSchemaDir);
   }
 }

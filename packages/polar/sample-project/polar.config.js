@@ -12,14 +12,6 @@ const accounts = [
 ];
 
 module.exports = {
-  compiler: {
-    rustc: {
-      version: '1.15.0',
-    },
-    cargo: {
-      version: '1.15.0'
-    }
-  },
   networks: {
     default: {
       endpoint: 'http://localhost:1337/'

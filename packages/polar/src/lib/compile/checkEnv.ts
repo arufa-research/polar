@@ -42,8 +42,8 @@ export function getWebAssemblyInstalled (): boolean {
 export function checkEnv (
   { rustcVersion, cargoVersion }: { rustcVersion: string, cargoVersion: string }
 ): boolean {
-  const rustcCurrVersion: string | null = getRustcVersion(rustcVersion);
-  const cargoCurrVersion: string | null = getCargoVersion(cargoVersion);
+  const rustcCurrVersion = getRustcVersion(rustcVersion);
+  const cargoCurrVersion = getCargoVersion(cargoVersion);
 
   const wasmInstalled: boolean = getWebAssemblyInstalled();
 

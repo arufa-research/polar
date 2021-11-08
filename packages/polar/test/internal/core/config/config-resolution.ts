@@ -31,8 +31,8 @@ describe("Config resolution", function () {
       it("should return the config merged ", async () => {
         const config = await loadConfigAndTasks();
         assert.containsAllKeys(config.networks, ["localhost", "custom"]);
-        const ncfg = config.networks.localhost as PolarNetworkUserConfig;
-        assert.equal(ncfg.endpoint, "http://127.0.0.1");
+        const ncfg = config.networks.localhost;
+        assert.equal(ncfg.url, "http://127.0.0.1");
         assert.deepEqual(config.networks.localhost.accounts, [account]);
       });
 

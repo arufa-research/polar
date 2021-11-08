@@ -8,7 +8,7 @@ import { getEnvRuntimeArgs } from "../../src/internal/core/params/env-variables"
 import { POLAR_PARAM_DEFINITIONS } from "../../src/internal/core/params/polar-params";
 import { Environment } from "../../src/internal/core/runtime-env";
 import { resetPolarContext } from "../../src/internal/reset";
-import { NetworkConfig, PromiseAny, PolarRuntimeEnvironment, PolarNetworkConfig } from "../../src/types";
+import { NetworkConfig, PolarNetworkConfig, PolarRuntimeEnvironment, PromiseAny } from "../../src/types";
 
 declare module "mocha" {
   interface Context {
@@ -20,7 +20,8 @@ let ctx: PolarContext;
 
 export const defaultNetCfg: PolarNetworkConfig = {
   accounts: [],
-  endpoint: "http://localhost:1337/"
+  url: "http://localhost:1337/",
+  chainId: 'columbus-3'
 };
 
 export function useEnvironment (

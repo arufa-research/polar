@@ -1,6 +1,6 @@
 # Polar
 
-Polar is a development framework for building secret contracts. The aim of the project is to make Secret contracts development process simple, efficient and scalable. User can focus on logic of secret contract and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment, Interacting with contracts using schema and contract testing framework.
+Polar is a development framework for building terra contracts. The aim of the project is to make terra contracts development process simple, efficient and scalable. User can focus on logic of terra contract and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment, Interacting with contracts using schema and contract testing framework.
 
 ## Requirements
 
@@ -8,7 +8,7 @@ The minimum packages/requirements are as follows:
  
 - Node 14+
 - Yarn v1.22+ or NPM `v6.0+**
-- Connection to an Secret node. 
+- Connection to an Terra node. 
 
 ## Setup rust environment
 
@@ -23,8 +23,8 @@ polar install
 ### Installation from released version
 
 To install polar globally in your system you can use:
-  - Using Yarn: `yarn global add secret-polar`
-  - Using NPM: `npm install -g secret-polar`
+  - Using Yarn: `yarn global add terra-polar`
+  - Using NPM: `npm install -g terra-polar`
 
 ### Installation from master.
 

@@ -12,8 +12,7 @@
 // Note that while many declarations are repeated here (i.e. network types'
 // fields), we don't use `extends` as that can interfere with plugin authors
 // trying to augment the config types.
-// Networks config\
-import { BroadcastMode } from "secretjs";
+// Networks config
 
 import * as types from "./internal/core/params/argument-types";
 
@@ -54,7 +53,7 @@ export interface InstantiateInfo {
 }
 
 export interface DeployInfo {
-  codeId: number
+  codeId: string
   contractCodeHash: string
   deployTimestamp: string
 }
@@ -62,12 +61,12 @@ export interface DeployInfo {
 export type PolarNetworkAccountsUserConfig = Account[];
 
 export interface PolarNetworkUserConfig {
-  endpoint: string
+  url: string
+  chainId: string
   httpHeaders?: Record<string, string>
   accounts: PolarNetworkAccountsUserConfig
   gasLimit?: string | number
   seed?: Uint8Array
-  broadCastMode?: BroadcastMode
   fees?: Record<string, unknown>
 }
 

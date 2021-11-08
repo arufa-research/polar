@@ -11,10 +11,10 @@ export default function (): void {
 async function nodeInfo (_taskArgs: TaskArguments, env: PolarRuntimeEnvironment): Promise<void> {
   const client = getClient(env.network);
   console.log("Network:", env.network.name);
-  console.log("ChainId:", await client.getChainId());
-  console.log("Block height:", await client.getHeight());
-  const nodeInfo = await client.restClient.nodeInfo()
-  // eslint-disable-next-line
-    .catch((err) => { throw new Error(`Could not fetch node info: ${err}`); });
-  console.log('Node Info: ', nodeInfo);
+  // console.log("ChainId:", await client.getChainId());
+  // console.log("Block height:", await client.getHeight());
+  // const nodeInfo = await client.restClient.nodeInfo()
+  // // eslint-disable-next-line
+  //   .catch((err) => { throw new Error(`Could not fetch node info: ${err}`); });
+  // console.log('Node Info: ', nodeInfo);
 }

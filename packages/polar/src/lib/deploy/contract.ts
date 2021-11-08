@@ -1,7 +1,12 @@
+import {
+  Block,
+  isTxError, MnemonicKey,
+  MsgExecuteContract, MsgInstantiateContract, MsgStoreCode, TxBroadcastResult,
+  TxError, TxSuccess
+} from '@terra-money/terra.js';
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient } from "secretjs";
 
 import { PolarError } from "../../internal/core/errors";
 import { ERRORS } from "../../internal/core/errors-list";
@@ -22,7 +27,7 @@ import type {
   UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
-import { ExecuteResult, getClient, getSigningClient } from "../client";
+import { getClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
 function buildCall (
@@ -92,11 +97,10 @@ export class Contract {
   readonly queryAbi: Abi;
   readonly executeAbi: Abi;
   readonly env: PolarRuntimeEnvironment;
-  readonly client: CosmWasmClient;
 
-  private codeId: number;
+  private codeId: string;
   private contractCodeHash: string;
-  private contractAddress: string;
+  private readonly contractAddress: string;
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 
@@ -110,7 +114,7 @@ export class Contract {
 
   constructor (contractName: string, env: PolarRuntimeEnvironment) {
     this.contractName = replaceAll(contractName, '-', '_');
-    this.codeId = 0;
+    this.codeId = "0";
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
@@ -148,14 +152,13 @@ export class Contract {
       const contractCodeId = this.checkpointData[env.network.name].deployInfo?.codeId;
       const contractAddr = this.checkpointData[env.network.name].instantiateInfo?.contractAddress;
       this.contractCodeHash = contractHash ?? "mock_hash";
-      this.codeId = contractCodeId ?? 0;
+      this.codeId = contractCodeId ?? "0";
       this.contractAddress = contractAddr ?? "mock_address";
     } else {
       this.checkpointData = {};
     }
 
     this.env = env;
-    this.client = getClient(env.network);
   }
 
   async parseSchema (): Promise<void> {
@@ -191,9 +194,7 @@ export class Contract {
     }
   }
 
-  async deploy (account: Account | UserAccount): Promise<DeployInfo> {
-    const accountVal: Account = (account as UserAccount).account !== undefined
-      ? (account as UserAccount).account : (account as Account);
+  async deploy (account: Account): Promise<DeployInfo> {
     const info = this.checkpointData[this.env.network.name]?.deployInfo;
     if (info) {
       console.log("Warning: contract already deployed, using checkpoints");
@@ -201,23 +202,42 @@ export class Contract {
     }
     await compress(this.contractName);
 
-    const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
+    const wasmFileContent = fs.readFileSync(this.contractPath).toString('base64');
 
-    const signingClient = await getSigningClient(this.env.network, accountVal);
-    const uploadReceipt = await signingClient.upload(wasmFileContent, {});
-    const codeId: number = uploadReceipt.codeId;
-    const contractCodeHash: string =
-      await signingClient.restClient.getCodeHashByCodeId(codeId);
+    const mk = new MnemonicKey({
+      mnemonic: account.mnemonic
+    });
+    const terra = getClient(this.env.network);
+    const wallet = terra.wallet(mk);
 
-    this.codeId = codeId;
+    const storeCode = new MsgStoreCode(
+      wallet.key.accAddress,
+      wasmFileContent
+    );
+    const storeCodeTx = await wallet.createAndSignTx({
+      msgs: [storeCode]
+    });
+    const storeCodeTxResult = await terra.tx.broadcast(storeCodeTx);
+
+    console.log(storeCodeTxResult);
+
+    if (isTxError(storeCodeTxResult)) {
+      throw new Error(
+        `store code failed. code: ${storeCodeTxResult.code}, codespace: ${storeCodeTxResult.codespace}, raw_log: ${storeCodeTxResult.raw_log}`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    }
+    const {
+      store_code: { codeId }
+    } = storeCodeTxResult.logs[0].eventsByType;
+
+    this.codeId = codeId[0];
     const deployInfo: DeployInfo = {
-      codeId: codeId,
-      contractCodeHash: contractCodeHash,
+      codeId: codeId[0],
+      contractCodeHash: "contractCodeHash",
       deployTimestamp: String(new Date())
     };
     this.checkpointData[this.env.network.name] =
       { ...this.checkpointData[this.env.network.name], deployInfo };
-    this.contractCodeHash = contractCodeHash;
+    this.contractCodeHash = "contractCodeHash";
     persistCheckpoint(this.checkpointPath, this.checkpointData);
 
     return deployInfo;
@@ -226,27 +246,36 @@ export class Contract {
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,
-    account: Account | UserAccount
+    account: Account
   ): Promise<InstantiateInfo> {
-    const accountVal: Account = (account as UserAccount).account !== undefined
-      ? (account as UserAccount).account : (account as Account);
-    if (this.contractCodeHash === "mock_hash") {
-      throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_DEPLOYED, {
-        param: this.contractName
-      });
-    }
-    const info = this.checkpointData[this.env.network.name]?.instantiateInfo;
-    if (info) {
-      console.log("Warning: contract already instantiated, using checkpoints");
-      return info;
-    }
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const mk = new MnemonicKey({
+      mnemonic: account.mnemonic
+    });
+    const terra = getClient(this.env.network);
+    const wallet = terra.wallet(mk);
+    const instantiate = new MsgInstantiateContract(
+      wallet.key.accAddress,
+      wallet.key.accAddress,
+      1, // code ID
+      initArgs // InitMsg
+    );
 
-    const contract = await signingClient.instantiate(this.codeId, initArgs, label);
-    this.contractAddress = contract.contractAddress;
+    const instantiateTx = await wallet.createAndSignTx({
+      msgs: [instantiate]
+    });
+    const instantiateTxResult = await terra.tx.broadcast(instantiateTx);
 
+    console.log(instantiateTxResult);
+
+    if (isTxError(instantiateTxResult)) {
+      throw new Error(
+        `instantiate failed. code: ${instantiateTxResult.code}, codespace: ${instantiateTxResult.codespace}, raw_log: ${instantiateTxResult.raw_log}`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    }
+    const {
+      instantiate_contract: { contractAddress }
+    } = instantiateTxResult.logs[0].eventsByType;
     const instantiateInfo: InstantiateInfo = {
-      contractAddress: this.contractAddress,
+      contractAddress: contractAddress[0],
       instantiateTimestamp: String(new Date())
     };
 
@@ -267,34 +296,46 @@ export class Contract {
     }
     // Query the contract
     console.log('Querying contract for ', methodName);
+    const terra = getClient(this.env.network);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
-    return await this.client.queryContractSmart(this.contractAddress, msgData);
+    return await terra.wasm.contractQuery(
+      this.contractAddress,
+      msgData // query msg
+    );
   }
 
   async executeMsg (
     methodName: string,
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
-    account: Account | UserAccount
-  ): Promise<ExecuteResult> {
-    const accountVal: Account = (account as UserAccount).account !== undefined
-      ? (account as UserAccount).account : (account as Account);
+    account: Account
+  ): Promise<any> {
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
         param: this.contractName
       });
     }
-    // Send execute msg to the contract
-    const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const mk = new MnemonicKey({
+      mnemonic: account.mnemonic
+    });
+    const terra = getClient(this.env.network);
+    const wallet = terra.wallet(mk);
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
-    // Send the same handleMsg to increment multiple times
-    return await signingClient.execute(
-      this.contractAddress,
-      msgData
+    const execute = new MsgExecuteContract(
+      wallet.key.accAddress, // sender
+      this.contractAddress, // contract account address
+      msgData, // handle msg
+      { uluna: 100000 } // coins
     );
+
+    const executeTx = await wallet.createAndSignTx({
+      msgs: [execute]
+    });
+
+    return await terra.tx.broadcast(executeTx);
   }
 }

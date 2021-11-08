@@ -32,7 +32,7 @@ export class PolarError extends Error {
     parentError?: Error
   ) {
     const prefix = `${getErrorCode(errorDescriptor)}: `;
-
+    console.log(errorDescriptor);
     const formattedMessage = applyErrorMessageTemplate(
       errorDescriptor.message,
       messageArguments

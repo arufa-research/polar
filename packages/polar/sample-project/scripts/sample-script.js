@@ -1,7 +1,11 @@
-const { Contract, getAccountByName } = require("secret-polar");
+const { Contract } = require("terra-polar");
 
 async function run (runtimeEnv) {
-  const contract_owner = getAccountByName("account_0", runtimeEnv);
+  const contract_owner = {
+    name: 'owner',
+    address: '',
+    mnemonic: "satisfy adjust timber high purchase tuition stool faith fine install that you unaware feed domain license impose boss human eager hat rent enjoy dawn"
+  };
   const contract = new Contract('sample-project', runtimeEnv);
   await contract.parseSchema();
 

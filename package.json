@@ -1,6 +1,6 @@
 {
   "name": "polar",
-  "description": "Polar is a development environment to compile, deploy, test, run scrt contracts on different networks.",
+  "description": "Polar is a development environment to compile, deploy, test, run terra contracts on different networks.",
   "repository": "https://github.com/arufa-research/polar.git",
   "author": "https://github.com/coco-sha",
   "license": "MIT",

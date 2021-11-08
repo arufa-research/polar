@@ -93,9 +93,9 @@ export class Contract {
   readonly initSchemaPath: string;
   readonly querySchemaPath: string;
   readonly executeSchemaPath: string;
-  readonly initAbi: Abi;
-  readonly queryAbi: Abi;
-  readonly executeAbi: Abi;
+  readonly initAbi?: Abi;
+  readonly queryAbi?: Abi;
+  readonly executeAbi?: Abi;
   readonly env: PolarRuntimeEnvironment;
 
   private codeId: string;
@@ -118,10 +118,11 @@ export class Contract {
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
-
+    console.log("contract path", this.contractPath);
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
     this.querySchemaPath = path.join(SCHEMA_DIR, this.contractName, "query_msg.json");
     this.executeSchemaPath = path.join(SCHEMA_DIR, this.contractName, "handle_msg.json");
+    console.log("init path", this.initSchemaPath, process.cwd());
 
     if (!fs.existsSync(this.initSchemaPath)) {
       console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
@@ -133,12 +134,12 @@ export class Contract {
       console.log("Warning: Execute schema not found for contract ", chalk.cyan(contractName));
     }
 
-    const initSchemaJson: AnyJson = fs.readJsonSync(this.initSchemaPath);
-    const querySchemaJson: AnyJson = fs.readJsonSync(this.querySchemaPath);
-    const executeSchemaJson: AnyJson = fs.readJsonSync(this.executeSchemaPath);
-    this.initAbi = new Abi(initSchemaJson);
-    this.queryAbi = new Abi(querySchemaJson);
-    this.executeAbi = new Abi(executeSchemaJson);
+    // const initSchemaJson: AnyJson = fs.readJsonSync(this.initSchemaPath);
+    // const querySchemaJson: AnyJson = fs.readJsonSync(this.querySchemaPath);
+    // const executeSchemaJson: AnyJson = fs.readJsonSync(this.executeSchemaPath);
+    // this.initAbi = new Abi(initSchemaJson);
+    // this.queryAbi = new Abi(querySchemaJson);
+    // this.executeAbi = new Abi(executeSchemaJson);
 
     this.query = {};
     this.tx = {};
@@ -162,36 +163,36 @@ export class Contract {
   }
 
   async parseSchema (): Promise<void> {
-    if (!fs.existsSync(this.querySchemaPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
-        param: this.contractName
-      });
-    }
-    if (!fs.existsSync(this.executeSchemaPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
-        param: this.contractName
-      });
-    }
-    await this.queryAbi.parseSchema();
-    await this.executeAbi.parseSchema();
+    // if (!fs.existsSync(this.querySchemaPath)) {
+    //   throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
+    //     param: this.contractName
+    //   });
+    // }
+    // if (!fs.existsSync(this.executeSchemaPath)) {
+    //   throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
+    //     param: this.contractName
+    //   });
+    // }
+    // await this.queryAbi.parseSchema();
+    // await this.executeAbi.parseSchema();
 
-    for (const message of this.queryAbi.messages) {
-      const msgName: string = message.identifier;
-      const args: AbiParam[] = message.args;
+    // for (const message of this.queryAbi.messages) {
+    //   const msgName: string = message.identifier;
+    //   const args: AbiParam[] = message.args;
 
-      if (this.query[msgName] == null) {
-        this.query[msgName] = buildCall(this, msgName, args);
-      }
-    }
+    //   if (this.query[msgName] == null) {
+    //     this.query[msgName] = buildCall(this, msgName, args);
+    //   }
+    // }
 
-    for (const message of this.executeAbi.messages) {
-      const msgName: string = message.identifier;
-      const args: AbiParam[] = message.args;
+    // for (const message of this.executeAbi.messages) {
+    //   const msgName: string = message.identifier;
+    //   const args: AbiParam[] = message.args;
 
-      if (this.tx[msgName] == null) {
-        this.tx[msgName] = buildSend(this, msgName, args);
-      }
-    }
+    //   if (this.tx[msgName] == null) {
+    //     this.tx[msgName] = buildSend(this, msgName, args);
+    //   }
+    // }
   }
 
   async deploy (account: Account): Promise<DeployInfo> {
@@ -201,7 +202,6 @@ export class Contract {
       return info;
     }
     await compress(this.contractName);
-
     const wasmFileContent = fs.readFileSync(this.contractPath).toString('base64');
 
     const mk = new MnemonicKey({
@@ -214,9 +214,11 @@ export class Contract {
       wallet.key.accAddress,
       wasmFileContent
     );
+    console.log("Store code ", storeCode);
     const storeCodeTx = await wallet.createAndSignTx({
       msgs: [storeCode]
     });
+    console.log("vreated");
     const storeCodeTxResult = await terra.tx.broadcast(storeCodeTx);
 
     console.log(storeCodeTxResult);

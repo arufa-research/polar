@@ -55,15 +55,11 @@ function printSuggestedCommands (projectName: string): void {
   console.log(`Success! Created project at ${chalk.greenBright(projectPath)}.`);
   // TODO: console.log(`Inside that directory, you can run several commands:`);
   // list commands and respective description
-  const npx =
-    getExecutionMode() === ExecutionMode.EXECUTION_MODE_GLOBAL_INSTALLATION
-      ? ""
-      : "npx ";
 
   console.log(`Begin by typing:`);
   console.log(`  cd ${projectName}`);
-  console.log(`  ${npx}${POLAR_NAME} help`);
-  console.log(`  ${npx}${POLAR_NAME} compile`);
+  console.log(`  ${POLAR_NAME} help`);
+  console.log(`  ${POLAR_NAME} compile`);
 }
 
 async function printPluginInstallationInstructions (): Promise<void> {

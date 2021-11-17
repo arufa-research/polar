@@ -14,8 +14,6 @@ async function setupRust (): Promise<boolean> {
   execSync(`rustup default stable`);
   execSync(`rustup target list --installed`);
   execSync(`rustup target add wasm32-unknown-unknown`);
-  execSync(`rustup install nightly`);
-  execSync(`rustup target add wasm32-unknown-unknown --toolchain nightly`);
   if (process.platform === "linux" || process.platform === "win32") { execSync(`sudo apt install build-essential`); }
 
   return true;

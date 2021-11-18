@@ -231,8 +231,13 @@ export interface Network {
   // provider:
 }
 
+interface RustVersion {
+  version: number
+}
+
 export interface ResolvedConfig extends PolarUserConfig {
   paths?: ProjectPathsConfig
+  rust?: RustVersion
   networks: Networks
 }
 

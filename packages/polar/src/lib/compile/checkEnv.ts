@@ -2,20 +2,12 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import semver from "semver";
 
-export function getRustcVersion (rustcVersion: string): string | null {
+import { setupRust } from "../../builtin-tasks/install";
+import { PolarRuntimeEnvironment } from "../../types";
+
+export function getRustcVersion (): string | null {
   try {
     const versionData = execSync(`rustc -V`);
-    const [version]: string[] = versionData.toString().split(/\s/)[1]?.trim().split('-') || [];
-
-    return semver.valid(version);
-  } catch (error) {
-    return null;
-  }
-}
-
-export function getCargoVersion (cargoVersion: string): string | null {
-  try {
-    const versionData = execSync(`cargo -V`);
     const [version]: string[] = versionData.toString().split(/\s/)[1]?.trim().split('-') || [];
 
     return semver.valid(version);
@@ -39,36 +31,28 @@ export function getWebAssemblyInstalled (): boolean {
   }
 }
 
-export function checkEnv (
-  { rustcVersion, cargoVersion }: { rustcVersion: string, cargoVersion: string }
-): boolean {
-  const rustcCurrVersion = getRustcVersion(rustcVersion);
-  const cargoCurrVersion = getCargoVersion(cargoVersion);
-
+export async function canCompile (
+  env: PolarRuntimeEnvironment
+): Promise<boolean> {
+  const rustcCurrVersion = getRustcVersion();
   const wasmInstalled: boolean = getWebAssemblyInstalled();
 
   if (!rustcCurrVersion) {
-    console.log(`Error: rustc not installed.`);
-    return false;
-  } else if (semver.lt(rustcCurrVersion, rustcVersion)) {
+    console.log(`Warning: rustc not installed.`);
+    console.log("Installing rust");
+    await setupRust(env);
+    return true;
+  } else if (semver.lt(rustcCurrVersion, env.config.rust?.version ?? rustcCurrVersion)) {
     if (rustcCurrVersion) {
-      console.log(`Error: rustc version ${chalk.green(rustcCurrVersion)} installed, required ${chalk.green(rustcVersion)}.`);
+      console.log(`warning: rustc version ${chalk.green(rustcCurrVersion)} installed, required ${chalk.green(env.config.rust?.version)}.`);
+      console.log("Updating rust version");
+      await setupRust(env);
     }
-    return false;
-  }
-
-  if (!cargoCurrVersion) {
-    console.log(`Error: rustc not installed.`);
-    return false;
-  } else if (semver.lt(cargoCurrVersion, cargoVersion)) {
-    if (cargoCurrVersion) {
-      console.log(`Error: cargo version ${chalk.green(cargoCurrVersion)} installed, required ${chalk.green(cargoVersion)}.`);
-    }
-    return false;
+    return true;
   }
 
   if (!wasmInstalled) {
-    return false;
+    execSync(`rustup target add wasm32-unknown-unknown`);
   }
 
   return true;

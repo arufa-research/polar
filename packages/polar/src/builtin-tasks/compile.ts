@@ -1,6 +1,6 @@
 import { boolean } from "../../src/internal/core/params/argument-types";
 import { task } from "../internal/core/config/config-env";
-import { checkEnv } from "../lib/compile/checkEnv";
+import { canCompile, checkEnv } from "../lib/compile/checkEnv";
 import { compile } from "../lib/compile/compile";
 import type { PolarRuntimeEnvironment } from "../types";
 import { TASK_COMPILE } from "./task-names";
@@ -23,17 +23,15 @@ export interface TaskArgs {
   force: boolean
 }
 
-function compileTask (
+async function compileTask (
   { docker, sourceDir, force }: TaskArgs,
   env: PolarRuntimeEnvironment
 ): Promise<void> {
-  if (!canCompile(env)) { // check if proper version of rust wasm compiler is installed
+  // check if proper version of rust wasm compiler is installed
+  // If not, install it
+  if (!(await canCompile(env))) {
     process.exit(1);
   }
 
-  return compile(docker, sourceDir, force);
-}
-
-function canCompile (env: PolarRuntimeEnvironment): boolean {
-  return checkEnv({ rustcVersion: '1.50.0', cargoVersion: '1.50.0' });
+  return await compile(docker, sourceDir, force);
 }

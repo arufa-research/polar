@@ -1,6 +1,6 @@
 import { boolean } from "../../src/internal/core/params/argument-types";
 import { task } from "../internal/core/config/config-env";
-import { canCompile, checkEnv } from "../lib/compile/checkEnv";
+import { canCompile } from "../lib/compile/checkEnv";
 import { compile } from "../lib/compile/compile";
 import type { PolarRuntimeEnvironment } from "../types";
 import { TASK_COMPILE } from "./task-names";

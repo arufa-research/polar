@@ -5,14 +5,19 @@ import semver from "semver";
 import { setupRust } from "../../builtin-tasks/install";
 import { PolarRuntimeEnvironment } from "../../types";
 
-export function getRustcVersion (): string | null {
+export function getRustcVersion (): string {
   try {
     const versionData = execSync(`rustc -V`);
     const [version]: string[] = versionData.toString().split(/\s/)[1]?.trim().split('-') || [];
 
-    return semver.valid(version);
+    const res = semver.valid(version);
+    if (typeof res === "string") {
+      return res;
+    } else {
+      throw new Error("Invalid rust version");
+    }
   } catch (error) {
-    return null;
+    throw new Error("Can't fetch rust version");
   }
 }
 
@@ -36,19 +41,16 @@ export async function canCompile (
 ): Promise<boolean> {
   const rustcCurrVersion = getRustcVersion();
   const wasmInstalled: boolean = getWebAssemblyInstalled();
+  const wantVersion = env.config.rust?.version ?? rustcCurrVersion;
 
   if (!rustcCurrVersion) {
     console.log(`Warning: rustc not installed.`);
     console.log("Installing rust");
     await setupRust(env);
-    return true;
-  } else if (semver.lt(rustcCurrVersion, env.config.rust?.version ?? rustcCurrVersion)) {
-    if (rustcCurrVersion) {
-      console.log(`warning: rustc version ${chalk.green(rustcCurrVersion)} installed, required ${chalk.green(env.config.rust?.version)}.`);
-      console.log("Updating rust version");
-      await setupRust(env);
-    }
-    return true;
+  } else if (rustcCurrVersion.localeCompare(wantVersion) !== 0) {
+    console.log(`warning: rustc version ${chalk.green(rustcCurrVersion)} installed, required ${chalk.green(env.config.rust?.version)}.`);
+    console.log("Updating rust version");
+    await setupRust(env);
   }
 
   if (!wasmInstalled) {

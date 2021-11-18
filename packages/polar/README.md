@@ -22,7 +22,7 @@ To install polar globally in your system you can use:
 ### Initialize a project
 
 ```bash
-polar init <project-name>
+$ polar init <project-name>
 ```
 
 This will create a directory <project-name> inside current directory with boiler-plate code.
@@ -32,17 +32,17 @@ This will create a directory <project-name> inside current directory with boiler
 Go to project directory:
 
 ```bash
-cd <project-name>
+$ cd <project-name>
 ```
 
 Compile the project and generate `.wasm` files:
 
 ```bash
-polar compile
+$ polar compile
 ```
 
 ## Run tests
 
 ```bash
-yarn run test
+$ yarn run test
 ```

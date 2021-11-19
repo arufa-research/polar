@@ -1,6 +1,7 @@
 import { Account as WasmAccount, CosmWasmClient } from "secretjs";
 import { PubKey } from "secretjs/types/types";
 
+import { PolarContext } from "../internal/context";
 import { PolarError } from "../internal/core/errors";
 import { ERRORS } from "../internal/core/errors-list";
 import { Account, Coin, PolarRuntimeEnvironment, UserAccount } from "../types";
@@ -44,9 +45,9 @@ export class UserAccountI implements UserAccount {
 }
 
 export function getAccountByName (
-  name: string,
-  env: PolarRuntimeEnvironment
+  name: string
 ): (Account | UserAccount) {
+  const env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
   if (env.network.config.accounts === undefined) {
     throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });
   }

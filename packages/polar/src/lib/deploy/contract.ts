@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient } from "secretjs";
 
+import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
 import { ERRORS } from "../../internal/core/errors-list";
 import {
@@ -91,7 +92,7 @@ export class Contract {
   readonly initAbi: Abi;
   readonly queryAbi: Abi;
   readonly executeAbi: Abi;
-  readonly env: PolarRuntimeEnvironment;
+  readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
   readonly client: CosmWasmClient;
 
   private codeId: number;
@@ -108,7 +109,7 @@ export class Contract {
     [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
-  constructor (contractName: string, env: PolarRuntimeEnvironment) {
+  constructor (contractName: string) {
     this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
@@ -144,9 +145,10 @@ export class Contract {
     // file exist load it else create new checkpoint
     if (fs.existsSync(this.checkpointPath)) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
-      const contractHash = this.checkpointData[env.network.name].deployInfo?.contractCodeHash;
-      const contractCodeId = this.checkpointData[env.network.name].deployInfo?.codeId;
-      const contractAddr = this.checkpointData[env.network.name].instantiateInfo?.contractAddress;
+      const contractHash = this.checkpointData[this.env.network.name].deployInfo?.contractCodeHash;
+      const contractCodeId = this.checkpointData[this.env.network.name].deployInfo?.codeId;
+      const contractAddr =
+        this.checkpointData[this.env.network.name].instantiateInfo?.contractAddress;
       this.contractCodeHash = contractHash ?? "mock_hash";
       this.codeId = contractCodeId ?? 0;
       this.contractAddress = contractAddr ?? "mock_address";
@@ -154,8 +156,7 @@ export class Contract {
       this.checkpointData = {};
     }
 
-    this.env = env;
-    this.client = getClient(env.network);
+    this.client = getClient(this.env.network);
   }
 
   async parseSchema (): Promise<void> {

@@ -29,7 +29,7 @@ declare namespace Chai {
     calledOnContractWith(contract: any, parameters: any[]): void
   }
 
-  type NumberComparer = (value: any, message?: string) => Assertion;
+  // type NumberComparer = (value: any, message?: string) => Assertion;
 
   interface AsyncAssertion extends Assertion, Promise<void> {}
 

@@ -2,7 +2,7 @@ import { Account as WasmAccount } from "secretjs";
 
 import { PolarContext } from "../../../internal/context";
 import type {
-  Account
+  Account, Coin
 } from "../../../types";
 import { getClient } from "../../client";
 
@@ -37,6 +37,17 @@ export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void
   });
 }
 
+function extractScrtBalance (
+  balances: readonly Coin[]
+): number {
+  for (const coin of balances) {
+    if (coin.denom === 'uscrt') {
+      return Number(coin.amount);
+    }
+  }
+  return 0;
+}
+
 export async function getBalanceChange (
   transaction: (() => Promise<any>), // eslint-disable-line  @typescript-eslint/no-explicit-any
   accountAddr: string,
@@ -48,13 +59,15 @@ export async function getBalanceChange (
 
   const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
 
-  const balanceBefore =
-    Number((await client.getAccount(accountAddr) as WasmAccount).balance[0].amount);
+  const balanceBefore = extractScrtBalance(
+    (await client.getAccount(accountAddr) as WasmAccount).balance
+  );
 
   const txResponse = await transaction();
 
-  const balanceAfter =
-    Number((await client.getAccount(accountAddr) as WasmAccount).balance[0].amount);
+  const balanceAfter = extractScrtBalance(
+    (await client.getAccount(accountAddr) as WasmAccount).balance
+  );
 
   // if (
   //   options?.includeFee !== true &&

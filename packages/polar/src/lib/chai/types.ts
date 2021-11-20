@@ -13,17 +13,17 @@ declare namespace Chai {
     properHex(length: number): void
     properAddress(): void
     properSecretAddress(): void
-    changeScrtBalance(account: any, balanceChange: any, includeFee?: any): AsyncAssertion
+    changeScrtBalance(account: any, balanceChange: number, includeFee?: boolean): AsyncAssertion
     changeScrtBalances(
       accounts: any[],
-      balances: any[],
-      includeFee?: any
+      balances: number[],
+      includeFee?: boolean
     ): AsyncAssertion
-    changeTokenBalance(token: any, account: any, balance: any): AsyncAssertion
+    changeTokenBalance(account: any, balanceChange: number, token: string): AsyncAssertion
     changeTokenBalances(
-      token: any,
       accounts: any[],
-      balances: any[]
+      balances: number[],
+      token: string
     ): AsyncAssertion
     calledOnContract(contract: any): void
     calledOnContractWith(contract: any, parameters: any[]): void

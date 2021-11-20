@@ -1,25 +1,24 @@
+import { Account as WasmAccount } from "secretjs";
+
+import { PolarContext } from "../../../internal/context";
 import type {
-  Account, PolarRuntimeEnvironment, UserAccount
+  Account
 } from "../../../types";
-import { getAccountByName, UserAccountI } from "../../account";
+import { getClient } from "../../client";
 
-interface BalanceChangeOptions {
-  includeFee?: boolean
-}
-
-export function supportChangeBalance (Assertion: Chai.AssertionStatic): void {
-  Assertion.addMethod('changeBalance', function (
+export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void {
+  Assertion.addMethod('changeScrtBalance', function (
     this: any, // eslint-disable-line  @typescript-eslint/no-explicit-any
     account: Account | string,
     balanceChange: number,
-    options: BalanceChangeOptions
+    includeFee?: boolean
   ) {
     const subject = this._obj;
 
     const accountAddr: string = (account as Account).address !== undefined
       ? (account as Account).address : (account as string);
     const derivedPromise = Promise.all([
-      getBalanceChange(subject, accountAddr, options)
+      getBalanceChange(subject, accountAddr, includeFee)
     ]).then(([actualChange]) => {
       this.assert(
         actualChange === balanceChange,
@@ -41,21 +40,21 @@ export function supportChangeBalance (Assertion: Chai.AssertionStatic): void {
 export async function getBalanceChange (
   transaction: (() => Promise<any>), // eslint-disable-line  @typescript-eslint/no-explicit-any
   accountAddr: string,
-  options?: BalanceChangeOptions
+  includeFee?: boolean
 ): Promise<number> {
   if (typeof transaction !== 'function') {
     // raise exception, should be function
   }
 
-  const env: PolarRuntimeEnvironment | undefined = undefined;
+  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
 
-  const account = getAccountByName(accountAddr, env) as UserAccount;// access env or client here
-
-  const balanceAfter = Number((await account.getBalance())[0].amount);
+  const balanceBefore =
+    Number((await client.getAccount(accountAddr) as WasmAccount).balance[0].amount);
 
   const txResponse = await transaction();
 
-  const balanceBefore = Number((await account.getBalance())[0].amount);
+  const balanceAfter =
+    Number((await client.getAccount(accountAddr) as WasmAccount).balance[0].amount);
 
   // if (
   //   options?.includeFee !== true &&
@@ -74,6 +73,6 @@ export async function getBalanceChange (
   //     return balanceAfter.sub(balanceBefore);
   //   }
   // } else {
-  return (balanceAfter - balanceBefore);
+  return (balanceBefore - balanceAfter);
   // }
 }

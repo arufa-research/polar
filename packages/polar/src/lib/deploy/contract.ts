@@ -16,12 +16,14 @@ import type {
   Account,
   AnyJson,
   Checkpoints,
+  Coin,
   ContractFunction,
   DeployInfo,
   InstantiateInfo,
   PolarRuntimeEnvironment,
   UserAccount
 } from "../../types";
+import { UserAccountI } from "../account";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
@@ -54,32 +56,27 @@ function buildSend (
   argNames: AbiParam[]
 ): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
+    account: Account | UserAccount,
+    transferAmount: readonly Coin[] | undefined,
     ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (args.length !== argNames.length + 1) {
-      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length + 1}`);
+    if (args.length !== argNames.length) {
+      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
       return;
     }
-
-    const accountVal = args[args.length - 1].account !== undefined
-      ? args[args.length - 1].account : args[args.length - 1];
-    if (
-      accountVal.address === undefined ||
-      accountVal.name === undefined ||
-      accountVal.mnemonic === undefined
-    ) {
-      console.error(`Invalid ${msgName} call. Last argument should be an account object.`);
-      return;
+    if (transferAmount === []) {
+      transferAmount = undefined;
     }
 
-    const account: Account = accountVal as Account;
+    const accountVal: Account = (account as UserAccount).account !== undefined
+      ? (account as UserAccount).account : (account as Account);
     const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
     argNames.forEach((abiParam, i) => {
       msgArgs[abiParam.name] = args[i];
     });
 
     // Execute function (write)
-    return contract.executeMsg(msgName, msgArgs, account);
+    return contract.executeMsg(msgName, msgArgs, accountVal, transferAmount);
   };
 }
 
@@ -277,7 +274,8 @@ export class Contract {
   async executeMsg (
     methodName: string,
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
-    account: Account | UserAccount
+    account: Account | UserAccount,
+    transferAmount?: readonly Coin[]
   ): Promise<ExecuteResult> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -295,7 +293,9 @@ export class Contract {
     // Send the same handleMsg to increment multiple times
     return await signingClient.execute(
       this.contractAddress,
-      msgData
+      msgData,
+      undefined,
+      transferAmount
     );
   }
 }

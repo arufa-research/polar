@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient } from "secretjs";
+import { CosmWasmClient, FeeTable } from "secretjs";
 
 import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
@@ -98,6 +98,8 @@ export class Contract {
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 
+  private readonly customFees: Partial<FeeTable> | undefined;
+
   public query: {
     [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
@@ -106,8 +108,9 @@ export class Contract {
     [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
-  constructor (contractName: string) {
+  constructor (contractName: string, customFees?: Partial<FeeTable>) {
     this.contractName = replaceAll(contractName, '-', '_');
+    this.customFees = customFees;
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";
@@ -201,7 +204,7 @@ export class Contract {
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = await getSigningClient(this.env.network, accountVal, this.customFees);
     const uploadReceipt = await signingClient.upload(wasmFileContent, {});
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
@@ -238,7 +241,7 @@ export class Contract {
       console.log("Warning: contract already instantiated, using checkpoints");
       return info;
     }
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = await getSigningClient(this.env.network, accountVal, this.customFees);
 
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
@@ -285,7 +288,7 @@ export class Contract {
       });
     }
     // Send execute msg to the contract
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = await getSigningClient(this.env.network, accountVal, this.customFees);
 
     const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
     msgData[methodName] = callArgs;

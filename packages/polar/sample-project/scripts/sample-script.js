@@ -1,8 +1,19 @@
 const { Contract, getAccountByName } = require("secret-polar");
 
 async function run (runtimeEnv) {
+  const customFees = {
+    upload: {
+        amount: [{ amount: "2000000", denom: "uscrt" }],
+        gas: "2000000",
+    },
+    init: {
+        amount: [{ amount: "500000", denom: "uscrt" }],
+        gas: "500000",
+    },
+  }
+
   const contract_owner = getAccountByName("account_0");
-  const contract = new Contract('sample-project');
+  const contract = new Contract("sample-project", customFees);
   await contract.parseSchema();
 
   const deploy_response = await contract.deploy(contract_owner);

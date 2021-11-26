@@ -13,7 +13,7 @@
 // fields), we don't use `extends` as that can interfere with plugin authors
 // trying to augment the config types.
 // Networks config\
-import { BroadcastMode } from "secretjs";
+import { BroadcastMode, FeeTable } from "secretjs";
 
 import * as types from "./internal/core/params/argument-types";
 
@@ -68,7 +68,7 @@ export interface PolarNetworkUserConfig {
   gasLimit?: string | number
   seed?: Uint8Array
   broadCastMode?: BroadcastMode
-  fees?: Record<string, unknown>
+  fees?: Partial<FeeTable>
 }
 
 export interface NetworksUserConfig {

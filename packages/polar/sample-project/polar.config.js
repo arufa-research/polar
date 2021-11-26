@@ -30,7 +30,17 @@ module.exports = {
       trustNode: true,
       keyringBackend: 'test',
       accounts: accounts,
-      types: {}
+      types: {},
+      fees: {
+        upload: {
+            amount: [{ amount: "2000000", denom: "uscrt" }],
+            gas: "2000000",
+        },
+        init: {
+            amount: [{ amount: "500000", denom: "uscrt" }],
+            gas: "500000",
+        },
+      }
     }
   },
   mocha: {

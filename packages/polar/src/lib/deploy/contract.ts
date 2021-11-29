@@ -86,9 +86,12 @@ export class Contract {
   readonly initSchemaPath: string;
   readonly querySchemaPath: string;
   readonly executeSchemaPath: string;
+  readonly responsePaths: string[] = [];
   readonly initAbi: Abi;
   readonly queryAbi: Abi;
   readonly executeAbi: Abi;
+  readonly responseAbis: Abi[] = [];
+
   readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
   readonly client: CosmWasmClient;
 
@@ -106,6 +109,10 @@ export class Contract {
     [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
   };
 
+  public responses: {
+    [name: string]: AbiParam[]
+  };
+
   constructor (contractName: string) {
     this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
@@ -116,6 +123,13 @@ export class Contract {
     this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
     this.querySchemaPath = path.join(SCHEMA_DIR, this.contractName, "query_msg.json");
     this.executeSchemaPath = path.join(SCHEMA_DIR, this.contractName, "handle_msg.json");
+
+    for (const file of fs.readdirSync(path.join(SCHEMA_DIR, this.contractName))) {
+      if (file.split('.')[0].split('_')[1] !== "response") { // *_response.json
+        continue;
+      }
+      this.responsePaths.push(path.join(SCHEMA_DIR, this.contractName, file));
+    }
 
     if (!fs.existsSync(this.initSchemaPath)) {
       console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
@@ -134,8 +148,15 @@ export class Contract {
     this.queryAbi = new Abi(querySchemaJson);
     this.executeAbi = new Abi(executeSchemaJson);
 
+    for (const file of this.responsePaths) {
+      const responseSchemaJson: AnyJson = fs.readJSONSync(file);
+      const responseAbi = new Abi(responseSchemaJson);
+      this.responseAbis.push(responseAbi);
+    }
+
     this.query = {};
     this.tx = {};
+    this.responses = {};
 
     // Load checkpoints
     this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
@@ -170,6 +191,10 @@ export class Contract {
     await this.queryAbi.parseSchema();
     await this.executeAbi.parseSchema();
 
+    for (const responseAbi of this.responseAbis) {
+      await responseAbi.parseSchema();
+    }
+
     for (const message of this.queryAbi.messages) {
       const msgName: string = message.identifier;
       const args: AbiParam[] = message.args;
@@ -185,6 +210,17 @@ export class Contract {
 
       if (this.tx[msgName] == null) {
         this.tx[msgName] = buildSend(this, msgName, args);
+      }
+    }
+
+    for (const responseAbi of this.responseAbis) {
+      for (const message of responseAbi.messages) {
+        const msgName: string = message.identifier;
+        const args: AbiParam[] = message.args;
+
+        if (this.responses[msgName] == null) {
+          this.responses[msgName] = args;
+        }
       }
     }
   }

@@ -59,7 +59,7 @@
     "node-fetch": "^2.6.1",
     "parse-cosmwasm-schema": "^0.2.0",
     "repl": "^0.1.3",
-    "secretjs": "^0.16.1",
+    "secretjs": "^0.17.5",
     "semver": "^7.3.5",
     "source-map-support": "^0.5.19",
     "vm": "^0.1.0",

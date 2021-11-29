@@ -9,7 +9,7 @@ declare namespace Chai {
     extends LanguageChains, NumericComparison, TypeComparison {
     reverted(): AsyncAssertion
     revertedWith(reason: string): AsyncAssertion
-    emit(contract: any, eventName: string): EmitAssertion
+    respondWith(responseMessage: string): AsyncAssertion
     properHex(length: number): void
     properAddress(): void
     properSecretAddress(): void

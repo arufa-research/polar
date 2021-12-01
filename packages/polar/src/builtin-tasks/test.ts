@@ -1,5 +1,7 @@
+import chalk from "chalk";
 import debug from "debug";
 import fsExtra from "fs-extra";
+import path from "path";
 
 import { task } from "../internal/core/config/config-env";
 import { PolarError } from "../internal/core/errors";
@@ -40,6 +42,15 @@ async function executeTestTask (
   // eslint-disable-next-line
 ): Promise<any> {
   const logDebugTag = "polar:tasks:run";
+
+  if (tests === undefined) {
+    tests = [];
+    for (const file of fsExtra.readdirSync(TESTS_DIR)) {
+      tests.push(path.join(TESTS_DIR, file));
+    }
+    console.log(`Reading test files in ${chalk.cyan(TESTS_DIR)} directory`);
+    console.log(`Found ${tests.length} test files: ${chalk.green(tests)}`);
+  }
 
   const nonExistent = filterNonExistent(tests);
   if (nonExistent.length !== 0) {

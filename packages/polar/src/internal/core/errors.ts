@@ -131,38 +131,19 @@ export function applyErrorMessageTemplate (
   // eslint-disable-next-line
   values: { [templateVar: string]: any }
 ): string {
-  return _applyErrorMessageTemplate(template, values, false);
+  return _applyErrorMessageTemplate(template, values);
 }
 
 /* eslint-disable sonarjs/cognitive-complexity */
 function _applyErrorMessageTemplate (
   template: string,
   // eslint-disable-next-line
-  values: { [templateVar: string]: any },
-  isRecursiveCall: boolean
+  values: { [templateVar: string]: any }
 ): string {
-  if (!isRecursiveCall) {
-    for (const variableName of Object.keys(values)) {
-      if (variableName.match(/^[a-zA-Z][a-zA-Z0-9]*$/) === null) {
-        throw new PolarError(ERRORS.INTERNAL.TEMPLATE_INVALID_VARIABLE_NAME, {
-          variable: variableName
-        });
-      }
-
-      const variableTag = `%${variableName}%`;
-
-      if (!template.includes(variableTag)) {
-        throw new PolarError(ERRORS.INTERNAL.TEMPLATE_VARIABLE_TAG_MISSING, {
-          variable: variableName
-        });
-      }
-    }
-  }
-
   if (template.includes('%%')) {
     return template
       .split('%%')
-      .map((part) => _applyErrorMessageTemplate(part, values, true))
+      .map((part) => _applyErrorMessageTemplate(part, values))
       .join('%');
   }
 
@@ -182,14 +163,6 @@ function _applyErrorMessageTemplate (
     }
 
     const variableTag = `%${variableName}%`;
-
-    if (value.match(/%([a-zA-Z][a-zA-Z0-9]*)?%/) !== null) {
-      throw new PolarError(
-        ERRORS.INTERNAL.TEMPLATE_VALUE_CONTAINS_VARIABLE_TAG,
-        { variable: variableName }
-      );
-    }
-
     template = replaceAll(template, variableTag, value);
   }
 

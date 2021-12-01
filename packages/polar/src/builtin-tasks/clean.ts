@@ -29,7 +29,7 @@ export default function (): void {
       if (!isCwdProjectDir()) {
         console.log(`Not in a valid polar project repo, exiting`);
         process.exit(1);
-      } else if (!fsExtra.existsSync(`./${ARTIFACTS_DIR}`)) {
+      } else if (!fsExtra.existsSync(`./${ARTIFACTS_DIR}`) && contractName.length) {
         throw new PolarError(ERRORS.GENERAL.ARTIFACTS_NOT_FOUND);
       } else if (contractNameNew.length !== 0 && fsExtra.existsSync(comp)) {
         const artifactsAbsPath = path.resolve(process.cwd(), ARTIFACTS_DIR);

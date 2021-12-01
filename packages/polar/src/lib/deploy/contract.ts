@@ -191,9 +191,9 @@ export class Contract {
     await this.queryAbi.parseSchema();
     await this.executeAbi.parseSchema();
 
-    for (const responseAbi of this.responseAbis) {
-      await responseAbi.parseSchema();
-    }
+    // for (const responseAbi of this.responseAbis) {
+    //   await responseAbi.parseSchema();
+    // }
 
     for (const message of this.queryAbi.messages) {
       const msgName: string = message.identifier;
@@ -213,16 +213,16 @@ export class Contract {
       }
     }
 
-    for (const responseAbi of this.responseAbis) {
-      for (const message of responseAbi.messages) {
-        const msgName: string = message.identifier;
-        const args: AbiParam[] = message.args;
+    // for (const responseAbi of this.responseAbis) {
+    //   for (const message of responseAbi.messages) {
+    //     const msgName: string = message.identifier;
+    //     const args: AbiParam[] = message.args;
 
-        if (this.responses[msgName] == null) {
-          this.responses[msgName] = args;
-        }
-      }
-    }
+    //     if (this.responses[msgName] == null) {
+    //       this.responses[msgName] = args;
+    //     }
+    //   }
+    // }
   }
 
   async deploy (account: Account | UserAccount): Promise<DeployInfo> {

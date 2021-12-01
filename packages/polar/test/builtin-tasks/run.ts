@@ -57,19 +57,19 @@ scripts directory: script 1 executed
     );
   });
 
-  // it("Should return the script's status code on failure", async function () {
-  //   await expectPolarErrorAsync(
-  //     async () =>
-  //       await this.env.run(TASK_RUN, {
-  //         scripts: ["scripts/other-scripts/1.js",
-  //           "scripts/other-scripts/failing.js", "scripts/1.js"]
-  //       }),
-  //     ERRORS.BUILTIN_TASKS.RUN_FILES_NOT_FOUND,
-  //     "scripts/other-scripts/failing.js"
-  //   );
-  //   const scriptOutput = fs.readFileSync(testFixtureOutputFile).toString();
-  //   assert.equal(scriptOutput, "other scripts directory: script 1 executed\n");
-  // });
+  it("Should return the script's status code on failure", async function () {
+    await expectPolarErrorAsync(
+      async () =>
+        await this.env.run(TASK_RUN, {
+          scripts: ["scripts/other-scripts/1.js",
+            "scripts/other-scripts/failing.js", "scripts/1.js"]
+        }),
+      ERRORS.BUILTIN_TASKS.RUN_SCRIPT_ERROR,
+      "scripts/other-scripts/failing.js"
+    );
+    const scriptOutput = fs.readFileSync(testFixtureOutputFile).toString();
+    assert.equal(scriptOutput, "other scripts directory: script 1 executed\n");
+  });
 
   it("Should allow to rerun successful scripts twice", async function () {
     await this.env.run(TASK_RUN, {

@@ -68,7 +68,11 @@ export async function runScript (
       script: relativeScriptPath
     });
   }
-  await requiredScript.default(runtimeEnv);
+  try {
+    await requiredScript.default(runtimeEnv);
+  } catch (error) {
+    displayErr(error, relativeScriptPath);
+  }
 }
 
 /**

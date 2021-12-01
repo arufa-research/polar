@@ -1,5 +1,5 @@
 
-async function run (runtimeEnv) {
+async function run () {
   throw new Error('failing script')
 }
 

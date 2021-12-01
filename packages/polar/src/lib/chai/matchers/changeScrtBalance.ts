@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Account as WasmAccount } from "secretjs";
 
 import { PolarContext } from "../../../internal/context";
@@ -13,14 +14,15 @@ export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void
     this: any, // eslint-disable-line  @typescript-eslint/no-explicit-any
     account: Account | string,
     balanceChange: number,
-    includeFee?: boolean
+    includeFee?: boolean,
+    logResponse?: boolean
   ) {
     const subject = this._obj;
 
     const accountAddr: string = (account as Account).address !== undefined
       ? (account as Account).address : (account as string);
     const derivedPromise = Promise.all([
-      getBalanceChange(subject, accountAddr, includeFee)
+      getBalanceChange(subject, accountAddr, includeFee, logResponse)
     ]).then(([actualChange]) => {
       this.assert(
         actualChange === balanceChange,
@@ -53,7 +55,8 @@ function extractScrtBalance (
 export async function getBalanceChange (
   transaction: (() => Promise<any>), // eslint-disable-line  @typescript-eslint/no-explicit-any
   accountAddr: string,
-  includeFee?: boolean
+  includeFee?: boolean,
+  logResponse?: boolean
 ): Promise<number> {
   if (typeof transaction !== 'function') {
     throw new PolarError(ERRORS.GENERAL.NOT_A_FUNCTION, {
@@ -68,6 +71,9 @@ export async function getBalanceChange (
   );
 
   const txResponse = await transaction();
+  if (logResponse === true) {
+    console.log(`${chalk.green("Transaction response:")} ${txResponse as string}`);
+  }
 
   const balanceAfter = extractScrtBalance(
     (await client.getAccount(accountAddr) as WasmAccount).balance

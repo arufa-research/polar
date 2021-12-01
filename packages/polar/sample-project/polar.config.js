@@ -23,10 +23,10 @@ module.exports = {
       keyringBackend: 'test',
       types: {}
     },
-    // Holodeck Testnet
+    // Supernova Testnet
     testnet: {
-      endpoint: 'http://chainofsecrets.secrettestnet.io',
-      chainId: 'holodeck-2',
+      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+      chainId: 'supernova-2',
       trustNode: true,
       keyringBackend: 'test',
       accounts: accounts,

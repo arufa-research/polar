@@ -39,9 +39,8 @@ async function runTests (
 async function executeTestTask (
   { tests }: Input,
   runtimeEnv: PolarRuntimeEnvironment
-  // eslint-disable-next-line
-): Promise<any> {
-  const logDebugTag = "polar:tasks:run";
+): Promise<void> {
+  const logDebugTag = "polar:tasks:test";
 
   if (tests === undefined) {
     tests = [];

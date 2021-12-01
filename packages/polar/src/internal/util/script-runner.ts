@@ -47,7 +47,7 @@ function displayErr (error: Error | PolarError | any, relativeScriptPath: string
   throw new PolarError(
     ERRORS.BUILTIN_TASKS.RUN_SCRIPT_ERROR, {
       script: relativeScriptPathWithLine,
-      message: error.message
+      error: error.message
     },
     error
   );

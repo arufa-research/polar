@@ -12,10 +12,6 @@ module.exports = {
     custom: {
       endpoint: 'http://localhost',
       accounts: accounts
-    },
-    localhost: {
-      endpoint: 'http://127.0.0.1',
-      accounts: accounts
     }
   },
   unknown: { asd: 12 }

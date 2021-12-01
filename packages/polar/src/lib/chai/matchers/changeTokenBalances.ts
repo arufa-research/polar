@@ -1,6 +1,8 @@
 import { Account as WasmAccount } from "secretjs";
 
 import { PolarContext } from "../../../internal/context";
+import { PolarError } from "../../../internal/core/errors";
+import { ERRORS } from "../../../internal/core/errors-list";
 import type {
   Account, Coin
 } from "../../../types";
@@ -75,7 +77,9 @@ export async function getBalanceChanges (
   token: string
 ): Promise<number[]> {
   if (typeof transaction !== 'function') {
-    // raise exception, should be function
+    throw new PolarError(ERRORS.GENERAL.NOT_A_FUNCTION, {
+      param: transaction
+    });
   }
 
   const balancesBefore = await getBalances(accountAddresses, token);

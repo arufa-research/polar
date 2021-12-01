@@ -2,6 +2,7 @@ import './types';
 
 import { supportChangeScrtBalance } from './matchers/changeScrtBalance';
 import { supportChangeTokenBalance } from './matchers/changeTokenBalance';
+import { supportChangeTokenBalances } from './matchers/changeTokenBalances';
 import { supportProperAddress } from './matchers/properAddress';
 import { supportProperHex } from './matchers/properHex';
 import { supportProperSecretAddress } from './matchers/properSecretAddress';
@@ -15,6 +16,7 @@ export function polarChai (chai: Chai.ChaiStatic, utils: Chai.ChaiUtils): void {
   supportProperSecretAddress(chai.Assertion);
   supportChangeScrtBalance(chai.Assertion);
   supportChangeTokenBalance(chai.Assertion);
+  supportChangeTokenBalances(chai.Assertion);
   supportReverted(chai.Assertion);
   supportRevertedWith(chai.Assertion);
   supportResponse(chai.Assertion);

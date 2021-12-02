@@ -13,7 +13,7 @@ const SAMPLE_PROJECT_DEPENDENCIES = [
   "chai"
 ];
 
-async function printWelcomeMessage (): Promise<void> {
+export async function printWelcomeMessage (): Promise<void> {
   const packageJson = await getPackageJson();
 
   console.log(
@@ -49,7 +49,7 @@ function copySampleProject (projectName: string): void {
   });
 }
 
-function printSuggestedCommands (projectName: string): void {
+export function printSuggestedCommands (projectName: string): void {
   const currDir = process.cwd();
   const projectPath = path.join(currDir, projectName);
   console.log(`Success! Created project at ${chalk.greenBright(projectPath)}.`);
@@ -114,7 +114,7 @@ export async function createProject (projectName: string): Promise<any> {
   printSuggestedCommands(projectName);
 }
 
-function createConfirmationPrompt (name: string, message: string) { // eslint-disable-line @typescript-eslint/explicit-function-return-type
+export function createConfirmationPrompt (name: string, message: string) { // eslint-disable-line @typescript-eslint/explicit-function-return-type
   return {
     type: "confirm",
     name,
@@ -208,16 +208,18 @@ async function confirmPluginInstallation (): Promise<boolean> {
   return responses.shouldInstallPlugin;
 }
 
-async function installDependencies (
+export async function installDependencies (
   packageManager: string,
-  args: string[]
+  args: string[],
+  location?: string
 ): Promise<boolean> {
   const { spawn } = await import("child_process");
 
   console.log(`${packageManager} ${args.join(" ")}`);
 
   const childProcess = spawn(packageManager, args, {
-    stdio: "inherit" as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    stdio: "inherit" as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    cwd: location
   });
 
   return await new Promise<boolean>((resolve, reject) => {

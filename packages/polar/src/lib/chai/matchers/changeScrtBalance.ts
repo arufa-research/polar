@@ -5,19 +5,42 @@ import { PolarContext } from "../../../internal/context";
 import { PolarError } from "../../../internal/core/errors";
 import { ERRORS } from "../../../internal/core/errors-list";
 import type {
-  Account, Coin
+  Account, Coin, UserAccount
 } from "../../../types";
 import { getClient } from "../../client";
+
+const defaultFees = {
+  upload: {
+    amount: [{ amount: "250000", denom: "uscrt" }],
+    gas: String(1000000)
+  },
+  init: {
+    amount: [{ amount: "125000", denom: "uscrt" }],
+    gas: String(500000)
+  },
+  exec: {
+    amount: [{ amount: "50000", denom: "uscrt" }],
+    gas: String(200000)
+  },
+  send: {
+    amount: [{ amount: "20000", denom: "uscrt" }],
+    gas: String(80000)
+  }
+};
 
 export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void {
   Assertion.addMethod('changeScrtBalance', function (
     this: any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-    account: Account | string,
+    account: UserAccount | Account | string,
     balanceChange: number,
     includeFee?: boolean,
     logResponse?: boolean
   ) {
     const subject = this._obj;
+
+    if ((account as UserAccount).account !== undefined) {
+      account = (account as UserAccount).account;
+    }
 
     const accountAddr: string = (account as Account).address !== undefined
       ? (account as Account).address : (account as string);
@@ -44,6 +67,7 @@ export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void
 function extractScrtBalance (
   balances: readonly Coin[]
 ): number {
+  console.log(balances);
   for (const coin of balances) {
     if (coin.denom === 'uscrt') {
       return Number(coin.amount);
@@ -52,7 +76,7 @@ function extractScrtBalance (
   return 0;
 }
 
-export async function getBalanceChange (
+export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitive-complexity
   transaction: (() => Promise<any>), // eslint-disable-line  @typescript-eslint/no-explicit-any
   accountAddr: string,
   includeFee?: boolean,
@@ -74,28 +98,45 @@ export async function getBalanceChange (
   if (logResponse === true) {
     console.log(`${chalk.green("Transaction response:")} ${txResponse as string}`);
   }
+  const txnEvents = txResponse.logs[0].events;
+  let msgEvent;
+  for (const event of txnEvents) {
+    if (event.type === 'message') {
+      msgEvent = event;
+      break;
+    }
+  }
+  const msgEventKeys: { [key: string]: string } = {};
+  for (const attr of msgEvent.attributes) {
+    msgEventKeys[attr.key] = attr.value;
+  }
 
   const balanceAfter = extractScrtBalance(
     (await client.getAccount(accountAddr) as WasmAccount).balance
   );
 
-  // if (
-  //   options?.includeFee !== true &&
-  //   (await getAddressOf(account)) === txResponse.from
-  // ) {
-  //   const txFeeEvent = txResponse.result.findRecord('balances', 'Deposit');
-  //   if (txFeeEvent) {
-  //     if (txFeeEvent.event.data[0].toString() === txResponse.from) {
-  //       return balanceAfter.sub(balanceBefore);
-  //     } else {
-  //       return balanceAfter
-  //         .add(txFeeEvent.event.data[1] as any)
-  //         .sub(balanceBefore);
-  //     }
-  //   } else {
-  //     return balanceAfter.sub(balanceBefore);
-  //   }
-  // } else {
-  return (balanceBefore - balanceAfter);
-  // }
+  const fees = Object.assign(
+    Object.assign({}, defaultFees),
+    (PolarContext.getPolarContext().getRuntimeEnv().network.config.fees ?? {})
+  );
+
+  if (
+    includeFee !== true &&
+    (await client.getAccount(accountAddr) as WasmAccount).address === msgEventKeys.signer
+  ) {
+    if ((await client.getAccount(accountAddr) as WasmAccount).address === msgEventKeys.signer) {
+      return balanceAfter - balanceBefore;
+    } else {
+      let txnFees = 0;
+      for (const [key, value] of Object.entries(fees)) {
+        if (key === msgEventKeys.action) {
+          txnFees = Number(value);
+          break;
+        }
+      }
+      return balanceAfter + txnFees - balanceBefore;
+    }
+  } else {
+    return balanceBefore - balanceAfter;
+  }
 }

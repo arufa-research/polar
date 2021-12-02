@@ -33,11 +33,11 @@ module.exports = {
       types: {},
       fees: {
         upload: {
-            amount: [{ amount: "2000000", denom: "uscrt" }],
+            amount: [{ amount: "500000", denom: "uscrt" }],
             gas: "2000000",
         },
         init: {
-            amount: [{ amount: "500000", denom: "uscrt" }],
+            amount: [{ amount: "125000", denom: "uscrt" }],
             gas: "500000",
         },
       }

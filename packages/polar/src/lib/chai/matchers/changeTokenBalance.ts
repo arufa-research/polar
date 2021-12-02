@@ -5,19 +5,23 @@ import { PolarContext } from "../../../internal/context";
 import { PolarError } from "../../../internal/core/errors";
 import { ERRORS } from "../../../internal/core/errors-list";
 import type {
-  Account, Coin
+  Account, Coin, UserAccount
 } from "../../../types";
 import { getClient } from "../../client";
 
 export function supportChangeTokenBalance (Assertion: Chai.AssertionStatic): void {
   Assertion.addMethod('changeTokenBalance', function (
     this: any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-    account: Account | string,
+    account: UserAccount | Account | string,
     token: string,
     balanceChange: number,
     logResponse?: boolean
   ) {
     const subject = this._obj;
+
+    if ((account as UserAccount).account !== undefined) {
+      account = (account as UserAccount).account;
+    }
 
     const accountAddr: string = (account as Account).address !== undefined
       ? (account as Account).address : (account as string);

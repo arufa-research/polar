@@ -17,7 +17,9 @@ async function run (runtimeEnv) {
 
   await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
 
-  await expect(contract.query.get_count()).to.respondWith({ 'count': 100 });
+  await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+
+  await expect(contract.query.get_count()).to.respondWith({ 'count': 1000 }); // this will fail
 }
 
 module.exports = { default: run };

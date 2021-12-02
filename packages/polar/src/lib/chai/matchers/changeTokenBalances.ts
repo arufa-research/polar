@@ -5,21 +5,27 @@ import { PolarContext } from "../../../internal/context";
 import { PolarError } from "../../../internal/core/errors";
 import { ERRORS } from "../../../internal/core/errors-list";
 import type {
-  Account, Coin
+  Account, Coin, UserAccount
 } from "../../../types";
 import { getClient } from "../../client";
 
 export function supportChangeTokenBalances (Assertion: Chai.AssertionStatic): void {
   Assertion.addMethod('changeTokenBalances', function (
     this: any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-    accounts: Account[] | string[],
+    accounts: UserAccount[] | Account[] | string[],
     token: string,
     balanceChanges: number[],
     logResponse?: boolean
   ) {
     const subject = this._obj;
 
-    const accountAddresses = accounts.map((account: string | Account) =>
+    if ((accounts as UserAccount[])[0].account !== undefined) {
+      accounts = accounts.map((account: UserAccount | string | Account) =>
+        (account as UserAccount).account
+      );
+    }
+
+    const accountAddresses = accounts.map((account: UserAccount | string | Account) =>
       (account as Account).address !== undefined
         ? (account as Account).address : (account as string));
 

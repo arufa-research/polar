@@ -8,6 +8,7 @@ import { PolarError } from "../core/errors";
 import { ERRORS } from "../core/errors-list";
 import { ExecutionMode, getExecutionMode } from "../core/execution-mode";
 import { getPackageJson, getPackageRoot } from "../util/packageInfo";
+import { initialize } from "./initialize-template";
 
 const SAMPLE_PROJECT_DEPENDENCIES = [
   "chai"
@@ -72,7 +73,13 @@ async function printPluginInstallationInstructions (): Promise<void> {
   console.log(`  ${cmd.join(" ")}`);
 }
 // eslint-disable-next-line
-export async function createProject (projectName: string): Promise<any> {
+export async function createProject (
+  projectName: string, templateName?: string, destination?: string
+): Promise<any> {
+  if (templateName !== undefined) {
+    await initialize({ force: false, templateName: templateName, destination: destination });
+    return;
+  }
   await printWelcomeMessage();
 
   copySampleProject(projectName);

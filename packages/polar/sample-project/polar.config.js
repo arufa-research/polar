@@ -23,21 +23,21 @@ module.exports = {
       keyringBackend: 'test',
       types: {}
     },
-    // Holodeck Testnet
+    // Supernova Testnet
     testnet: {
-      endpoint: 'http://chainofsecrets.secrettestnet.io',
-      chainId: 'holodeck-2',
+      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+      chainId: 'supernova-2',
       trustNode: true,
       keyringBackend: 'test',
       accounts: accounts,
       types: {},
       fees: {
         upload: {
-            amount: [{ amount: "2000000", denom: "uscrt" }],
+            amount: [{ amount: "500000", denom: "uscrt" }],
             gas: "2000000",
         },
         init: {
-            amount: [{ amount: "500000", denom: "uscrt" }],
+            amount: [{ amount: "125000", denom: "uscrt" }],
             gas: "500000",
         },
       }

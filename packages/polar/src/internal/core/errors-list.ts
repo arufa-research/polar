@@ -266,6 +266,13 @@ Please check that the configured keypair are correct.`,
       title: "Multiple contracts with same name",
       description: `Multiple contracts with same name.`,
       shouldBeReported: false
+    },
+    NOT_A_FUNCTION: {
+      number: 29,
+      message: "Object %obj% should be a function",
+      title: "Object is not a function",
+      description: `Object is not a function.`,
+      shouldBeReported: false
     }
   },
   NETWORK: {

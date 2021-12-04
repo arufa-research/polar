@@ -8,32 +8,25 @@ declare namespace Chai {
   interface Assertion
     extends LanguageChains, NumericComparison, TypeComparison {
     reverted(): AsyncAssertion
-    revertedWith(reason: string): AsyncAssertion
-    respondWith(responseMessage: string): AsyncAssertion
+    revertedWith(revertReason: string): AsyncAssertion
+    respondWith(responseMessage: any): AsyncAssertion // eslint-disable-line  @typescript-eslint/no-explicit-any
     properHex(length: number): void
     properAddress(): void
     properSecretAddress(): void
-    changeScrtBalance(account: any, balanceChange: number, includeFee?: boolean): AsyncAssertion
-    changeScrtBalances(
-      accounts: any[],
-      balances: number[],
-      includeFee?: boolean
+    changeScrtBalance(
+      account: string, balanceChange: number, includeFee?: boolean, logResponse?: boolean
     ): AsyncAssertion
-    changeTokenBalance(account: any, balanceChange: number, token: string): AsyncAssertion
+    changeTokenBalance(
+      account: string, token: string, balanceChange: number, logResponse?: boolean
+    ): AsyncAssertion
     changeTokenBalances(
-      accounts: any[],
-      balances: number[],
-      token: string
+      accounts: string[], token: string, balanceChanges: number[], logResponse?: boolean
     ): AsyncAssertion
-    calledOnContract(contract: any): void
-    calledOnContractWith(contract: any, parameters: any[]): void
   }
-
-  // type NumberComparer = (value: any, message?: string) => Assertion;
 
   interface AsyncAssertion extends Assertion, Promise<void> {}
 
   interface EmitAssertion extends AsyncAssertion {
-    withArgs(...args: any[]): AsyncAssertion
+    withArgs(...args: any[]): AsyncAssertion // eslint-disable-line  @typescript-eslint/no-explicit-any
   }
 }

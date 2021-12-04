@@ -1,8 +1,8 @@
 
 export function supportReverted (Assertion: Chai.AssertionStatic): void {
-  Assertion.addProperty('reverted', function (this: any): any {
+  Assertion.addProperty('reverted', function (this: any): any { // eslint-disable-line  @typescript-eslint/no-explicit-any
     const promise = this._obj;
-    const onSuccess = (value: any): any => {
+    const onSuccess = (value: any): any => { // eslint-disable-line  @typescript-eslint/no-explicit-any
       this.assert(
         false,
         'Expected transaction to be reverted',
@@ -12,7 +12,7 @@ export function supportReverted (Assertion: Chai.AssertionStatic): void {
       );
       return value;
     };
-    const onError = (error: any): any => {
+    const onError = (error: any): any => { // eslint-disable-line  @typescript-eslint/no-explicit-any
       const message = (error instanceof Object && 'message' in error) ? error.message : JSON.stringify(error);
       const isReverted = message.search('failed to execute message') >= 0;
       this.assert(

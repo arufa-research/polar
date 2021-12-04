@@ -8,25 +8,7 @@ import type {
   Account, Coin, UserAccount
 } from "../../../types";
 import { getClient } from "../../client";
-
-const defaultFees = {
-  upload: {
-    amount: [{ amount: "250000", denom: "uscrt" }],
-    gas: String(1000000)
-  },
-  init: {
-    amount: [{ amount: "125000", denom: "uscrt" }],
-    gas: String(500000)
-  },
-  exec: {
-    amount: [{ amount: "50000", denom: "uscrt" }],
-    gas: String(200000)
-  },
-  send: {
-    amount: [{ amount: "20000", denom: "uscrt" }],
-    gas: String(80000)
-  }
-};
+import { defaultFees } from "../../contants";
 
 export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void {
   Assertion.addMethod('changeScrtBalance', function (

@@ -31,4 +31,14 @@ describe("sample_project", () => {
 
     await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
   });
+
+  it("increment", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    const ex_response = await contract.tx.increment(contract_owner, []);
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+  });
 });

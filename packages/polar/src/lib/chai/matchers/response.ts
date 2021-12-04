@@ -8,7 +8,7 @@ export function supportResponse (Assertion: Chai.AssertionStatic): void {
 
     const strResponse = JSON.stringify(responseMessage);
 
-    const derivedPromise = subject.then((response: any) => {
+    const derivedPromise = subject.then((response: any) => { // eslint-disable-line  @typescript-eslint/no-explicit-any
       response = JSON.stringify(response);
       this.assert(
         response === strResponse,

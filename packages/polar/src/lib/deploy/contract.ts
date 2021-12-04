@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient, FeeTable } from "secretjs";
+import { CosmWasmClient } from "secretjs";
 
 import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
@@ -23,7 +23,6 @@ import type {
   PolarRuntimeEnvironment,
   UserAccount
 } from "../../types";
-import { UserAccountI } from "../account";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";

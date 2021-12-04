@@ -7,7 +7,6 @@ import { task } from "../internal/core/config/config-env";
 import { PolarError } from "../internal/core/errors";
 import { ERRORS } from "../internal/core/errors-list";
 import { TESTS_DIR } from "../internal/core/project-structure";
-import { runScript } from "../internal/util/script-runner";
 import { assertDirChildren } from "../lib/files";
 import { PolarRuntimeEnvironment } from "../types";
 import { TASK_TEST } from "./task-names";
@@ -25,15 +24,17 @@ async function runTests (
   scriptNames: string[],
   logDebugTag: string
 ): Promise<void> {
-  const log = debug(logDebugTag);
+  const { default: Mocha } = await import('mocha');
+  const mocha = new Mocha(runtimeEnv.config.mocha);
 
   for (const relativeScriptPath of scriptNames) {
-    log(`Running test ${relativeScriptPath}`);
-    await runScript(
-      relativeScriptPath,
-      runtimeEnv
-    );
+    mocha.addFile(relativeScriptPath);
   }
+  const testFailures = await new Promise<number>((resolve, reject) => {
+    mocha.run(resolve);
+  });
+
+  process.exitCode = testFailures;
 }
 
 async function executeTestTask (

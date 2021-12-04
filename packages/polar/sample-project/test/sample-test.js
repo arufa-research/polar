@@ -20,16 +20,16 @@ describe("sample_project", () => {
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
     await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
-    // await expect(contract.query.get_count()).to.respondWith({ 'count': 1000 }); // this will fail
   });
-
+  
   it("unauthorized reset", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
-
+    
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
-
+    
     await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
 
   it("increment", async () => {

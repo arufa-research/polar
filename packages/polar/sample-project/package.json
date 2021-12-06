@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "secret-polar": "^0.2.0"
+    "secret-polar": "^0.9.0",
+    "chai": "^4.3.4"
   }
 }

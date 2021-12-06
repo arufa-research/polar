@@ -91,7 +91,7 @@ async function checkTemplateExists (
   const templatePath = path.join(basePath, templateName);
   if (fse.existsSync(templatePath)) { return [templatePath, templateName]; } else {
     console.log(chalk.red(`Error occurred: template "${templateName}" does not exist in ${TEMPLATES_GIT_REMOTE}`));
-    const prompt = new (enquirer as any).Select({
+    const prompt = new (enquirer as any).Select({ // eslint-disable-line  @typescript-eslint/no-explicit-any
       name: 'Select an option',
       message: 'Do you want to pick an existing template or exit?',
       choices: ['Pick an existing template', 'exit']
@@ -105,7 +105,7 @@ async function checkTemplateExists (
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
 
-      const dappsPrompt = new (enquirer as any).Select({
+      const dappsPrompt = new (enquirer as any).Select({ // eslint-disable-line  @typescript-eslint/no-explicit-any
         name: 'dapps',
         message: 'Pick a template',
         choices: dApps
@@ -146,8 +146,9 @@ function _normalizeDestination (destination?: string): string {
  *     or not (if --force is not used).
  *  - If `--force` is used, then conflicting files are overwritten.
  */
-export async function initialize ({ force, templateName, destination }:
-{ force: boolean, templateName?: string, destination?: string}): Promise<void> {
+export async function initialize ({ force, projectName, templateName, destination }:
+{ force: boolean, projectName: string, templateName?: string, destination?: string}):
+  Promise<void> {
   await printWelcomeMessage();
 
   const normalizedDestination = _normalizeDestination(destination);
@@ -195,5 +196,5 @@ export async function initialize ({ force, templateName, destination }:
       chalk.yellow(`\nInstall your project dependencies using '${packageManager} install'`)
     );
   }
-  printSuggestedCommands(templateName);
+  printSuggestedCommands(projectName);
 }

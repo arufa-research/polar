@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import chalk from "chalk";
 import fsExtra from "fs-extra";
 import os from "os";
@@ -75,9 +76,16 @@ async function printPluginInstallationInstructions (): Promise<void> {
 // eslint-disable-next-line
 export async function createProject (
   projectName: string, templateName?: string, destination?: string
-): Promise<any> {
+): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   if (templateName !== undefined) {
-    await initialize({ force: false, templateName: templateName, destination: destination });
+    const currDir = process.cwd();
+    const projectPath = destination ?? path.join(currDir, projectName);
+    await initialize({
+      force: false,
+      projectName: projectName,
+      templateName: templateName,
+      destination: projectPath
+    });
     return;
   }
   await printWelcomeMessage();
@@ -121,7 +129,7 @@ export async function createProject (
   printSuggestedCommands(projectName);
 }
 
-export function createConfirmationPrompt (name: string, message: string) { // eslint-disable-line @typescript-eslint/explicit-function-return-type
+export function createConfirmationPrompt (name: string, message: string): any { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return {
     type: "confirm",
     name,
@@ -143,7 +151,7 @@ export function createConfirmationPrompt (name: string, message: string) { // es
       return input;
     },
     format (): string {
-      const that = this as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const that = this; // eslint-disable-line @typescript-eslint/no-explicit-any
       const value = that.value === true ? "y" : "n";
 
       if (that.state.submitted === true) {

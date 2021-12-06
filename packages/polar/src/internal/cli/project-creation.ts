@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import chalk from "chalk";
 import fsExtra from "fs-extra";
 import os from "os";
@@ -8,12 +9,13 @@ import { PolarError } from "../core/errors";
 import { ERRORS } from "../core/errors-list";
 import { ExecutionMode, getExecutionMode } from "../core/execution-mode";
 import { getPackageJson, getPackageRoot } from "../util/packageInfo";
+import { initialize } from "./initialize-template";
 
 const SAMPLE_PROJECT_DEPENDENCIES = [
   "chai"
 ];
 
-async function printWelcomeMessage (): Promise<void> {
+export async function printWelcomeMessage (): Promise<void> {
   const packageJson = await getPackageJson();
 
   console.log(
@@ -49,7 +51,7 @@ function copySampleProject (projectName: string): void {
   });
 }
 
-function printSuggestedCommands (projectName: string): void {
+export function printSuggestedCommands (projectName: string): void {
   const currDir = process.cwd();
   const projectPath = path.join(currDir, projectName);
   console.log(`Success! Created project at ${chalk.greenBright(projectPath)}.`);
@@ -72,7 +74,20 @@ async function printPluginInstallationInstructions (): Promise<void> {
   console.log(`  ${cmd.join(" ")}`);
 }
 // eslint-disable-next-line
-export async function createProject (projectName: string): Promise<any> {
+export async function createProject (
+  projectName: string, templateName?: string, destination?: string
+): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
+  if (templateName !== undefined) {
+    const currDir = process.cwd();
+    const projectPath = destination ?? path.join(currDir, projectName);
+    await initialize({
+      force: false,
+      projectName: projectName,
+      templateName: templateName,
+      destination: projectPath
+    });
+    return;
+  }
   await printWelcomeMessage();
 
   copySampleProject(projectName);
@@ -114,7 +129,7 @@ export async function createProject (projectName: string): Promise<any> {
   printSuggestedCommands(projectName);
 }
 
-function createConfirmationPrompt (name: string, message: string) { // eslint-disable-line @typescript-eslint/explicit-function-return-type
+export function createConfirmationPrompt (name: string, message: string): any { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return {
     type: "confirm",
     name,
@@ -136,7 +151,7 @@ function createConfirmationPrompt (name: string, message: string) { // eslint-di
       return input;
     },
     format (): string {
-      const that = this as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const that = this; // eslint-disable-line @typescript-eslint/no-explicit-any
       const value = that.value === true ? "y" : "n";
 
       if (that.state.submitted === true) {
@@ -208,16 +223,18 @@ async function confirmPluginInstallation (): Promise<boolean> {
   return responses.shouldInstallPlugin;
 }
 
-async function installDependencies (
+export async function installDependencies (
   packageManager: string,
-  args: string[]
+  args: string[],
+  location?: string
 ): Promise<boolean> {
   const { spawn } = await import("child_process");
 
   console.log(`${packageManager} ${args.join(" ")}`);
 
   const childProcess = spawn(packageManager, args, {
-    stdio: "inherit" as any // eslint-disable-line @typescript-eslint/no-explicit-any
+    stdio: "inherit" as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+    cwd: location
   });
 
   return await new Promise<boolean>((resolve, reject) => {

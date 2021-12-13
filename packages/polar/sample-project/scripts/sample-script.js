@@ -11,8 +11,8 @@ async function run () {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
-  const ex_response = await contract.tx.increment(contract_owner, []);
-  console.log(ex_response);
+  const inc_response = await contract.tx.increment(contract_owner, []);
+  console.log(inc_response);
 
   const response = await contract.query.get_count();
   console.log(response);

@@ -217,7 +217,7 @@ export class Contract {
       console.log("Warning: contract already deployed, using checkpoints");
       return info;
     }
-    await compress(this.contractName);
+    await compress(this.contractName, this.env.config.rust?.optimizer);
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 

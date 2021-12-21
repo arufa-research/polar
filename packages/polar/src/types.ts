@@ -233,6 +233,7 @@ export interface Network {
 
 interface RustVersion {
   version: string
+  optimizer?: string
 }
 
 export interface ResolvedConfig extends PolarUserConfig {

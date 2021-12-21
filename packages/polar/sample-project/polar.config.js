@@ -47,6 +47,7 @@ module.exports = {
     timeout: 60000
   },
   rust: {
-    version: "1.55.0"
+    version: "1.55.0",
+    optimizer: "1.0.5"
   }
 };

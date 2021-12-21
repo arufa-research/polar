@@ -7,15 +7,14 @@ import zlib from "zlib";
 import {
   ARTIFACTS_DIR,
   CONTRACTS_DIR,
-  CONTRACTS_OUT_DIR,
-  singleImageVersion
+  CONTRACTS_OUT_DIR
 } from "../../internal/core/project-structure";
 import { readContractName } from "../compile/compile";
 
 const CONTRACT_WASM = "contract.wasm.gz";
 
 export async function compress (
-  contractName: string, imageVersion?: number
+  contractName: string, imageVersion?: string
 ): Promise<void> {
   const destPath = path.join(CONTRACTS_OUT_DIR, `${contractName}_compressed.wasm`);
 
@@ -31,7 +30,7 @@ export async function compress (
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
                   enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}`;
 
-    console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/rust-optimizer:${singleImageVersion}...`));
+    console.log(chalk.greenBright(`Creating compressed .wasm file using enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}...`));
     execSync(dockerCmd, { stdio: 'inherit' });
 
     const fileContents = fs.createReadStream(path.join(CONTRACTS_DIR, CONTRACT_WASM));
@@ -47,7 +46,7 @@ export async function compress (
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
                   enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}`;
 
-      console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/rust-optimizer:${singleImageVersion}...`));
+      console.log(chalk.greenBright(`Creating compressed .wasm file using enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}...`));
       execSync(dockerCmd, { stdio: 'inherit' });
 
       const contractName = readContractName(path.join(path.join(CONTRACTS_DIR, p), "Cargo.toml"));

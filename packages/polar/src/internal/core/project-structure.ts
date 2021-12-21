@@ -14,8 +14,8 @@ export const SCHEMA_DIR = "artifacts/schema";
 export const SCRIPTS_DIR = "scripts";
 export const TESTS_DIR = "test";
 
-export const singleImageVersion = "0.12.0";
-export const multiImageVersion = "0.12.0";
+export const singleImageVersion = "1.0.5";
+export const multiImageVersion = "1.0.5";
 
 export function isCwdInsideProject (): boolean {
   return Boolean(findUp.sync(JS_CONFIG_FILENAME));

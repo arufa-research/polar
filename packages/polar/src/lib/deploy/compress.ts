@@ -2,20 +2,21 @@ import chalk from "chalk";
 import { execSync } from "child_process";
 import fs, { readdirSync } from "fs-extra";
 import path from "path";
+import zlib from "zlib";
 
 import {
   ARTIFACTS_DIR,
   CONTRACTS_DIR,
   CONTRACTS_OUT_DIR,
-  multiImageVersion,
   singleImageVersion
 } from "../../internal/core/project-structure";
 import { readContractName } from "../compile/compile";
 
+const CONTRACT_WASM = "contract.wasm.gz";
+
 export async function compress (
-  contractName: string
+  contractName: string, imageVersion?: number
 ): Promise<void> {
-  const sourcePath = path.join(CONTRACTS_DIR, "artifacts", `${contractName}.wasm`);
   const destPath = path.join(CONTRACTS_OUT_DIR, `${contractName}_compressed.wasm`);
 
   if (fs.existsSync(destPath)) {
@@ -25,35 +26,41 @@ export async function compress (
   const paths = readdirSync(CONTRACTS_DIR);
   if (paths.includes("Cargo.toml")) {
     // Only one contract in the contracts dir and compile in contracts dir only
-    const dockerCmd = `sudo docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/code \
+    const dockerCmd = `sudo docker run --rm -v ${path.resolve(CONTRACTS_DIR)}:/contract \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/code/target \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
-                  cosmwasm/rust-optimizer:${singleImageVersion}`;
+                  enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}`;
 
     console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/rust-optimizer:${singleImageVersion}...`));
     execSync(dockerCmd, { stdio: 'inherit' });
 
-    fs.copyFileSync(sourcePath, destPath);
-    fs.rmdirSync(path.join(CONTRACTS_DIR, "artifacts"), { recursive: true });
-    console.log(`Created file ${path.join(CONTRACTS_OUT_DIR, `${contractName}.wasm`)}`);
-  } else { // Multiple contracts and each should be compiled by going inside each of them
-    const contractPath = path.join(CONTRACTS_DIR, path.basename(paths[0]));
+    const fileContents = fs.createReadStream(path.join(CONTRACTS_DIR, CONTRACT_WASM));
+    const writeStream = fs.createWriteStream(destPath);
+    const unzip = zlib.createGunzip();
 
-    const dockerCmd = `sudo docker run --rm -v ${path.resolve(contractPath)}:/code \
+    fileContents.pipe(unzip).pipe(writeStream);
+    fs.unlinkSync(path.join(CONTRACTS_DIR, CONTRACT_WASM));
+  } else { // Multiple contracts and each should be compiled by going inside each of them
+    for (const p of paths) {
+      const dockerCmd = `sudo docker run --rm -v ${path.resolve(path.join(CONTRACTS_DIR, p))}:/contract \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/code/target \
                   --mount type=volume,source=${path.basename(ARTIFACTS_DIR)},target=/usr/local/cargo/registry \
-                  cosmwasm/rust-optimizer:${singleImageVersion}`;
+                  enigmampc/secret-contract-optimizer:${imageVersion ?? "latest"}`;
 
-    console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/workspace-optimizer:${multiImageVersion}...`));
-    execSync(dockerCmd, { stdio: 'inherit' });
+      console.log(chalk.greenBright(`Creating compressed .wasm file using cosmwasm/rust-optimizer:${singleImageVersion}...`));
+      execSync(dockerCmd, { stdio: 'inherit' });
 
-    for (const p of paths) {
       const contractName = readContractName(path.join(path.join(CONTRACTS_DIR, p), "Cargo.toml"));
-      const sourcePath = path.join(path.join(CONTRACTS_DIR, paths[0]), "artifacts", `${contractName}.wasm`);
       const destPath = path.join(CONTRACTS_OUT_DIR, `${contractName}_compressed.wasm`);
 
-      fs.copyFileSync(sourcePath, destPath);
-      fs.rmdirSync(path.join(path.join(CONTRACTS_DIR, path.basename(p)), "artifacts"), { recursive: true });
+      const fileContents = fs.createReadStream(
+        path.join(path.join(CONTRACTS_DIR, p), CONTRACT_WASM)
+      );
+      const writeStream = fs.createWriteStream(destPath);
+      const unzip = zlib.createGunzip();
+
+      fileContents.pipe(unzip).pipe(writeStream);
+      fs.unlinkSync(path.join(path.join(CONTRACTS_DIR, p), CONTRACT_WASM));
     }
   }
 }

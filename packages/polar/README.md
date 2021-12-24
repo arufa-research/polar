@@ -46,3 +46,7 @@ $ polar compile
 ```bash
 $ yarn run test
 ```
+
+## Documentation
+
+Check out detailed documentation [here](https://docs.arufaresearch.com/).

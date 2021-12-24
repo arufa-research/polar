@@ -1,6 +1,6 @@
 {
   "name": "secret-polar",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "main": "dist/src/index.js",
   "authors": [
     {
@@ -12,6 +12,7 @@
       "url": "https://github.com/udit-gulati"
     }
   ],
+  "keywords": ["cosmwasm", "secret-network", "dev-tooling", "blockchain", "rust", "testing-framework", "smart-contracts", "typescript"],
   "license": "MIT",
   "scripts": {
     "build": "tsc --build .",

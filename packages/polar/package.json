@@ -12,7 +12,16 @@
       "url": "https://github.com/udit-gulati"
     }
   ],
-  "keywords": ["cosmwasm", "secret-network", "dev-tooling", "blockchain", "rust", "testing-framework", "smart-contracts", "typescript"],
+  "keywords": [
+    "cosmwasm",
+    "secret-network",
+    "dev-tooling",
+    "blockchain",
+    "rust",
+    "testing-framework",
+    "smart-contracts",
+    "typescript"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "tsc --build .",
@@ -47,6 +56,7 @@
     "@types/debug": "^4.1.5",
     "@types/fs-extra": "^9.0.11",
     "@types/glob": "^7.1.3",
+    "@types/mocha": "^9.0.0",
     "@types/node-fetch": "^2.5.10",
     "@types/tmp": "^0.2.2",
     "chai": "^4.3.4",
@@ -60,6 +70,7 @@
     "fs-extra": "^10.0.0",
     "glob": "^7.1.7",
     "gunzip-file": "^0.1.1",
+    "mocha": "^9.1.3",
     "node-fetch": "^2.6.1",
     "parse-cosmwasm-schema": "^0.2.0",
     "repl": "^0.1.3",

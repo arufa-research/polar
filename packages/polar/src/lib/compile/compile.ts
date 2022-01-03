@@ -62,7 +62,7 @@ export async function compile (
     }
     const contractName = readContractName(path.join(dir, toml));
     createArtifacts(
-      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker, skipSchema
+      TARGET_DIR, path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker, skipSchema
     );
   }
 }

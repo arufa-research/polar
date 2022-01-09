@@ -264,12 +264,16 @@ export class Contract {
     }
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const initTimestamp = String(new Date());
+    label = (this.env.runtimeArgs.command === "test")
+      ? `deploy ${this.contractName} ${initTimestamp}` : label;
+    console.log(`Instantiating with label: ${label}`);
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
     const instantiateInfo: InstantiateInfo = {
       contractAddress: this.contractAddress,
-      instantiateTimestamp: String(new Date())
+      instantiateTimestamp: initTimestamp
     };
 
     if (this.env.runtimeArgs.command !== "test") {

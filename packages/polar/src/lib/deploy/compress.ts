@@ -1,10 +1,9 @@
 import chalk from "chalk";
 import { execSync } from "child_process";
-import fs, { readdirSync } from "fs-extra";
+import fs from "fs-extra";
 import path from "path";
 
 import {
-  ARTIFACTS_DIR,
   CONTRACTS_OUT_DIR
 } from "../../internal/core/project-structure";
 import { compile } from "../compile/compile";

@@ -21,6 +21,7 @@ import type {
   DeployInfo,
   InstantiateInfo,
   PolarRuntimeEnvironment,
+  StdFee,
   UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
@@ -49,14 +50,19 @@ function buildCall (
   };
 }
 
+export interface ExecArgs {
+  account: Account | UserAccount
+  transferAmount: readonly Coin[] | undefined
+  customFees: StdFee | undefined
+}
+
 function buildSend (
   contract: Contract,
   msgName: string,
   argNames: AbiParam[]
 ): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
-    account: Account | UserAccount,
-    transferAmount: readonly Coin[] | undefined,
+    { account, transferAmount, customFees }: ExecArgs,
     ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (args.length !== argNames.length) {
@@ -75,7 +81,7 @@ function buildSend (
     });
 
     // Execute function (write)
-    return contract.executeMsg(msgName, msgArgs, accountVal, transferAmount);
+    return contract.executeMsg(msgName, msgArgs, accountVal, transferAmount, customFees);
   };
 }
 
@@ -211,7 +217,10 @@ export class Contract {
     }
   }
 
-  async deploy (account: Account | UserAccount): Promise<DeployInfo> {
+  async deploy (
+    account: Account | UserAccount,
+    customFees?: StdFee | undefined
+  ): Promise<DeployInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
     const info = this.checkpointData[this.env.network.name]?.deployInfo;
@@ -224,7 +233,12 @@ export class Contract {
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
     const signingClient = await getSigningClient(this.env.network, accountVal);
-    const uploadReceipt = await signingClient.upload(wasmFileContent, {});
+    const uploadReceipt = await signingClient.upload(
+      wasmFileContent,
+      {},
+      `upload ${this.contractName}`,
+      customFees
+    );
     const codeId: number = uploadReceipt.codeId;
     const contractCodeHash: string =
       await signingClient.restClient.getCodeHashByCodeId(codeId);
@@ -249,7 +263,9 @@ export class Contract {
   async instantiate (
     initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     label: string,
-    account: Account | UserAccount
+    account: Account | UserAccount,
+    transferAmount?: readonly Coin[],
+    customFees?: StdFee | undefined
   ): Promise<InstantiateInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -269,7 +285,13 @@ export class Contract {
     label = (this.env.runtimeArgs.command === "test")
       ? `deploy ${this.contractName} ${initTimestamp}` : label;
     console.log(`Instantiating with label: ${label}`);
-    const contract = await signingClient.instantiate(this.codeId, initArgs, label);
+    const contract = await signingClient.instantiate(
+      this.codeId,
+      initArgs,
+      label,
+      `init ${this.contractName}`,
+      transferAmount,
+      customFees);
     this.contractAddress = contract.contractAddress;
 
     const instantiateInfo: InstantiateInfo = {
@@ -306,7 +328,8 @@ export class Contract {
     methodName: string,
     callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
     account: Account | UserAccount,
-    transferAmount?: readonly Coin[]
+    transferAmount?: readonly Coin[],
+    customFees?: StdFee | undefined
   ): Promise<ExecuteResult> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -325,8 +348,9 @@ export class Contract {
     return await signingClient.execute(
       this.contractAddress,
       msgData,
-      undefined,
-      transferAmount
+      `execute handle ${this.contractName}`,
+      transferAmount,
+      customFees
     );
   }
 }

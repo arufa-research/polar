@@ -28,4 +28,8 @@ export async function compress (
 
   console.log(chalk.greenBright(`Creating compressed .wasm file for ${contractName}`));
   execSync(compressCmd, { stdio: 'inherit' });
+
+  if (!fs.existsSync(destPath)) {
+    execSync(`wasm-opt -Oz ${srcPath} -o ${destPath}`, { stdio: 'inherit' });
+  }
 }

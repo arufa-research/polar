@@ -19,7 +19,8 @@ import { replaceAll } from "../../internal/util/strings";
 export async function compile (
   docker: boolean,
   sourceDir: string[],
-  force: boolean
+  force: boolean,
+  skipSchema: boolean
 ): Promise<void> {
   await assertDir(CACHE_DIR);
   let contractDirs: string[] = [];
@@ -56,10 +57,12 @@ export async function compile (
 
   for (const dir of contractDirs) {
     compileContract(dir, docker);
-    generateSchema(dir, docker);
+    if (!skipSchema) { // only generate schema if this flag is not passed
+      generateSchema(dir, docker);
+    }
     const contractName = readContractName(path.join(dir, toml));
     createArtifacts(
-      path.join(dir, TARGET_DIR), path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker
+      TARGET_DIR, path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker, skipSchema
     );
   }
 }
@@ -105,7 +108,8 @@ export function createArtifacts (
   schemaDir: string,
   artifactsDir: string,
   sourceSchemaDir: string,
-  docker: boolean
+  docker: boolean,
+  skipSchema: boolean
 ): void {
   const paths = fs.readdirSync(targetDir);
 
@@ -127,6 +131,10 @@ export function createArtifacts (
     const sourcePath = path.resolve(targetDir, filename);
     const destPath = path.resolve(artifactsDir, filename);
     fs.copyFileSync(sourcePath, destPath);
+  }
+
+  if (skipSchema) { // do not copy schema to artifacts as there is none
+    return;
   }
 
   const schemaPaths = fs.readdirSync(sourceSchemaDir);

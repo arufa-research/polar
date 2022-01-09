@@ -59,6 +59,7 @@ async function executeTestTask (
   }
 
   runtimeEnv.runtimeArgs.command = "test"; // used by Contract() class to skip artifacts
+  runtimeEnv.runtimeArgs.useCheckpoints = false;
 
   await runTests(
     runtimeEnv,

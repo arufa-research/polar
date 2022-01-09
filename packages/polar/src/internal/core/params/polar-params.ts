@@ -20,6 +20,15 @@ export const POLAR_PARAM_DEFINITIONS: ParamDefinitions = {
     isOptional: true,
     isVariadic: false
   },
+  useCheckpoints: {
+    name: "useCheckpoints",
+    defaultValue: true,
+    description: "Specify if checkpoints should be used.",
+    type: types.boolean,
+    isFlag: true,
+    isOptional: true,
+    isVariadic: false
+  },
   showStackTraces: {
     name: "showStackTraces",
     defaultValue: false,

@@ -160,8 +160,9 @@ export class Contract {
     // Load checkpoints
     this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
     // file exist load it else create new checkpoint
-    // skip checkpoints if test command is run
-    if (fs.existsSync(this.checkpointPath) && this.env.runtimeArgs.command !== "test") {
+    // skip checkpoints if test command is run, or skip-checkpoints is passed
+    if (fs.existsSync(this.checkpointPath) &&
+    this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
       const contractHash = this.checkpointData[this.env.network.name].deployInfo?.contractCodeHash;
       const contractCodeId = this.checkpointData[this.env.network.name].deployInfo?.codeId;
@@ -235,7 +236,7 @@ export class Contract {
       deployTimestamp: String(new Date())
     };
 
-    if (this.env.runtimeArgs.command !== "test") {
+    if (this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData[this.env.network.name] =
         { ...this.checkpointData[this.env.network.name], deployInfo };
       persistCheckpoint(this.checkpointPath, this.checkpointData);
@@ -276,7 +277,7 @@ export class Contract {
       instantiateTimestamp: initTimestamp
     };
 
-    if (this.env.runtimeArgs.command !== "test") {
+    if (this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData[this.env.network.name] =
         { ...this.checkpointData[this.env.network.name], instantiateInfo };
       persistCheckpoint(this.checkpointPath, this.checkpointData);

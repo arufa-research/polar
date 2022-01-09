@@ -28,7 +28,7 @@ describe("sample_project", () => {
     
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
     
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
     await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
 
@@ -38,7 +38,7 @@ describe("sample_project", () => {
 
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
-    const ex_response = await contract.tx.increment(contract_owner, []);
+    const ex_response = await contract.tx.increment({account: contract_owner});
     await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
   });
 });

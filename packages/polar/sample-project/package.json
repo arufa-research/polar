@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "Apache-2.0",
   "dependencies": {
-    "secret-polar": "^0.9.0",
-    "chai": "^4.3.4"
+    "@types/chai": "^4.3.0",
+    "chai": "^4.3.4",
+    "secret-polar": "^0.9.0"
   }
 }

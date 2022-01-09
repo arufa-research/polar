@@ -11,6 +11,15 @@ export const POLAR_PARAM_DEFINITIONS: ParamDefinitions = {
     isFlag: false,
     isVariadic: false
   },
+  command: {
+    name: "command",
+    defaultValue: "",
+    description: "Name of polar task ran.",
+    type: types.string,
+    isFlag: false,
+    isOptional: true,
+    isVariadic: false
+  },
   showStackTraces: {
     name: "showStackTraces",
     defaultValue: false,

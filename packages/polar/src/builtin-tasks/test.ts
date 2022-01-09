@@ -58,6 +58,8 @@ async function executeTestTask (
     });
   }
 
+  runtimeEnv.runtimeArgs.command = "test"; // used by Contract() class to skip artifacts
+
   await runTests(
     runtimeEnv,
     assertDirChildren(TESTS_DIR, tests),

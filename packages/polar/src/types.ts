@@ -251,6 +251,8 @@ export interface ResolvedConfig extends PolarUserConfig {
  */
 export interface RuntimeArgs {
   network: string
+  command?: string
+  useCheckpoints?: boolean
   showStackTraces: boolean
   version: boolean
   help: boolean

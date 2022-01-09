@@ -12,6 +12,7 @@ import { TASK_RUN } from "./task-names";
 
 interface Input {
   scripts: string[]
+  skipCheckpoints: boolean
 }
 
 export function filterNonExistent (scripts: string[]): string[] {
@@ -39,7 +40,7 @@ async function runScripts (
 }
 
 async function executeRunTask (
-  { scripts }: Input,
+  { scripts, skipCheckpoints }: Input,
   runtimeEnv: PolarRuntimeEnvironment
   // eslint-disable-next-line
 ): Promise<any> {
@@ -50,6 +51,10 @@ async function executeRunTask (
     throw new PolarError(ERRORS.BUILTIN_TASKS.RUN_FILES_NOT_FOUND, {
       scripts: nonExistent
     });
+  }
+
+  if (skipCheckpoints) { // used by Contract() class to skip checkpoints
+    runtimeEnv.runtimeArgs.useCheckpoints = false;
   }
 
   await runScripts(
@@ -67,5 +72,6 @@ export default function (): void {
       "scripts",
       "A js file to be run within polar's environment"
     )
+    .addFlag("skipCheckpoints", "do not read from or write checkpoints")
     .setAction((input, env) => executeRunTask(input, env));
 }

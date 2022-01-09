@@ -160,7 +160,9 @@ export class Contract {
     // Load checkpoints
     this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
     // file exist load it else create new checkpoint
-    if (fs.existsSync(this.checkpointPath)) {
+    // skip checkpoints if test command is run, or skip-checkpoints is passed
+    if (fs.existsSync(this.checkpointPath) &&
+    this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
       const contractHash = this.checkpointData[this.env.network.name].deployInfo?.contractCodeHash;
       const contractCodeId = this.checkpointData[this.env.network.name].deployInfo?.codeId;
@@ -233,10 +235,13 @@ export class Contract {
       contractCodeHash: contractCodeHash,
       deployTimestamp: String(new Date())
     };
-    this.checkpointData[this.env.network.name] =
-      { ...this.checkpointData[this.env.network.name], deployInfo };
+
+    if (this.env.runtimeArgs.useCheckpoints === true) {
+      this.checkpointData[this.env.network.name] =
+        { ...this.checkpointData[this.env.network.name], deployInfo };
+      persistCheckpoint(this.checkpointPath, this.checkpointData);
+    }
     this.contractCodeHash = contractCodeHash;
-    persistCheckpoint(this.checkpointPath, this.checkpointData);
 
     return deployInfo;
   }
@@ -260,17 +265,23 @@ export class Contract {
     }
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const initTimestamp = String(new Date());
+    label = (this.env.runtimeArgs.command === "test")
+      ? `deploy ${this.contractName} ${initTimestamp}` : label;
+    console.log(`Instantiating with label: ${label}`);
     const contract = await signingClient.instantiate(this.codeId, initArgs, label);
     this.contractAddress = contract.contractAddress;
 
     const instantiateInfo: InstantiateInfo = {
       contractAddress: this.contractAddress,
-      instantiateTimestamp: String(new Date())
+      instantiateTimestamp: initTimestamp
     };
 
-    this.checkpointData[this.env.network.name] =
-      { ...this.checkpointData[this.env.network.name], instantiateInfo };
-    persistCheckpoint(this.checkpointPath, this.checkpointData);
+    if (this.env.runtimeArgs.useCheckpoints === true) {
+      this.checkpointData[this.env.network.name] =
+        { ...this.checkpointData[this.env.network.name], instantiateInfo };
+      persistCheckpoint(this.checkpointPath, this.checkpointData);
+    }
     return instantiateInfo;
   }
 

@@ -21,16 +21,12 @@ import type {
   DeployInfo,
   InstantiateInfo,
   PolarRuntimeEnvironment,
+  StdFee,
   UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
-
-export interface StdFee {
-  readonly amount: readonly Coin[]
-  readonly gas: string
-}
 
 function buildCall (
   contract: Contract,

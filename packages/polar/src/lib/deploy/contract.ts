@@ -2,7 +2,6 @@ import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
 import { CosmWasmClient } from "secretjs";
-import { StdFee } from "secretjs/types/types";
 
 import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
@@ -27,6 +26,11 @@ import type {
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
+
+export interface StdFee {
+  readonly amount: readonly Coin[]
+  readonly gas: string
+}
 
 function buildCall (
   contract: Contract,

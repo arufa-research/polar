@@ -24,9 +24,16 @@ async function run () {
   console.log(response);
 
   const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
+  const customFees = { // custom fees
+    amount: [{ amount: "750000", denom: "uscrt" }],
+    gas: "3000000",
+  }
   const ex_response = await contract.tx.increment(
     {account: contract_owner, transferAmount: transferAmount}
   );
+  // const ex_response = await contract.tx.increment(
+  //   {account: contract_owner, transferAmount: transferAmount, customFees: customFees}
+  // );
   console.log(ex_response);
 }
 

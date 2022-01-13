@@ -12,16 +12,16 @@ const accounts = [
 ];
 
 const networks = {
+  localnet: {
+    endpoint: 'http://localhost:1337/'
+  },
   // Pulsar-2
   testnet: {
     endpoint: 'http://testnet.securesecrets.org:1317/',
-    chainId: 'pulsar-2',
-    trustNode: true,
-    keyringBackend: 'test',
-    accounts: accounts,
-  },
-  localnet: {
-    endpoint: 'http://localhost:1337/'
+        chainId: 'pulsar-2',
+        trustNode: true,
+        keyringBackend: 'test',
+        accounts: accounts,
   },
   development: {
     endpoint: 'tcp://0.0.0.0:26656',
@@ -52,8 +52,11 @@ const networks = {
 };
 
 module.exports = {
-  default: networks.testnet,
-  networks: networks,
+  networks: {
+    default: networks.testnet,
+    localnet: networks.localnet,
+    development: networks.development
+  },
   mocha: {
     timeout: 60000
   },

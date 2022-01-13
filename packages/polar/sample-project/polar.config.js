@@ -13,7 +13,8 @@ const accounts = [
 
 module.exports = {
   networks: {
-    default: {
+    default: testnet,
+    localnet: {
       endpoint: 'http://localhost:1337/'
     },
     development: {
@@ -23,8 +24,15 @@ module.exports = {
       keyringBackend: 'test',
       types: {}
     },
-    // Supernova Testnet
     testnet: {
+      endpoint: 'http://testnet.securesecrets.org:1317/',
+      chainId: 'pulsar-2',
+      trustNode: true,
+      keyringBackend: 'test',
+      accounts: accounts,
+    },
+    // Supernova Testnet
+    supernova: {
       endpoint: 'http://bootstrap.supernova.enigma.co:1317',
       chainId: 'supernova-2',
       trustNode: true,

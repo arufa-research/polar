@@ -11,45 +11,51 @@ const accounts = [
   }
 ];
 
+const networks = {
+  localnet: {
+    endpoint: 'http://localhost:1337/'
+  },
+  // Pulsar-2
+  testnet: {
+    endpoint: 'http://testnet.securesecrets.org:1317/',
+        chainId: 'pulsar-2',
+        trustNode: true,
+        keyringBackend: 'test',
+        accounts: accounts,
+  },
+  development: {
+    endpoint: 'tcp://0.0.0.0:26656',
+    nodeId: '115aa0a629f5d70dd1d464bc7e42799e00f4edae',
+    chainId: 'enigma-pub-testnet-3',
+    keyringBackend: 'test',
+    types: {}
+  },
+  // Supernova Testnet
+  supernova: {
+    endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+    chainId: 'supernova-2',
+    trustNode: true,
+    keyringBackend: 'test',
+    accounts: accounts,
+    types: {},
+    fees: {
+      upload: {
+          amount: [{ amount: "500000", denom: "uscrt" }],
+          gas: "2000000",
+      },
+      init: {
+          amount: [{ amount: "125000", denom: "uscrt" }],
+          gas: "500000",
+      },
+    }
+  }
+};
+
 module.exports = {
   networks: {
-    default: testnet,
-    localnet: {
-      endpoint: 'http://localhost:1337/'
-    },
-    development: {
-      endpoint: 'tcp://0.0.0.0:26656',
-      nodeId: '115aa0a629f5d70dd1d464bc7e42799e00f4edae',
-      chainId: 'enigma-pub-testnet-3',
-      keyringBackend: 'test',
-      types: {}
-    },
-    testnet: {
-      endpoint: 'http://testnet.securesecrets.org:1317/',
-      chainId: 'pulsar-2',
-      trustNode: true,
-      keyringBackend: 'test',
-      accounts: accounts,
-    },
-    // Supernova Testnet
-    supernova: {
-      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
-      chainId: 'supernova-2',
-      trustNode: true,
-      keyringBackend: 'test',
-      accounts: accounts,
-      types: {},
-      fees: {
-        upload: {
-            amount: [{ amount: "500000", denom: "uscrt" }],
-            gas: "2000000",
-        },
-        init: {
-            amount: [{ amount: "125000", denom: "uscrt" }],
-            gas: "500000",
-        },
-      }
-    }
+    default: networks.testnet,
+    localnet: networks.localnet,
+    development: networks.development
   },
   mocha: {
     timeout: 60000

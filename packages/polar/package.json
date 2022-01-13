@@ -1,6 +1,6 @@
 {
   "name": "secret-polar",
-  "version": "0.9.6",
+  "version": "0.9.8",
   "main": "dist/src/index.js",
   "authors": [
     {

@@ -6,6 +6,6 @@
   "dependencies": {
     "@types/chai": "^4.3.0",
     "chai": "^4.3.4",
-    "secret-polar": "^0.9.7"
+    "secret-polar": "^0.9.8"
   }
 }

@@ -97,12 +97,12 @@ export class Contract {
   readonly executeAbi: Abi;
   readonly responseAbis: Abi[] = [];
 
-  readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
-  readonly client: CosmWasmClient;
+  private readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
+  private readonly client: CosmWasmClient;
 
-  private codeId: number;
-  private contractCodeHash: string;
-  private contractAddress: string;
+  public codeId: number;
+  public contractCodeHash: string;
+  public contractAddress: string;
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 

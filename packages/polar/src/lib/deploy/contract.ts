@@ -280,7 +280,7 @@ export class Contract {
   }
 
   async instantiate (
-    initArgs: object, // eslint-disable-line @typescript-eslint/ban-types
+    initArgs: Record<string, unknown>,
     label: string,
     account: Account | UserAccount,
     transferAmount?: readonly Coin[],
@@ -328,7 +328,7 @@ export class Contract {
 
   async queryMsg (
     methodName: string,
-    callArgs: object // eslint-disable-line @typescript-eslint/ban-types
+    callArgs: Record<string, unknown>
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
@@ -337,7 +337,7 @@ export class Contract {
     }
     // Query the contract
     console.log('Querying contract for ', methodName);
-    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    const msgData: { [key: string]: Record<string, unknown> } = {};
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
     return await this.client.queryContractSmart(this.contractAddress, msgData);
@@ -345,7 +345,7 @@ export class Contract {
 
   async executeMsg (
     methodName: string,
-    callArgs: object, // eslint-disable-line @typescript-eslint/ban-types
+    callArgs: Record<string, unknown>,
     account: Account | UserAccount,
     transferAmount?: readonly Coin[],
     customFees?: StdFee | undefined
@@ -360,7 +360,7 @@ export class Contract {
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
-    const msgData: { [key: string]: object } = {}; // eslint-disable-line @typescript-eslint/ban-types
+    const msgData: { [key: string]: Record<string, unknown> } = {};
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times

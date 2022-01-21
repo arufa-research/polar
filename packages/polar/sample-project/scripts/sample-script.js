@@ -17,6 +17,10 @@ async function run () {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
+  // use below line if contract initiation done using another contract
+  // const contract_addr = "secret76597235472354792347952394";
+  // contract.instantiatedWithAddress(contract_addr);
+
   const inc_response = await contract.tx.increment({account: contract_owner});
   console.log(inc_response);
 

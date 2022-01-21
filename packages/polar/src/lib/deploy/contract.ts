@@ -285,6 +285,12 @@ export class Contract {
   ): void {
     const initTimestamp = (timestamp !== undefined) ? String(timestamp) : String(new Date());
 
+    // contract address already exists
+    if (this.contractAddress !== "mock_address") {
+      console.error(`Contract already has address: ${this.contractAddress}`);
+      return;
+    }
+
     const instantiateInfo: InstantiateInfo = {
       contractAddress: address,
       instantiateTimestamp: initTimestamp

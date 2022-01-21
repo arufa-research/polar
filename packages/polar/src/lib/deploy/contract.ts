@@ -34,19 +34,25 @@ function buildCall (
   argNames: AbiParam[]
 ): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
-    ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
+    args?: Record<string, unknown> | undefined
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (args.length !== argNames.length) {
-      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
-      return;
+    const validArgs = [];
+    for (const argName of argNames) {
+      validArgs.push(argName.name);
     }
-    const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
-    argNames.forEach((abiParam, i) => {
-      msgArgs[abiParam.name] = args[i];
-    });
+    if (args !== undefined) {
+      const argKeys = Object.keys(args);
+      // argKeys should be a subset of validArgs
+      for (const key of argKeys) {
+        if (!(validArgs.includes(key))) {
+          console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
+          return;
+        }
+      }
+    }
 
     // Query function
-    return contract.queryMsg(msgName, msgArgs);
+    return await contract.queryMsg(msgName, args !== undefined ? args : {});
   };
 }
 
@@ -63,25 +69,38 @@ function buildSend (
 ): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
   return async function (
     { account, transferAmount, customFees }: ExecArgs,
-    ...args: any[] // eslint-disable-line  @typescript-eslint/no-explicit-any
+    args?: Record<string, unknown> | undefined
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (args.length !== argNames.length) {
-      console.error(`Invalid ${msgName} call. Argument count ${args.length}, expected ${argNames.length}`);
-      return;
-    }
     if (transferAmount === []) {
       transferAmount = undefined;
     }
 
+    const validArgs = [];
+    for (const argName of argNames) {
+      validArgs.push(argName.name);
+    }
+    if (args !== undefined) {
+      const argKeys = Object.keys(args);
+      // argKeys should be a subset of validArgs
+      for (const key of argKeys) {
+        if (!(validArgs.includes(key))) {
+          console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
+          return;
+        }
+      }
+    }
+
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
-    const msgArgs: any = {}; // eslint-disable-line  @typescript-eslint/no-explicit-any
-    argNames.forEach((abiParam, i) => {
-      msgArgs[abiParam.name] = args[i];
-    });
 
     // Execute function (write)
-    return contract.executeMsg(msgName, msgArgs, accountVal, transferAmount, customFees);
+    return await contract.executeMsg(
+      msgName,
+      args !== undefined ? args : {},
+      accountVal,
+      transferAmount,
+      customFees
+    );
   };
 }
 

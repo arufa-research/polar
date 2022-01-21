@@ -279,6 +279,23 @@ export class Contract {
     return deployInfo;
   }
 
+  instantiatedWithAddress (
+    address: string,
+    timestamp?: Date | undefined
+  ): void {
+    const initTimestamp = (timestamp !== undefined) ? String(timestamp) : String(new Date());
+
+    const instantiateInfo: InstantiateInfo = {
+      contractAddress: address,
+      instantiateTimestamp: initTimestamp
+    };
+
+    // set init data (contract address, init timestamp) in checkpoints
+    this.checkpointData[this.env.network.name] =
+      { ...this.checkpointData[this.env.network.name], instantiateInfo };
+    persistCheckpoint(this.checkpointPath, this.checkpointData);
+  }
+
   async instantiate (
     initArgs: Record<string, unknown>,
     label: string,
@@ -336,7 +353,7 @@ export class Contract {
       });
     }
     // Query the contract
-    console.log('Querying contract for ', methodName);
+    console.log('Querying contract for', methodName);
     const msgData: { [key: string]: Record<string, unknown> } = {};
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);

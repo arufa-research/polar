@@ -28,6 +28,28 @@ import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
 import { ExecuteResult, getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
+function checkCallArgs (
+  args: Record<string, unknown> | undefined,
+  argNames: AbiParam[],
+  msgName: string
+): boolean {
+  const validArgs = [];
+  for (const argName of argNames) {
+    validArgs.push(argName.name);
+  }
+  if (args !== undefined) {
+    const argKeys = Object.keys(args);
+    // argKeys should be a subset of validArgs
+    for (const key of argKeys) {
+      if (!(validArgs.includes(key))) {
+        console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 function buildCall (
   contract: Contract,
   msgName: string,
@@ -36,19 +58,8 @@ function buildCall (
   return async function (
     args?: Record<string, unknown> | undefined
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    const validArgs = [];
-    for (const argName of argNames) {
-      validArgs.push(argName.name);
-    }
-    if (args !== undefined) {
-      const argKeys = Object.keys(args);
-      // argKeys should be a subset of validArgs
-      for (const key of argKeys) {
-        if (!(validArgs.includes(key))) {
-          console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
-          return;
-        }
-      }
+    if (!checkCallArgs(args, argNames, msgName)) {
+      return;
     }
 
     // Query function
@@ -75,19 +86,8 @@ function buildSend (
       transferAmount = undefined;
     }
 
-    const validArgs = [];
-    for (const argName of argNames) {
-      validArgs.push(argName.name);
-    }
-    if (args !== undefined) {
-      const argKeys = Object.keys(args);
-      // argKeys should be a subset of validArgs
-      for (const key of argKeys) {
-        if (!(validArgs.includes(key))) {
-          console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
-          return;
-        }
-      }
+    if (!checkCallArgs(args, argNames, msgName)) {
+      return;
     }
 
     const accountVal: Account = (account as UserAccount).account !== undefined

@@ -18,10 +18,10 @@ const networks = {
   // Pulsar-2
   testnet: {
     endpoint: 'http://testnet.securesecrets.org:1317/',
-        chainId: 'pulsar-2',
-        trustNode: true,
-        keyringBackend: 'test',
-        accounts: accounts,
+    chainId: 'pulsar-2',
+    trustNode: true,
+    keyringBackend: 'test',
+    accounts: accounts,
   },
   development: {
     endpoint: 'tcp://0.0.0.0:26656',

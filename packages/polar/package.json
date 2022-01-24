@@ -71,7 +71,7 @@
     "glob": "^7.1.7",
     "gunzip-file": "^0.1.1",
     "mocha": "^9.1.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "parse-cosmwasm-schema": "^0.2.0",
     "repl": "^0.1.3",
     "secretjs": "^0.17.5",

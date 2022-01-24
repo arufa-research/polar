@@ -287,8 +287,12 @@ export class Contract {
 
     // contract address already exists
     if (this.contractAddress !== "mock_address") {
-      console.error(`Contract already has address: ${this.contractAddress}`);
+      console.log(
+        `Contract ${this.contractName} already has address: ${this.contractAddress}, skipping`
+      );
       return;
+    } else {
+      this.contractAddress = address;
     }
 
     const instantiateInfo: InstantiateInfo = {

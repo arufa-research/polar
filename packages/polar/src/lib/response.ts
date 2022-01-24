@@ -1,4 +1,6 @@
 
+// Parses the response from contract query, init, deploy or execute
+// and returns logs as a {key: value} object
 export function getLogs (
   response: any // eslint-disable-line  @typescript-eslint/no-explicit-any
 ): Record<string, string|string[]> {

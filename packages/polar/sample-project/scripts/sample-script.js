@@ -1,4 +1,4 @@
-const { Contract, getAccountByName } = require("secret-polar");
+const { Contract, getAccountByName, getLogs } = require("secret-polar");
 
 async function run () {
   const contract_owner = getAccountByName("account_0");
@@ -23,6 +23,8 @@ async function run () {
 
   const inc_response = await contract.tx.increment({account: contract_owner});
   console.log(inc_response);
+  // to get logs as a key:value object
+  // console.log(getLogs(inc_response));
 
   const response = await contract.query.get_count();
   console.log(response);

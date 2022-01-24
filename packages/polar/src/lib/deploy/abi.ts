@@ -30,6 +30,9 @@ export class Abi {
       const tree: ExecuteMsgNode = await parseSchema(schema) as ExecuteMsgNode;
 
       const messages: AbiMessage[] = [];
+      if (tree.value.variants === undefined) {
+        return messages;
+      }
       tree.value.variants.forEach((variant) => {
         Object.entries(variant.value.members).forEach(([fnName, fnBody]) => {
           const msgArgs: AbiParam[] = [];

@@ -43,7 +43,7 @@ function displayErr (error: Error | PolarError | any, relativeScriptPath: string
     throw error;
   }
   const relativeScriptPathWithLine = attachLineNumbertoScriptPath(error, relativeScriptPath);
-
+  console.log(error);
   throw new PolarError(
     ERRORS.BUILTIN_TASKS.RUN_SCRIPT_ERROR, {
       script: relativeScriptPathWithLine,

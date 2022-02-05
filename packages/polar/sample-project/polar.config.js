@@ -13,7 +13,8 @@ const accounts = [
 
 const networks = {
   localnet: {
-    endpoint: 'http://localhost:1337/'
+    endpoint: 'http://localhost:1337/',
+    accounts: accounts,
   },
   // Pulsar-2
   testnet: {

@@ -184,10 +184,17 @@ export class Contract {
 
     // Load checkpoints
     this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName + (instance ?? "")}.yaml`);
+    // For multiple instances
+    const mainContract = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
+    if (fs.existsSync(mainContract)) {
+      const data = loadCheckpoint(mainContract);
+      delete data[this.env.network.name].instantiateInfo;
+      persistCheckpoint(this.checkpointPath, data);
+    }
     // file exist load it else create new checkpoint
     // skip checkpoints if test command is run, or skip-checkpoints is passed
     if (fs.existsSync(this.checkpointPath) &&
-    this.env.runtimeArgs.useCheckpoints === true) {
+      this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
       const contractHash = this.checkpointData[this.env.network.name].deployInfo?.contractCodeHash;
       const contractCodeId = this.checkpointData[this.env.network.name].deployInfo?.codeId;

@@ -137,7 +137,7 @@ export class Contract {
     [name: string]: AbiParam[]
   };
 
-  constructor (contractName: string) {
+  constructor (contractName: string, instance?: string) {
     this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
@@ -183,7 +183,7 @@ export class Contract {
     this.responses = {};
 
     // Load checkpoints
-    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName + (instance ?? "")}.yaml`);
     // file exist load it else create new checkpoint
     // skip checkpoints if test command is run, or skip-checkpoints is passed
     if (fs.existsSync(this.checkpointPath) &&

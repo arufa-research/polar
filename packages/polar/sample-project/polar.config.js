@@ -13,7 +13,7 @@ const accounts = [
     name: 'account_2',
     address: 'secret1ajz54hz8azwuy34qwy9fkjnfcrvf0dzswy0lqq',
     mnemonic: 'chair love bleak wonder skirt permit say assist aunt credit roast size obtain minute throw sand usual age smart exact enough room shadow charge'
-  }
+  },
   {
     name: 'account_3',
     address: 'secret1ldjxljw7v4vk6zhyduywh04hpj0jdwxsmrlatf',

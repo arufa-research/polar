@@ -1,13 +1,23 @@
 const accounts = [
   {
     name: 'account_0',
-    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
-    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+    address: 'secret1ap26qrlp8mcq2pg6r47w43l0y8zkqm8a450s03',
+    mnemonic: 'grant rice replace explain federal release fix clever romance raise often wild taxi quarter soccer fiber love must tape steak together observe swap guitar'
   },
   {
     name: 'account_1',
-    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
-    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
+    address: 'secret1fc3fzy78ttp0lwuujw7e52rhspxn8uj52zfyne',
+    mnemonic: 'jelly shadow frog dirt dragon use armed praise universe win jungle close inmate rain oil canvas beauty pioneer chef soccer icon dizzy thunder meadow'
+  },
+  {
+    name: 'account_2',
+    address: 'secret1ajz54hz8azwuy34qwy9fkjnfcrvf0dzswy0lqq',
+    mnemonic: 'chair love bleak wonder skirt permit say assist aunt credit roast size obtain minute throw sand usual age smart exact enough room shadow charge'
+  }
+  {
+    name: 'account_3',
+    address: 'secret1ldjxljw7v4vk6zhyduywh04hpj0jdwxsmrlatf',
+    mnemonic: 'word twist toast cloth movie predict advance crumble escape whale sail such angry muffin balcony keen move employ cook valve hurt glimpse breeze brick'
   }
 ];
 

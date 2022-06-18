@@ -51,7 +51,13 @@ export class Environment implements PolarRuntimeEnvironment {
   ) {
     log("Creating RuntimeEnv");
 
-    const ncfg = config.networks[runtimeArgs.network];
+    let ncfg = config.networks[runtimeArgs.network];
+    if (runtimeArgs.network === "local") {
+      ncfg = {
+        endpoint: 'http://localhost:1337/',
+        accounts: []
+      };
+    }
     // network configuration is required for all tasks except few setup tasks
     if (!ncfg && networkRequired) {
       throw new PolarError(ERRORS.NETWORK.CONFIG_NOT_FOUND, {

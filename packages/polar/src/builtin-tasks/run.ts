@@ -8,6 +8,7 @@ import { SCRIPTS_DIR } from "../internal/core/project-structure";
 import { runScript } from "../internal/util/script-runner";
 import { assertDirChildren } from "../lib/files";
 import { PolarRuntimeEnvironment } from "../types";
+import { setupLocalNet, stopLocalNode } from "./setup-local-net";
 import { TASK_RUN } from "./task-names";
 
 interface Input {
@@ -57,13 +58,23 @@ async function executeRunTask (
     runtimeEnv.runtimeArgs.useCheckpoints = false;
   }
 
-  await runScripts(
-    runtimeEnv,
-    assertDirChildren(SCRIPTS_DIR, scripts),
-    true,
-    logDebugTag,
-    false
-  );
+  if (runtimeEnv.network.name === "local") {
+    await setupLocalNet(runtimeEnv.network.config);
+  }
+
+  try {
+    await runScripts(
+      runtimeEnv,
+      assertDirChildren(SCRIPTS_DIR, scripts),
+      true,
+      logDebugTag,
+      false
+    );
+  } catch (error) {
+    await stopLocalNode();
+    throw error;
+  }
+  await stopLocalNode();
 }
 
 export default function (): void {

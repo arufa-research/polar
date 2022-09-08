@@ -1,6 +1,6 @@
 # Polar
 
-Polar is a development framework for building secret contracts. The aim of the project is to make Secret contracts development process simple, efficient and scalable. User can focus on logic of secret contract and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment, Interacting with contracts using schema and contract testing framework.
+Polar is a development framework for building the secret contracts. The aim of the project is to make Secret contracts development process simple, efficient and scalable. Users can focus on the logic of secret contracts and not much about further steps in development. It facilitates features such as initiating project repo from contract templates, easy compilation of contracts, deployment, Interacting with contracts using schema and contract testing framework.
 
 ## Requirements
 
@@ -8,11 +8,11 @@ The minimum packages/requirements are as follows:
  
 - Node 14+
 - Yarn v1.22+ or NPM `v6.0+**
-- Connection to an Secret node. 
+- Connection to a Secret node. 
 
 ## Setup rust environment
 
-Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed with the help of polar in just a command.
+Polar requires a Rust environment installed on a local machine to work properly. This Rust environment can be installed with the help of polar in just a command.
 
 ```bash
 $ polar install
@@ -51,7 +51,7 @@ $ cd infrastructure
 $ make setup-rust
 ```
 
-Follow our infrastructure README for instructions how to setup a private network.
+Follow our infrastructure README for instructions on how to set up a private network.
 
 ## Usage
 
@@ -61,11 +61,11 @@ Follow our infrastructure README for instructions how to setup a private network
 $ polar init <project-name>
 ```
 
-This will create a directory <project-name> inside current directory with boiler-plate code. The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory contains  `.js` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory contains `.js` scripts to run tests for the deployed contracts.
+This will create a directory <project-name> inside the current directory with boiler-plate code. The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory contains  `.js` scripts that users can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory contains `.js` scripts to run tests for the deployed contracts.
 
 ### Listing Tasks
 
-To see the possible tasks (commands) that are available, go to project's folder. 
+To see the possible tasks (commands) that are available, go to the project's folder. 
 
 ```bash
 $ polar
@@ -101,7 +101,7 @@ This will remove specific files related to that contract.
 
 ### Running user scripts
 
-User scripts are a way to define the flow of interacting with contracts on some network in form of a script. These scripts can be used to deploy a contract, query/transact with the contract.A sample script scripts/sample-script.js is available in the boilerplate.
+User scripts are a way to define the flow of interacting with contracts on some network in the form of a script. These scripts can be used to deploy a contract, query/transact with the contract.A sample script scripts/sample-script.js is available in the boilerplate.
 
 
 ## Run tests

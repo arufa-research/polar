@@ -1,5 +1,4 @@
-import { Account as WasmAccount, CosmWasmClient } from "secretjs";
-import { PubKey } from "secretjs/types/types";
+import { Account as WasmAccount, SecretNetworkClient } from "secretjs";
 
 import { PolarContext } from "../internal/context";
 import { PolarError } from "../internal/core/errors";
@@ -9,38 +8,35 @@ import { getClient } from "./client";
 
 export class UserAccountI implements UserAccount {
   account: Account;
-  client: CosmWasmClient;
+  client?: SecretNetworkClient;
 
-  constructor (account: Account, env: PolarRuntimeEnvironment) {
+  constructor (account: Account) {
     this.account = account;
-    this.client = getClient(env.network);
+  }
+
+  async loadClient (env: PolarRuntimeEnvironment): Promise<void> {
+    this.client = await getClient(env.network);
   }
 
   async getAccountInfo (): Promise<WasmAccount | undefined> {
-    return await this.client.getAccount(this.account.address);
+    if (this.client === undefined) {
+      throw new Error("Client is not loaded, Please load client using `await loadClient(env)`");
+    }
+    return await this.client.query.auth.account({ address: this.account.address });
   }
 
   async getBalance (): Promise<readonly Coin[]> {
-    const info = await this.client.getAccount(this.account.address);
-    if (info?.balance === undefined) {
+    if (this.client === undefined) {
+      throw new Error("Client is not loaded, Please load client using `await loadClient(env)`");
+    }
+    const info = await this.client.query.bank.balance({
+      address: this.account.address,
+      denom: "uscrt"
+    });
+    if (info === undefined) {
       throw new PolarError(ERRORS.GENERAL.BALANCE_UNDEFINED);
     }
-    return info?.balance;
-  }
-
-  async getPublicKey (): Promise<PubKey | undefined> {
-    const info = await this.client.getAccount(this.account.address);
-    return info?.pubkey;
-  }
-
-  async getAccountNumber (): Promise<number | undefined> {
-    const info = await this.client.getAccount(this.account.address);
-    return info?.accountNumber;
-  }
-
-  async getSequence (): Promise<number | undefined> {
-    const info = await this.client.getAccount(this.account.address);
-    return info?.sequence;
+    return [info.balance ?? { amount: "0", denom: "uscrt" }];
   }
 }
 
@@ -53,7 +49,7 @@ export function getAccountByName (
   }
   for (const value of env.network.config.accounts) {
     if (value.name === name) {
-      return new UserAccountI(value, env);
+      return new UserAccountI(value);
     }
   }
   throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });

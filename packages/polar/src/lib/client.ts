@@ -1,27 +1,23 @@
-import { CosmWasmClient, EnigmaUtils, ExecuteResult, Secp256k1Pen, SigningCosmWasmClient } from "secretjs";
+import { SecretNetworkClient, Wallet } from "secretjs";
 
 import { Account, Network } from "../types";
 
-export function getClient (network: Network): CosmWasmClient {
-  return new CosmWasmClient(
-    network.config.endpoint, network.config.seed, network.config.broadCastMode
-  );
+export async function getClient (network: Network): Promise<SecretNetworkClient> {
+  return await SecretNetworkClient.create({
+    chainId: network.config.chainId,
+    grpcWebUrl: network.config.endpoint
+  });
 }
 
 export async function getSigningClient (
   network: Network,
   account: Account
-): Promise<SigningCosmWasmClient> {
-  const signingPen = await Secp256k1Pen.fromMnemonic(account.mnemonic);
-  const txEncryptionSeed = EnigmaUtils.GenerateNewSeed();
-  return new SigningCosmWasmClient(
-    network.config.endpoint,
-    account.address,
-    (signBytes) => signingPen.sign(signBytes),
-    network.config.seed ?? txEncryptionSeed,
-    network.config.fees,
-    network.config.broadCastMode
-  );
+): Promise<SecretNetworkClient> {
+  const wall = new Wallet(account.mnemonic);
+  return await SecretNetworkClient.create({
+    grpcWebUrl: network.config.endpoint,
+    chainId: network.config.chainId,
+    wallet: wall,
+    walletAddress: account.address
+  });
 }
-
-export { ExecuteResult };

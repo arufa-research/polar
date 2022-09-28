@@ -13,7 +13,7 @@
 // fields), we don't use `extends` as that can interfere with plugin authors
 // trying to augment the config types.
 // Networks config\
-import { BroadcastMode, FeeTable } from "secretjs";
+import { FeePool } from "secretjs/dist/protobuf_stuff/cosmos/distribution/v1beta1/distribution";
 
 import * as types from "./internal/core/params/argument-types";
 
@@ -67,12 +67,11 @@ export type PolarNetworkAccountsUserConfig = Account[];
 
 export interface PolarNetworkUserConfig {
   endpoint: string
-  httpHeaders?: Record<string, string>
   accounts: PolarNetworkAccountsUserConfig
   gasLimit?: string | number
-  seed?: Uint8Array
-  broadCastMode?: BroadcastMode
-  fees?: Partial<FeeTable>
+  chainId: string
+  // TODO: check fees
+  fees?: Partial<FeePool>
 }
 
 export interface NetworksUserConfig {

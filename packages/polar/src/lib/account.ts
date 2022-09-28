@@ -40,16 +40,18 @@ export class UserAccountI implements UserAccount {
   }
 }
 
-export function getAccountByName (
+export async function getAccountByName (
   name: string
-): (Account | UserAccount) {
+): Promise<Account | UserAccount> {
   const env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
   if (env.network.config.accounts === undefined) {
     throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });
   }
   for (const value of env.network.config.accounts) {
     if (value.name === name) {
-      return new UserAccountI(value);
+      const res = new UserAccountI(value);
+      await res.loadClient(env);
+      return res;
     }
   }
   throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });

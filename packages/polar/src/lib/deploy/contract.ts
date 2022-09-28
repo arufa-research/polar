@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient } from "secretjs";
+import { SecretNetworkClient } from "secretjs";
 
 import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
@@ -25,7 +25,7 @@ import type {
   UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
-import { ExecuteResult, getClient, getSigningClient } from "../client";
+import { getClient, getSigningClient } from "../client";
 import { Abi, AbiParam } from "./abi";
 
 function checkCallArgs (
@@ -98,7 +98,7 @@ function buildSend (
       msgName,
       args !== undefined ? args : {},
       accountVal,
-      transferAmount,
+      transferAmount as Coin[],
       customFees
     );
   };
@@ -117,7 +117,7 @@ export class Contract {
   readonly responseAbis: Abi[] = [];
 
   private readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
-  private readonly client: CosmWasmClient;
+  private client?: SecretNetworkClient;
 
   public codeId: number;
   public contractCodeHash: string;
@@ -206,8 +206,10 @@ export class Contract {
     } else {
       this.checkpointData = {};
     }
+  }
 
-    this.client = getClient(this.env.network);
+  async setupClient (): Promise<void> {
+    this.client = await getClient(this.env.network);
   }
 
   async parseSchema (): Promise<void> {
@@ -259,16 +261,25 @@ export class Contract {
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
     const signingClient = await getSigningClient(this.env.network, accountVal);
-    const uploadReceipt = await signingClient.upload(
-      wasmFileContent,
-      {},
-      `upload ${this.contractName}`,
-      customFees
+    const uploadReceipt = await signingClient.tx.compute.storeCode(
+      {
+        sender: accountVal.address,
+        wasmByteCode: wasmFileContent,
+        source: "",
+        builder: ""
+      },
+      {
+        gasLimit: 1000_0000_00 // TODO: Fix fees
+        // gasPriceInFeeDenom: customFees?.gas
+      }
     );
-    const codeId: number = uploadReceipt.codeId;
-    const contractCodeHash: string =
-      await signingClient.restClient.getCodeHashByCodeId(codeId);
+    const res = uploadReceipt?.arrayLog?.find((log) => log.type === "message" && log.key === "code_id");
+    if (res === undefined) {
+      throw new Error("Response for storing code not received!");
+    }
+    const codeId = Number(res.value);
 
+    const contractCodeHash = await signingClient.query.compute.codeHash(codeId);
     this.codeId = codeId;
     const deployInfo: DeployInfo = {
       codeId: codeId,
@@ -317,7 +328,7 @@ export class Contract {
     initArgs: Record<string, unknown>,
     label: string,
     account: Account | UserAccount,
-    transferAmount?: readonly Coin[],
+    transferAmount?: Coin[],
     customFees?: StdFee | undefined
   ): Promise<InstantiateInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
@@ -338,14 +349,29 @@ export class Contract {
     label = (this.env.runtimeArgs.command === "test")
       ? `deploy ${this.contractName} ${initTimestamp}` : label;
     console.log(`Instantiating with label: ${label}`);
-    const contract = await signingClient.instantiate(
-      this.codeId,
-      initArgs,
-      label,
-      `init ${this.contractName}`,
-      transferAmount,
-      customFees);
-    this.contractAddress = contract.contractAddress;
+
+    const tx = await signingClient.tx.compute.instantiateContract(
+      {
+        codeId: this.codeId,
+        sender: accountVal.address,
+        codeHash: this.contractCodeHash,
+        initMsg: initArgs,
+        label: label,
+        initFunds: transferAmount
+      },
+      {
+        gasLimit: 100_000 // TODO: check gas
+      }
+    );
+
+    // Find the contract_address in the logs
+    const res = tx?.arrayLog?.find(
+      (log) => log.type === "message" && log.key === "contract_address"
+    );
+    if (res === undefined) {
+      throw new Error("Response for storing code not received!");
+    }
+    this.contractAddress = res.value;
 
     const instantiateInfo: InstantiateInfo = {
       contractAddress: this.contractAddress,
@@ -374,16 +400,22 @@ export class Contract {
     const msgData: { [key: string]: Record<string, unknown> } = {};
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
-    return await this.client.queryContractSmart(this.contractAddress, msgData);
+
+    if (this.client === undefined) {
+      throw new Error("Client is not loaded. Please load it using `await contractName.setupClient()`");
+    }
+    return await this.client.query.compute.queryContract(
+      { contractAddress: this.contractAddress, query: msgData, codeHash: this.contractCodeHash }
+    );
   }
 
   async executeMsg (
     methodName: string,
     callArgs: Record<string, unknown>,
     account: Account | UserAccount,
-    transferAmount?: readonly Coin[],
+    transferAmount?: Coin[],
     customFees?: StdFee | undefined
-  ): Promise<ExecuteResult> {
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
     if (this.contractAddress === "mock_address") {
@@ -398,12 +430,17 @@ export class Contract {
     msgData[methodName] = callArgs;
     console.log(this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
-    return await signingClient.execute(
-      this.contractAddress,
-      msgData,
-      `execute handle ${this.contractName}`,
-      transferAmount,
-      customFees
+    return await signingClient.tx.compute.executeContract(
+      {
+        sender: accountVal.address,
+        contractAddress: this.contractAddress,
+        codeHash: this.contractCodeHash,
+        msg: msgData,
+        sentFunds: transferAmount
+      },
+      {
+        gasLimit: 100_000 // TODO: check fees
+      }
     );
   }
 }

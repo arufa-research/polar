@@ -221,7 +221,7 @@ export const inputFile: ArgumentType<string> = {
           name: argName,
           value: strValue
         },
-        error
+        error as Error
       );
     }
 
@@ -248,7 +248,7 @@ export const inputFile: ArgumentType<string> = {
           name: argName,
           type: inputFile.name
         },
-        error
+        error as Error
       );
     }
   }
@@ -264,9 +264,9 @@ export const json: ArgumentType<any> = {  // eslint-disable-line
         ERRORS.ARGUMENTS.INVALID_JSON_ARGUMENT,
         {
           param: argName,
-          error: error.message
+          error: (error as Error).message
         },
-        error
+        error as Error
       );
     }
   },

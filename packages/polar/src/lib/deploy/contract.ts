@@ -82,10 +82,6 @@ function buildSend (
     { account, transferAmount, customFees }: ExecArgs,
     args?: Record<string, unknown> | undefined
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (transferAmount === []) {
-      transferAmount = undefined;
-    }
-
     if (!checkCallArgs(args, argNames, msgName)) {
       return;
     }

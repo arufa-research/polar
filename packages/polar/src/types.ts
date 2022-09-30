@@ -29,7 +29,7 @@ export interface Coin {
 }
 
 export interface TxnStdFee {
-  readonly amount: Coin[]
+  readonly amount: readonly Coin[]
   readonly gas: string
 }
 
@@ -38,7 +38,7 @@ export interface StdFee {
   readonly init: TxnStdFee
   readonly exec: TxnStdFee
   readonly send: TxnStdFee
-  readonly amount: Coin[]
+  readonly amount: readonly Coin[]
   readonly gas: string
 }
 

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Account as WasmAccount } from "secretjs";
+import { SecretNetworkClient } from "secretjs";
 
 import { PolarContext } from "../../../internal/context";
 import { PolarError } from "../../../internal/core/errors";
@@ -32,7 +32,7 @@ export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void
       this.assert(
         actualChange === balanceChange,
         `Expected "${accountAddr}" to change balance by ${balanceChange} uscrt, ` +
-          `but it has changed by ${actualChange} uscrt`,
+        `but it has changed by ${actualChange} uscrt`,
         `Expected "${accountAddr}" to not change balance by ${balanceChange} uscrt,`,
         balanceChange,
         actualChange
@@ -58,6 +58,21 @@ function extractScrtBalance (
   return 0;
 }
 
+export async function getBalance (client: SecretNetworkClient, accountAddress: string):
+Promise<readonly Coin[]> {
+  if (client === undefined) {
+    throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
+  }
+  const info = await client.query.bank.balance({
+    address: accountAddress,
+    denom: "uscrt"
+  });
+  if (info === undefined) {
+    throw new PolarError(ERRORS.GENERAL.BALANCE_UNDEFINED);
+  }
+  return [info.balance ?? { amount: "0", denom: "uscrt" }];
+}
+
 export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitive-complexity
   transaction: (() => Promise<any>), // eslint-disable-line  @typescript-eslint/no-explicit-any
   accountAddr: string,
@@ -70,10 +85,9 @@ export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitiv
     });
   }
 
-  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
-
+  const client = await getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
   const balanceBefore = extractScrtBalance(
-    (await client.getAccount(accountAddr) as WasmAccount).balance
+    await getBalance(client, accountAddr)
   );
 
   const txResponse = await transaction();
@@ -94,7 +108,7 @@ export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitiv
   }
 
   const balanceAfter = extractScrtBalance(
-    (await client.getAccount(accountAddr) as WasmAccount).balance
+    await getBalance(client, accountAddr)
   );
 
   const fees = Object.assign(
@@ -104,9 +118,9 @@ export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitiv
 
   if (
     includeFee !== true &&
-    (await client.getAccount(accountAddr) as WasmAccount).address === msgEventKeys.signer
+    accountAddr === msgEventKeys.signer
   ) {
-    if ((await client.getAccount(accountAddr) as WasmAccount).address === msgEventKeys.signer) {
+    if (accountAddr === msgEventKeys.signer) {
       return balanceAfter - balanceBefore;
     } else {
       let txnFees = 0;

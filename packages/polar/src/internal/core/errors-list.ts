@@ -273,6 +273,20 @@ Please check that the configured keypair are correct.`,
       title: "Object is not a function",
       description: `Object is not a function.`,
       shouldBeReported: false
+    },
+    CLIENT_NOT_LOADED: {
+      number: 30,
+      message: "Client is not loaded, Please load client using `await setupClient(env)`",
+      title: "Client it not loaded",
+      description: `Client not loaded`,
+      shouldBeReported: false
+    },
+    STORE_RESPONSE_NOT_RECEIVED: {
+      number: 31,
+      message: "Response for storing code not received!",
+      title: "Error while storing code",
+      description: "Response for storing code not received",
+      shouldBeReported: false
     }
   },
   NETWORK: {

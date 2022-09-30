@@ -8,6 +8,7 @@ import type {
   Account, Coin, UserAccount
 } from "../../../types";
 import { getClient } from "../../client";
+import { getBalance } from "./changeScrtBalance";
 
 export function supportChangeTokenBalance (Assertion: Chai.AssertionStatic): void {
   Assertion.addMethod('changeTokenBalance', function (
@@ -31,7 +32,7 @@ export function supportChangeTokenBalance (Assertion: Chai.AssertionStatic): voi
       this.assert(
         actualChange === balanceChange,
         `Expected "${accountAddr}" to change balance by ${balanceChange} ${token}, ` +
-          `but it has changed by ${actualChange} ${token}`,
+        `but it has changed by ${actualChange} ${token}`,
         `Expected "${accountAddr}" to not change balance by ${balanceChange} ${token},`,
         balanceChange,
         actualChange
@@ -69,10 +70,10 @@ export async function getBalanceChange (
     });
   }
 
-  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
+  const client = await getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
 
   const balanceBefore = extractTokenBalance(
-    (await client.getAccount(accountAddr) as WasmAccount).balance,
+    await getBalance(client, accountAddr),
     token
   );
 
@@ -82,7 +83,7 @@ export async function getBalanceChange (
   }
 
   const balanceAfter = extractTokenBalance(
-    (await client.getAccount(accountAddr) as WasmAccount).balance,
+    await getBalance(client, accountAddr),
     token
   );
 

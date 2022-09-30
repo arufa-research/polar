@@ -3,7 +3,8 @@ const SCRT_CHAIN_NAME = "testnet";
 
 const cfg: PolarNetworkUserConfig = {
   accounts: [],
-  endpoint: SCRT_CHAIN_NAME
+  endpoint: SCRT_CHAIN_NAME,
+  chainId: "pulsar-3"
 };
 
 const defaultConfig: Config = {

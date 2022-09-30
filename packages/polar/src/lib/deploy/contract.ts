@@ -247,7 +247,9 @@ export class Contract {
 
   async deploy (
     account: Account | UserAccount,
-    customFees?: StdFee | undefined
+    customFees?: StdFee | undefined,
+    source?: string,
+    builder?: string
   ): Promise<DeployInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -265,8 +267,8 @@ export class Contract {
       {
         sender: accountVal.address,
         wasmByteCode: wasmFileContent,
-        source: "",
-        builder: ""
+        source: source ?? "",
+        builder: builder ?? ""
       },
       {
         gasLimit: 1000_0000_00 // TODO: Fix fees

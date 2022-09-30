@@ -26,7 +26,17 @@ export interface Coin {
   readonly denom: string
   readonly amount: string
 }
+
+export interface TxnStdFee {
+  readonly amount: readonly Coin[]
+  readonly gas: string
+}
+
 export interface StdFee {
+  readonly upload: TxnStdFee
+  readonly init: TxnStdFee
+  readonly exec: TxnStdFee
+  readonly send: TxnStdFee
   readonly amount: readonly Coin[]
   readonly gas: string
 }

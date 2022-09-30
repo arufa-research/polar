@@ -12,9 +12,12 @@ import {
   CACHE_DIR,
   CONTRACTS_DIR,
   SCHEMA_DIR,
-  TARGET_DIR
+  TARGET_DIR,
+  TS_SCHEMA_DIR
 } from "../../internal/core/project-structure";
 import { replaceAll } from "../../internal/util/strings";
+import { generateTsSchema } from "./tsSchema";
+import { readSchemas } from "./utils";
 
 export async function compile (
   docker: boolean,

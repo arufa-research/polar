@@ -42,7 +42,7 @@ export class UserAccountI implements UserAccount {
 
 export async function getAccountByName (
   name: string
-): Promise<Account | UserAccount> {
+): Promise<UserAccount> {
   const env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
   if (env.network.config.accounts === undefined) {
     throw new PolarError(ERRORS.GENERAL.ACCOUNT_DOES_NOT_EXIST, { name: name });

@@ -14,20 +14,20 @@ export class UserAccountI implements UserAccount {
     this.account = account;
   }
 
-  async loadClient (env: PolarRuntimeEnvironment): Promise<void> {
+  async setupClient (env: PolarRuntimeEnvironment): Promise<void> {
     this.client = await getClient(env.network);
   }
 
   async getAccountInfo (): Promise<WasmAccount | undefined> {
     if (this.client === undefined) {
-      throw new Error("Client is not loaded, Please load client using `await loadClient(env)`");
+      throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }
     return await this.client.query.auth.account({ address: this.account.address });
   }
 
   async getBalance (): Promise<readonly Coin[]> {
     if (this.client === undefined) {
-      throw new Error("Client is not loaded, Please load client using `await loadClient(env)`");
+      throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }
     const info = await this.client.query.bank.balance({
       address: this.account.address,
@@ -50,7 +50,7 @@ export async function getAccountByName (
   for (const value of env.network.config.accounts) {
     if (value.name === name) {
       const res = new UserAccountI(value);
-      await res.loadClient(env);
+      await res.setupClient(env);
       return res;
     }
   }

@@ -275,7 +275,7 @@ export class Contract {
     );
     const res = uploadReceipt?.arrayLog?.find((log) => log.type === "message" && log.key === "code_id");
     if (res === undefined) {
-      throw new Error("Response for storing code not received!");
+      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED);
     }
     const codeId = Number(res.value);
 
@@ -369,7 +369,7 @@ export class Contract {
       (log) => log.type === "message" && log.key === "contract_address"
     );
     if (res === undefined) {
-      throw new Error("Response for storing code not received!");
+      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED);
     }
     this.contractAddress = res.value;
 
@@ -402,7 +402,7 @@ export class Contract {
     console.log(this.contractAddress, msgData);
 
     if (this.client === undefined) {
-      throw new Error("Client is not loaded. Please load it using `await contractName.setupClient()`");
+      throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }
     return await this.client.query.compute.queryContract(
       { contractAddress: this.contractAddress, query: msgData, codeHash: this.contractCodeHash }

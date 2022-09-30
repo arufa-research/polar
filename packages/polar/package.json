@@ -1,6 +1,6 @@
 {
   "name": "secret-polar",
-  "version": "0.0.04",
+  "version": "0.9.94",
   "main": "dist/src/index.js",
   "repository": "https://github.com/arufa-research/polar.git",
   "description": "Polar is a development environment to compile, deploy, test, run scrt contracts on different networks.",

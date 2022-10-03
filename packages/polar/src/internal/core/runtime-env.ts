@@ -222,7 +222,7 @@ export class Environment implements PolarRuntimeEnvironment {
             values[paramName] = resolvedArgumentValue;
           }
         } catch (error) {
-          errors.push(error);
+          errors.push(error as PolarError);
         }
         return { errors, values };
       },

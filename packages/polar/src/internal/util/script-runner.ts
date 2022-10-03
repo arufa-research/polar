@@ -14,7 +14,7 @@ async function loadScript (relativeScriptPath: string): Promise<any> {
   } catch (err) {
     throw new PolarError(ERRORS.GENERAL.SCRIPT_LOAD_ERROR, {
       script: absoluteScriptPath,
-      error: err.message
+      error: (err as Error).message
     });
   }
 }

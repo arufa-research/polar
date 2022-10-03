@@ -47,7 +47,7 @@ export function supportChangeTokenBalance (Assertion: Chai.AssertionStatic): voi
 }
 
 function extractTokenBalance (
-  balances: readonly Coin[],
+  balances: Coin[],
   denom: string
 ): number {
   for (const coin of balances) {

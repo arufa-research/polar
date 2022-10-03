@@ -47,7 +47,7 @@ export function supportChangeScrtBalance (Assertion: Chai.AssertionStatic): void
 }
 
 function extractScrtBalance (
-  balances: readonly Coin[]
+  balances: Coin[]
 ): number {
   console.log(balances);
   for (const coin of balances) {
@@ -59,7 +59,7 @@ function extractScrtBalance (
 }
 
 export async function getBalance (client: SecretNetworkClient, accountAddress: string):
-Promise<readonly Coin[]> {
+Promise<Coin[]> {
   if (client === undefined) {
     throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
   }

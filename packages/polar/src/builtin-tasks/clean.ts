@@ -2,9 +2,9 @@ import chalk from "chalk";
 import fsExtra from "fs-extra";
 import path from "path";
 
-import { ERRORS } from "../../src/internal/core/errors-list";
 import { task } from "../internal/core/config/config-env";
 import { PolarError } from "../internal/core/errors";
+import { ERRORS } from "../internal/core/errors-list";
 import { ARTIFACTS_DIR, isCwdProjectDir } from "../internal/core/project-structure";
 import type { PolarRuntimeEnvironment } from "../types";
 import { TASK_CLEAN } from "./task-names";

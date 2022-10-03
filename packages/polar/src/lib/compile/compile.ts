@@ -60,10 +60,10 @@ export async function compile (
 
   for (const dir of contractDirs) {
     compileContract(dir, docker);
-    if (!skipSchema) { // only generate schema if this flag is not passed
-      generateSchema(dir, docker);
-    }
     const contractName = readContractName(path.join(dir, toml));
+    if (!skipSchema) { // only generate schema if this flag is not passed
+      await generateSchema(contractName, dir, docker);
+    }
     createArtifacts(
       TARGET_DIR, path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker, skipSchema
     );
@@ -95,7 +95,11 @@ export function compileContract (contractDir: string, docker: boolean): void {
   process.chdir(currDir);
 }
 
-export function generateSchema (contractDir: string, docker: boolean): void {
+export async function generateSchema (
+  contractName: string,
+  contractDir: string,
+  docker: boolean
+): Promise<void> {
   const currDir = process.cwd();
   process.chdir(contractDir);
   console.log(`Creating schema for contract in directory: ${chalk.gray(contractDir)}`);
@@ -104,6 +108,17 @@ export function generateSchema (contractDir: string, docker: boolean): void {
   execSync(`cargo run --example schema`, { stdio: 'inherit' });
 
   process.chdir(currDir);
+
+  // Creates typescript objects for execute and query msgs from json schema files
+  const contractTsSchemaDir = TS_SCHEMA_DIR;
+  // create nested dirs if not present
+  if (!fs.existsSync(contractTsSchemaDir)) {
+    fs.mkdirSync(contractTsSchemaDir, { recursive: true });
+  }
+  console.log(`Creating TS schema objects for contract in directory: ${chalk.gray(contractTsSchemaDir)}`);
+
+  const srcSchemas = readSchemas(path.join(contractDir, "schema"));
+  await generateTsSchema(contractName, srcSchemas, contractTsSchemaDir);
 }
 
 export function createArtifacts (

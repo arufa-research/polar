@@ -2,10 +2,10 @@ import generate from "@babel/generator";
 import * as t from '@babel/types';
 import { pascal } from "case";
 import { writeFileSync } from 'fs';
-import * as w from 'junokit-wasm-ast-types';
-import { getMessageProperties } from "junokit-wasm-ast-types";
 import { sync as mkdirp } from "mkdirp";
 import { join } from "path";
+import * as w from 'polar-wasm-ast-types';
+import { getMessageProperties } from "polar-wasm-ast-types";
 
 import { findAndParseTypes, findExecuteMsg, findQueryMsg } from "./utils";
 
@@ -26,16 +26,13 @@ export async function generateTsSchema (
   let ReadOnlyInstance = null;
 
   const body = [];
+
   body.push(
-    w.importStmt(['ExecuteResult'], '@cosmjs/cosmwasm-stargate')
+    w.importStmt(['Contract', 'polarTypes'], 'secret-polar')
   );
 
   body.push(
-    w.importStmt(['Contract', 'junokitTypes'], 'junokit')
-  );
-
-  body.push(
-    w.importStmt(['Coin', 'StdFee'], '@cosmjs/amino')
+    w.importStmt(['Coin'], 'secretjs')
   );
 
   // TYPES

@@ -29,7 +29,6 @@ export async function generateTsSchema (
 
   body.push(
     w.importStmt(['Contract', 'polarTypes', 'Coin'], 'secret-polar')
-
   );
 
   // TYPES

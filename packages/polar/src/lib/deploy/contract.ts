@@ -25,7 +25,7 @@ import { getClient, getSigningClient } from "../client";
 
 export interface ExecArgs {
   account: Account | UserAccount
-  transferAmount: readonly Coin[] | undefined
+  transferAmount: Coin[] | undefined
   customFees: TxnStdFee | undefined
 }
 

@@ -4,5 +4,6 @@ import { createAccounts } from "./lib/createAccounts";
 import { Contract } from "./lib/deploy/contract";
 import { getLogs } from "./lib/response";
 import * as polarTypes from "./types";
+import { Coin } from "./types";
 
-export { Contract, createAccounts, getAccountByName, polarChai, getLogs, polarTypes };
+export { Contract, createAccounts, getAccountByName, polarChai, getLogs, polarTypes, Coin };

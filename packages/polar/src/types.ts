@@ -22,13 +22,14 @@ export interface Account {
   address: string
   mnemonic: string
 }
+
 export interface Coin {
   readonly denom: string
   readonly amount: string
 }
 
 export interface TxnStdFee {
-  readonly amount: readonly Coin[]
+  readonly amount: Coin[]
   readonly gas: string
 }
 
@@ -37,13 +38,13 @@ export interface StdFee {
   readonly init: TxnStdFee
   readonly exec: TxnStdFee
   readonly send: TxnStdFee
-  readonly amount: readonly Coin[]
+  readonly amount: Coin[]
   readonly gas: string
 }
 
 export interface UserAccount {
   account: Account
-  getBalance: () => Promise<readonly Coin[]>
+  getBalance: () => Promise<Coin[]>
 }
 
 export interface ContractInfo {

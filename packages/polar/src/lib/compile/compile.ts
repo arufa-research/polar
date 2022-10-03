@@ -80,7 +80,7 @@ export function compileContract (contractDir: string, docker: boolean): void {
   const currDir = process.cwd();
   process.chdir(contractDir);
   console.log(`🛠 Compiling your contract in directory: ${chalk.gray(contractDir)}`);
-  console.log("===========================================");
+  console.log("================================A=SA==AS=AS=======");
   // Compiles the contract and creates .wasm file alongside others
   try {
     execSync(`RUSTFLAGS='-C link-arg=-s' cargo build --release --target wasm32-unknown-unknown`, { stdio: 'inherit' });

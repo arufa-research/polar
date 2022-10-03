@@ -25,7 +25,7 @@ import { getClient, getSigningClient } from "../client";
 
 export interface ExecArgs {
   account: Account | UserAccount
-  transferAmount: readonly Coin[] | undefined
+  transferAmount: Coin[] | undefined
   customFees: TxnStdFee | undefined
 }
 
@@ -247,7 +247,7 @@ export class Contract {
     account: Account | UserAccount,
     customFees?: TxnStdFee,
     memo?: string,
-    transferAmount?: Coin[]
+    transferAmount?: readonly Coin[]
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);

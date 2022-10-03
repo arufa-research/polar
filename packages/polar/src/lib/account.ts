@@ -25,7 +25,7 @@ export class UserAccountI implements UserAccount {
     return await this.client.query.auth.account({ address: this.account.address });
   }
 
-  async getBalance (): Promise<readonly Coin[]> {
+  async getBalance (): Promise<Coin[]> {
     if (this.client === undefined) {
       throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }

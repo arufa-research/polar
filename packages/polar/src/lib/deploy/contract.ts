@@ -25,7 +25,7 @@ import { getClient, getSigningClient } from "../client";
 
 export interface ExecArgs {
   account: Account | UserAccount
-  transferAmount: Coin[] | undefined
+  transferAmount: readonly Coin[] | undefined
   customFees: TxnStdFee | undefined
 }
 
@@ -267,7 +267,7 @@ export class Contract {
         contractAddress: this.contractAddress,
         codeHash: this.contractCodeHash,
         msg: msgData,
-        sentFunds: transferAmount
+        sentFunds: transferAmount as Coin[] | undefined
       },
       {
         gasLimit: 100_000 // TODO: check fees

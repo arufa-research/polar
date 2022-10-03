@@ -4,7 +4,7 @@ import { SampleProjectContract } from "../artifacts/typescript_schema/SampleProj
 
 export default async function run () {
   const runTs = String(new Date());
-  const contract_owner = getAccountByName("account_0");
+  const contract_owner = await getAccountByName("account_0");
   const contract = new SampleProjectContract();
 
   const deploy_response = await contract.deploy(

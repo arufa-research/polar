@@ -283,9 +283,16 @@ Please check that the configured keypair are correct.`,
     },
     STORE_RESPONSE_NOT_RECEIVED: {
       number: 31,
-      message: "Response for storing code not received!",
+      message: "Failed to deploy contract %contractName%, response: %jsonLog%",
       title: "Error while storing code",
-      description: "Response for storing code not received",
+      description: "Received error response: %jsonLog%",
+      shouldBeReported: false
+    },
+    INIT_RESPONSE_NOT_RECEIVED: {
+      number: 32,
+      message: "Failed to init contract %contractName%, response: %jsonLog%",
+      title: "Error while instantiating contract",
+      description: "Received error response: %jsonLog%",
       shouldBeReported: false
     }
   },

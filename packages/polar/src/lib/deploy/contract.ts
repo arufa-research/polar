@@ -96,6 +96,11 @@ export class Contract {
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
+    );
+
     const signingClient = await getSigningClient(this.env.network, accountVal);
     const uploadReceipt = await signingClient.tx.compute.storeCode(
       {
@@ -105,13 +110,18 @@ export class Contract {
         builder: builder ?? ""
       },
       {
-        gasLimit: 1000_0000_00 // TODO: Fix fees
-        // gasPriceInFeeDenom: customFees?.gas
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice
       }
     );
-    const res = uploadReceipt?.arrayLog?.find((log) => log.type === "message" && log.key === "code_id");
+    const res = uploadReceipt?.arrayLog?.find(
+      (log) => log.type === "message" && log.key === "code_id"
+    );
     if (res === undefined) {
-      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED);
+      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED, {
+        jsonLog: JSON.stringify(uploadReceipt, null, 2),
+        contractName: this.contractName
+      });
     }
     const codeId = Number(res.value);
 
@@ -181,6 +191,11 @@ export class Contract {
     }
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
+    );
+
     const initTimestamp = String(new Date());
     label = (this.env.runtimeArgs.command === "test")
       ? `deploy ${this.contractName} ${initTimestamp}` : label;
@@ -196,7 +211,8 @@ export class Contract {
         initFunds: transferAmount
       },
       {
-        gasLimit: 100_000 // TODO: check gas
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice
       }
     );
 
@@ -205,7 +221,10 @@ export class Contract {
       (log) => log.type === "message" && log.key === "contract_address"
     );
     if (res === undefined) {
-      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED);
+      throw new PolarError(ERRORS.GENERAL.INIT_RESPONSE_NOT_RECEIVED, {
+        jsonLog: JSON.stringify(tx, null, 2),
+        contractName: this.contractName
+      });
     }
     this.contractAddress = res.value;
 
@@ -259,6 +278,11 @@ export class Contract {
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
+    );
+
     console.log('Executing', this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
     return await signingClient.tx.compute.executeContract(
@@ -270,7 +294,9 @@ export class Contract {
         sentFunds: transferAmount as Coin[] | undefined
       },
       {
-        gasLimit: 100_000 // TODO: check fees
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice,
+        memo: memo
       }
     );
   }

@@ -25,7 +25,7 @@ export default async function run () {
     {"count": 102},
     `deploy test ${runTs}`,
     contract_owner,
-    undefined,
+    undefined,  // transferAmount
     customFees,
   );
   console.log(contract_info);

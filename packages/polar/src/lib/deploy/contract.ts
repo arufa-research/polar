@@ -42,7 +42,7 @@ export class Contract {
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 
-  constructor (contractName: string, instance?: string) {
+  constructor (contractName: string) {
     this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
@@ -50,14 +50,7 @@ export class Contract {
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
     // Load checkpoints
-    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName + (instance ?? "")}.yaml`);
-    // For multiple instances
-    const mainContract = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
-    if (fs.existsSync(mainContract)) {
-      const data = loadCheckpoint(mainContract);
-      delete data[this.env.network.name].instantiateInfo;
-      persistCheckpoint(this.checkpointPath, data);
-    }
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
     // file exist load it else create new checkpoint
     // skip checkpoints if test command is run, or skip-checkpoints is passed
     if (fs.existsSync(this.checkpointPath) &&

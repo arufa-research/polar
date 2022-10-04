@@ -1,4 +1,3 @@
-sample-project/yarn.lock
 yarn.lock
-src
-test
+src/
+test/

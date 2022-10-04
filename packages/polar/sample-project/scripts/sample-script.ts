@@ -17,10 +17,16 @@ export default async function run () {
   );
   console.log(deploy_response);
 
+  const customFees = { // custom fees
+    amount: [{ amount: "750000", denom: "uscrt" }],
+    gas: "3000000",
+  };
   const contract_info = await contract.instantiate(
     {"count": 102},
     `deploy test ${runTs}`,
     contract_owner,
+    undefined,
+    customFees,
   );
   console.log(contract_info);
 
@@ -30,13 +36,8 @@ export default async function run () {
   const response = await contract.getCount();
   console.log(response);
 
-  const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
-  const customFees = { // custom fees
-    amount: [{ amount: "750000", denom: "uscrt" }],
-    gas: "3000000",
-  }
   const ex_response = await contract.increment(
-    {account: contract_owner, transferAmount: transferAmount}
+    {account: contract_owner, customFees: customFees}
   );
   console.log(ex_response);
 }

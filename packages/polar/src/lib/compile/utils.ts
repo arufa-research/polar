@@ -19,7 +19,9 @@ export const findExecuteMsg = (schemas: any[]): Record<string, unknown> => { // 
   return schemas.find((schema: { title: string }) =>
     schema.title === 'ExecuteMsg' ||
       schema.title === 'ExecuteMsg_for_Empty' || // if cleanse is used, this is never
-      schema.title === 'ExecuteMsgForEmpty'
+      schema.title === 'ExecuteMsgForEmpty' ||
+      schema.title === 'Cw20ExecuteMsg' ||
+      schema.title === 'Snip20ExecuteMsg'
   );
 };
 

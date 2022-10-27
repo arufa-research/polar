@@ -15,7 +15,7 @@ The minimum packages/requirements are as follows:
 Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed with the help of polar in just a command.
 
 ```bash
-$ polar install
+polar install
 ```
 
 ## Install polar
@@ -33,32 +33,23 @@ The master branch corresponds to the latest version.
 To use  `polar` on your system, follow the steps below:
 
 ```bash
-$ git clone https://github.com/arufa-research/polar.git
-$ cd polar
-$ yarn install
-$ yarn build
-$ cd packages/polar
-$ yarn link
-$ chmod +x $HOME/.yarn/bin/polar
+git clone https://github.com/arufa-research/polar.git
+cd polar
+yarn install
+yarn build
+cd packages/polar
+yarn link
+chmod +x $HOME/.yarn/bin/polar
 ```
 
-### Install dependencies
-
-Setup Rust compiler
-
-```bash
-$ cd infrastructure
-$ make setup-rust
-```
-
-Follow our infrastructure README for instructions how to setup a private network.
+Follow infrastructure README for instructions how to setup a private network.
 
 ## Usage
 
 ### Initialize a project
 
 ```bash
-$ polar init <project-name>
+polar init <project-name>
 ```
 
 This will create a directory <project-name> inside current directory with boiler-plate code. The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory contains  `.js` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory contains `.js` scripts to run tests for the deployed contracts.
@@ -68,7 +59,7 @@ This will create a directory <project-name> inside current directory with boiler
 To see the possible tasks (commands) that are available, go to project's folder. 
 
 ```bash
-$ polar
+polar
 ``` 
 
 This is the list of built-in tasks. This is your starting point to find out what tasks are available to run.
@@ -78,8 +69,8 @@ This is the list of built-in tasks. This is your starting point to find out what
 To compile the contracts, Go to project directory:
 
 ```bash
-$ cd <project-name>
-$ polar compile
+cd <project-name>
+polar compile
 ```
 
 This command will generate compiled .wasm files in artifacts/contracts/ dir and schema .json files in artifacts/schema/ dir.
@@ -89,12 +80,12 @@ This command will generate compiled .wasm files in artifacts/contracts/ dir and 
 To clear artifacts data, use
 
 ```bash
-$ polar clean
+polar clean
 ``` 
 This will remove the artifacts directory completely. To clean artifacts for only one contract, use
 
 ```bash
-$ polar clean <contract-name>
+polar clean <contract-name>
 ``` 
 This will remove specific files related to that contract.
 
@@ -107,7 +98,7 @@ User scripts are a way to define the flow of interacting with contracts on some 
 ## Run tests
 
 ```bash
-$ yarn run test
+yarn run test
 ```
 
 ## License

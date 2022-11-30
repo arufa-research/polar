@@ -18,13 +18,13 @@ export async function expectErrorAsync (
       return;
     }
     if (typeof matchMessage === "string") {
-      if (err.message !== matchMessage) {
-        notExactMatch.message += `${String(err.message)}"`;
+      if ((err as PolarError).message !== matchMessage) {
+        notExactMatch.message += `${String((err as PolarError).message)}"`;
         throw notExactMatch; // eslint-disable-line @typescript-eslint/no-throw-literal
       }
     } else {
-      if (matchMessage.exec(err.message) === null) {
-        notRegexpMatch.message += `${String(err.message)}"`;
+      if (matchMessage.exec((err as PolarError).message) === null) {
+        notRegexpMatch.message += `${String((err as PolarError).message)}"`;
         throw notRegexpMatch; // eslint-disable-line @typescript-eslint/no-throw-literal
       }
     }
@@ -46,17 +46,17 @@ export function expectPolarError (
     }
   } catch (error) {
     assert.instanceOf(error, PolarError, errorMessage);
-    assert.equal(error.number, errorDescriptor.number, errorMessage);
+    assert.equal((error as PolarError).number, errorDescriptor.number, errorMessage);
     assert.notMatch(
-      error.message,
+      (error as PolarError).message,
       /%[a-zA-Z][a-zA-Z0-9]*%/,
       "PolarError has an non-replaced variable tag"
     );
 
     if (typeof matchMessage === "string") {
-      assert.include(error.message, matchMessage, errorMessage);
+      assert.include((error as PolarError).message, matchMessage, errorMessage);
     } else if (matchMessage !== undefined) {
-      assert.match(error.message, matchMessage, errorMessage);
+      assert.match((error as PolarError).message, matchMessage, errorMessage);
     }
 
     return;
@@ -88,22 +88,22 @@ export async function expectPolarErrorAsync (
     await f();
   } catch (error) {
     assert.instanceOf(error, PolarError);
-    assert.equal(error.number, errorDescriptor.number);
+    assert.equal((error as PolarError).number, errorDescriptor.number);
     assert.notMatch(
-      error.message,
+      (error as PolarError).message,
       /%[a-zA-Z][a-zA-Z0-9]*%/,
       "PolarError has an non-replaced variable tag"
     );
 
     if (matchMessage !== undefined) {
       if (typeof matchMessage === "string") {
-        if (!error.message.includes(matchMessage)) {
-          notExactMatch.message += `${String(error.message)}`;
+        if (!(error as PolarError).message.includes(matchMessage)) {
+          notExactMatch.message += `${String((error as PolarError).message)}`;
           throw notExactMatch; // eslint-disable-line @typescript-eslint/no-throw-literal
         }
       } else {
-        if (matchMessage.exec(error.message) === null) {
-          notRegexpMatch.message += `${String(error.message)}`;
+        if (matchMessage.exec((error as PolarError).message) === null) {
+          notRegexpMatch.message += `${String((error as PolarError).message)}`;
           throw notRegexpMatch; // eslint-disable-line @typescript-eslint/no-throw-literal
         }
       }

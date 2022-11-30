@@ -1,123 +1,40 @@
-import chalk from "chalk";
 import fs from "fs-extra";
 import path from "path";
-import { CosmWasmClient } from "secretjs";
+import { SecretNetworkClient } from "secretjs";
 
 import { PolarContext } from "../../internal/context";
 import { PolarError } from "../../internal/core/errors";
 import { ERRORS } from "../../internal/core/errors-list";
 import {
-  ARTIFACTS_DIR,
-  SCHEMA_DIR
+  ARTIFACTS_DIR
 } from "../../internal/core/project-structure";
 import { replaceAll } from "../../internal/util/strings";
 import { compress } from "../../lib/deploy/compress";
 import type {
   Account,
-  AnyJson,
   Checkpoints,
   Coin,
-  ContractFunction,
   DeployInfo,
   InstantiateInfo,
   PolarRuntimeEnvironment,
-  StdFee,
+  TxnStdFee,
   UserAccount
 } from "../../types";
 import { loadCheckpoint, persistCheckpoint } from "../checkpoints";
-import { ExecuteResult, getClient, getSigningClient } from "../client";
-import { Abi, AbiParam } from "./abi";
-
-function checkCallArgs (
-  args: Record<string, unknown> | undefined,
-  argNames: AbiParam[],
-  msgName: string
-): boolean {
-  const validArgs = [];
-  for (const argName of argNames) {
-    validArgs.push(argName.name);
-  }
-  if (args !== undefined) {
-    const argKeys = Object.keys(args);
-    // argKeys should be a subset of validArgs
-    for (const key of argKeys) {
-      if (!(validArgs.includes(key))) {
-        console.error(`Invalid ${msgName} call. Argument '${key}' not an argument of '${msgName}' method`);
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-function buildCall (
-  contract: Contract,
-  msgName: string,
-  argNames: AbiParam[]
-): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-  return async function (
-    args?: Record<string, unknown> | undefined
-  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (!checkCallArgs(args, argNames, msgName)) {
-      return;
-    }
-
-    // Query function
-    return await contract.queryMsg(msgName, args !== undefined ? args : {});
-  };
-}
+import { getClient, getSigningClient } from "../client";
 
 export interface ExecArgs {
   account: Account | UserAccount
   transferAmount: readonly Coin[] | undefined
-  customFees: StdFee | undefined
-}
-
-function buildSend (
-  contract: Contract,
-  msgName: string,
-  argNames: AbiParam[]
-): ContractFunction<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-  return async function (
-    { account, transferAmount, customFees }: ExecArgs,
-    args?: Record<string, unknown> | undefined
-  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
-    if (transferAmount === []) {
-      transferAmount = undefined;
-    }
-
-    if (!checkCallArgs(args, argNames, msgName)) {
-      return;
-    }
-
-    const accountVal: Account = (account as UserAccount).account !== undefined
-      ? (account as UserAccount).account : (account as Account);
-
-    // Execute function (write)
-    return await contract.executeMsg(
-      msgName,
-      args !== undefined ? args : {},
-      accountVal,
-      transferAmount,
-      customFees
-    );
-  };
+  customFees: TxnStdFee | undefined
 }
 
 export class Contract {
   readonly contractName: string;
   readonly contractPath: string;
-  readonly initSchemaPath: string;
-  readonly querySchemaPath: string;
-  readonly executeSchemaPath: string;
-  readonly responsePaths: string[] = [];
-  readonly initAbi: Abi;
-  readonly queryAbi: Abi;
-  readonly executeAbi: Abi;
-  readonly responseAbis: Abi[] = [];
 
   private readonly env: PolarRuntimeEnvironment = PolarContext.getPolarContext().getRuntimeEnv();
-  private readonly client: CosmWasmClient;
+  private client?: SecretNetworkClient;
 
   public codeId: number;
   public contractCodeHash: string;
@@ -125,72 +42,15 @@ export class Contract {
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 
-  public query: {
-    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
-  };
-
-  public tx: {
-    [name: string]: ContractFunction<any> // eslint-disable-line  @typescript-eslint/no-explicit-any
-  };
-
-  public responses: {
-    [name: string]: AbiParam[]
-  };
-
-  constructor (contractName: string, instance?: string) {
+  constructor (contractName: string) {
     this.contractName = replaceAll(contractName, '-', '_');
     this.codeId = 0;
     this.contractCodeHash = "mock_hash";
     this.contractAddress = "mock_address";
     this.contractPath = path.join(ARTIFACTS_DIR, "contracts", `${this.contractName}_compressed.wasm`);
 
-    this.initSchemaPath = path.join(SCHEMA_DIR, this.contractName, "init_msg.json");
-    this.querySchemaPath = path.join(SCHEMA_DIR, this.contractName, "query_msg.json");
-    this.executeSchemaPath = path.join(SCHEMA_DIR, this.contractName, "handle_msg.json");
-
-    for (const file of fs.readdirSync(path.join(SCHEMA_DIR, this.contractName))) {
-      if (file.split('.')[0].split('_')[1] !== "response") { // *_response.json
-        continue;
-      }
-      this.responsePaths.push(path.join(SCHEMA_DIR, this.contractName, file));
-    }
-
-    if (!fs.existsSync(this.initSchemaPath)) {
-      console.log("Warning: Init schema not found for contract ", chalk.cyan(contractName));
-    }
-    if (!fs.existsSync(this.querySchemaPath)) {
-      console.log("Warning: Query schema not found for contract ", chalk.cyan(contractName));
-    }
-    if (!fs.existsSync(this.executeSchemaPath)) {
-      console.log("Warning: Execute schema not found for contract ", chalk.cyan(contractName));
-    }
-
-    const initSchemaJson: AnyJson = fs.readJsonSync(this.initSchemaPath);
-    const querySchemaJson: AnyJson = fs.readJsonSync(this.querySchemaPath);
-    const executeSchemaJson: AnyJson = fs.readJsonSync(this.executeSchemaPath);
-    this.initAbi = new Abi(initSchemaJson);
-    this.queryAbi = new Abi(querySchemaJson);
-    this.executeAbi = new Abi(executeSchemaJson);
-
-    for (const file of this.responsePaths) {
-      const responseSchemaJson: AnyJson = fs.readJSONSync(file);
-      const responseAbi = new Abi(responseSchemaJson);
-      this.responseAbis.push(responseAbi);
-    }
-
-    this.query = {};
-    this.tx = {};
-    this.responses = {};
-
     // Load checkpoints
-    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName + (instance ?? "")}.yaml`);
-    // For multiple instances
-    const mainContract = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
-    if (fs.existsSync(mainContract)) {
-      const data = loadCheckpoint(mainContract);
-      delete data[this.env.network.name].instantiateInfo;
-      persistCheckpoint(this.checkpointPath, data);
-    }
+    this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
     // file exist load it else create new checkpoint
     // skip checkpoints if test command is run, or skip-checkpoints is passed
     if (fs.existsSync(this.checkpointPath) &&
@@ -206,46 +66,17 @@ export class Contract {
     } else {
       this.checkpointData = {};
     }
-
-    this.client = getClient(this.env.network);
   }
 
-  async parseSchema (): Promise<void> {
-    if (!fs.existsSync(this.querySchemaPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.QUERY_SCHEMA_NOT_FOUND, {
-        param: this.contractName
-      });
-    }
-    if (!fs.existsSync(this.executeSchemaPath)) {
-      throw new PolarError(ERRORS.ARTIFACTS.EXEC_SCHEMA_NOT_FOUND, {
-        param: this.contractName
-      });
-    }
-    await this.queryAbi.parseSchema();
-    await this.executeAbi.parseSchema();
-
-    for (const message of this.queryAbi.messages) {
-      const msgName: string = message.identifier;
-      const args: AbiParam[] = message.args;
-
-      if (this.query[msgName] == null) {
-        this.query[msgName] = buildCall(this, msgName, args);
-      }
-    }
-
-    for (const message of this.executeAbi.messages) {
-      const msgName: string = message.identifier;
-      const args: AbiParam[] = message.args;
-
-      if (this.tx[msgName] == null) {
-        this.tx[msgName] = buildSend(this, msgName, args);
-      }
-    }
+  async setupClient (): Promise<void> {
+    this.client = await getClient(this.env.network);
   }
 
   async deploy (
     account: Account | UserAccount,
-    customFees?: StdFee | undefined
+    customFees?: TxnStdFee,
+    source?: string,
+    builder?: string
   ): Promise<DeployInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -258,17 +89,36 @@ export class Contract {
 
     const wasmFileContent: Buffer = fs.readFileSync(this.contractPath);
 
-    const signingClient = await getSigningClient(this.env.network, accountVal);
-    const uploadReceipt = await signingClient.upload(
-      wasmFileContent,
-      {},
-      `upload ${this.contractName}`,
-      customFees
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
     );
-    const codeId: number = uploadReceipt.codeId;
-    const contractCodeHash: string =
-      await signingClient.restClient.getCodeHashByCodeId(codeId);
 
+    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const uploadReceipt = await signingClient.tx.compute.storeCode(
+      {
+        sender: accountVal.address,
+        wasmByteCode: wasmFileContent,
+        source: source ?? "",
+        builder: builder ?? ""
+      },
+      {
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice
+      }
+    );
+    const res = uploadReceipt?.arrayLog?.find(
+      (log) => log.type === "message" && log.key === "code_id"
+    );
+    if (res === undefined) {
+      throw new PolarError(ERRORS.GENERAL.STORE_RESPONSE_NOT_RECEIVED, {
+        jsonLog: JSON.stringify(uploadReceipt, null, 2),
+        contractName: this.contractName
+      });
+    }
+    const codeId = Number(res.value);
+
+    const contractCodeHash = await signingClient.query.compute.codeHash(codeId);
     this.codeId = codeId;
     const deployInfo: DeployInfo = {
       codeId: codeId,
@@ -317,8 +167,8 @@ export class Contract {
     initArgs: Record<string, unknown>,
     label: string,
     account: Account | UserAccount,
-    transferAmount?: readonly Coin[],
-    customFees?: StdFee | undefined
+    transferAmount?: Coin[],
+    customFees?: TxnStdFee
   ): Promise<InstantiateInfo> {
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
@@ -334,18 +184,42 @@ export class Contract {
     }
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
+    );
+
     const initTimestamp = String(new Date());
     label = (this.env.runtimeArgs.command === "test")
       ? `deploy ${this.contractName} ${initTimestamp}` : label;
     console.log(`Instantiating with label: ${label}`);
-    const contract = await signingClient.instantiate(
-      this.codeId,
-      initArgs,
-      label,
-      `init ${this.contractName}`,
-      transferAmount,
-      customFees);
-    this.contractAddress = contract.contractAddress;
+
+    const tx = await signingClient.tx.compute.instantiateContract(
+      {
+        codeId: this.codeId,
+        sender: accountVal.address,
+        codeHash: this.contractCodeHash,
+        initMsg: initArgs,
+        label: label,
+        initFunds: transferAmount
+      },
+      {
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice
+      }
+    );
+
+    // Find the contract_address in the logs
+    const res = tx?.arrayLog?.find(
+      (log) => log.type === "message" && log.key === "contract_address"
+    );
+    if (res === undefined) {
+      throw new PolarError(ERRORS.GENERAL.INIT_RESPONSE_NOT_RECEIVED, {
+        jsonLog: JSON.stringify(tx, null, 2),
+        contractName: this.contractName
+      });
+    }
+    this.contractAddress = res.value;
 
     const instantiateInfo: InstantiateInfo = {
       contractAddress: this.contractAddress,
@@ -361,8 +235,7 @@ export class Contract {
   }
 
   async queryMsg (
-    methodName: string,
-    callArgs: Record<string, unknown>
+    msgData: Record<string, unknown>
   ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     if (this.contractAddress === "mock_address") {
       throw new PolarError(ERRORS.GENERAL.CONTRACT_NOT_INSTANTIATED, {
@@ -370,20 +243,24 @@ export class Contract {
       });
     }
     // Query the contract
-    console.log('Querying contract for', methodName);
-    const msgData: { [key: string]: Record<string, unknown> } = {};
-    msgData[methodName] = callArgs;
+    console.log('Querying', this.contractAddress, '=>', Object.keys(msgData)[0]);
     console.log(this.contractAddress, msgData);
-    return await this.client.queryContractSmart(this.contractAddress, msgData);
+
+    if (this.client === undefined) {
+      throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
+    }
+    return await this.client.query.compute.queryContract(
+      { contractAddress: this.contractAddress, query: msgData, codeHash: this.contractCodeHash }
+    );
   }
 
   async executeMsg (
-    methodName: string,
-    callArgs: Record<string, unknown>,
+    msgData: Record<string, unknown>,
     account: Account | UserAccount,
-    transferAmount?: readonly Coin[],
-    customFees?: StdFee | undefined
-  ): Promise<ExecuteResult> {
+    customFees?: TxnStdFee,
+    memo?: string,
+    transferAmount?: readonly Coin[]
+  ): Promise<any> { // eslint-disable-line  @typescript-eslint/no-explicit-any
     const accountVal: Account = (account as UserAccount).account !== undefined
       ? (account as UserAccount).account : (account as Account);
     if (this.contractAddress === "mock_address") {
@@ -394,16 +271,26 @@ export class Contract {
     // Send execute msg to the contract
     const signingClient = await getSigningClient(this.env.network, accountVal);
 
-    const msgData: { [key: string]: Record<string, unknown> } = {};
-    msgData[methodName] = callArgs;
-    console.log(this.contractAddress, msgData);
+    const inGasLimit = parseInt(customFees?.gas as string);
+    const inGasPrice = (
+      parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
+    );
+
+    console.log('Executing', this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
-    return await signingClient.execute(
-      this.contractAddress,
-      msgData,
-      `execute handle ${this.contractName}`,
-      transferAmount,
-      customFees
+    return await signingClient.tx.compute.executeContract(
+      {
+        sender: accountVal.address,
+        contractAddress: this.contractAddress,
+        codeHash: this.contractCodeHash,
+        msg: msgData,
+        sentFunds: transferAmount as Coin[] | undefined
+      },
+      {
+        gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
+        gasPriceInFeeDenom: Number.isNaN(inGasPrice) ? undefined : inGasPrice,
+        memo: memo
+      }
     );
   }
 }

@@ -54,7 +54,7 @@ export function getEnvRuntimeArgs (
             varName: envVarName,
             value: rawValue
           },
-          error
+          error as Error
         );
       }
     } else {

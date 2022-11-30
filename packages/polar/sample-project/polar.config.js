@@ -1,5 +1,5 @@
 
-const accounts = [
+const testnet_accounts = [
   {
     name: 'account_0',
     address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
@@ -12,51 +12,49 @@ const accounts = [
   }
 ];
 
+const localnet_accounts = [
+  {
+    name: 'account_0',
+    address: '',
+    mnemonic: ''
+  }
+];
+
+const mainnet_accounts = [
+];
+
 const networks = {
   localnet: {
-    endpoint: 'http://localhost:1337/',
-    accounts: accounts,
+    endpoint: 'http://localhost:26657/',
+    chainId: 'testing',
+    accounts: localnet_accounts,
   },
-  // Pulsar-2
   testnet: {
     endpoint: 'http://testnet.securesecrets.org:1317/',
     chainId: 'pulsar-2',
-    accounts: accounts,
+    trustNode: true,
+    keyringBackend: 'test',
+    accounts: testnet_accounts,
   },
-  development: {
-    endpoint: 'tcp://0.0.0.0:26656',
-    chainId: 'enigma-pub-testnet-3',
-    types: {}
+  mainnet: {
+    endpoint: 'https://secretnetwork-lcd.stakely.io/',
+    chainId: 'secret-4',
+    trustNode: true,
+    keyringBackend: 'test',
+    accounts: mainnet_accounts,
   },
-  // Supernova Testnet
-  supernova: {
-    endpoint: 'http://bootstrap.supernova.enigma.co:1317',
-    chainId: 'supernova-2',
-    accounts: accounts,
-    types: {},
-    fees: {
-      upload: {
-          amount: [{ amount: "500000", denom: "uscrt" }],
-          gas: "2000000",
-      },
-      init: {
-          amount: [{ amount: "125000", denom: "uscrt" }],
-          gas: "500000",
-      },
-    }
-  }
 };
 
 module.exports = {
   networks: {
     default: networks.testnet,
     localnet: networks.localnet,
-    development: networks.development
+    mainnet: networks.mainnet,
   },
   mocha: {
     timeout: 60000
   },
   rust: {
-    version: "1.55.0",
+    version: "1.60.0",
   }
 };

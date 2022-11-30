@@ -273,6 +273,27 @@ Please check that the configured keypair are correct.`,
       title: "Object is not a function",
       description: `Object is not a function.`,
       shouldBeReported: false
+    },
+    CLIENT_NOT_LOADED: {
+      number: 30,
+      message: "Client is not loaded, Please load client using `await setupClient(env)`",
+      title: "Client it not loaded",
+      description: `Client not loaded`,
+      shouldBeReported: false
+    },
+    STORE_RESPONSE_NOT_RECEIVED: {
+      number: 31,
+      message: "Failed to deploy contract %contractName%, response: %jsonLog%",
+      title: "Error while storing code",
+      description: "Received error response: %jsonLog%",
+      shouldBeReported: false
+    },
+    INIT_RESPONSE_NOT_RECEIVED: {
+      number: 32,
+      message: "Failed to init contract %contractName%, response: %jsonLog%",
+      title: "Error while instantiating contract",
+      description: "Received error response: %jsonLog%",
+      shouldBeReported: false
     }
   },
   NETWORK: {

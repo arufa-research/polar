@@ -11,6 +11,7 @@ export const CACHE_DIR = join(ARTIFACTS_DIR, ".cache");
 export const CONTRACTS_OUT_DIR = join(ARTIFACTS_DIR, "contracts");
 export const TARGET_DIR = "target/wasm32-unknown-unknown/release/";
 export const SCHEMA_DIR = "artifacts/schema";
+export const TS_SCHEMA_DIR = "artifacts/typescript_schema";
 export const SCRIPTS_DIR = "scripts";
 export const TESTS_DIR = "test";
 

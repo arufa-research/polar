@@ -1,11 +1,14 @@
 import debug from "debug";
 import fsExtra from "fs-extra";
+import path from "path";
+import * as ts from "typescript";
 
 import { task } from "../internal/core/config/config-env";
 import { PolarError } from "../internal/core/errors";
 import { ERRORS } from "../internal/core/errors-list";
 import { SCRIPTS_DIR } from "../internal/core/project-structure";
 import { runScript } from "../internal/util/script-runner";
+import { buildTsScripts } from "../lib/compile/scripts";
 import { assertDirChildren } from "../lib/files";
 import { PolarRuntimeEnvironment } from "../types";
 import { TASK_RUN } from "./task-names";
@@ -46,6 +49,8 @@ async function executeRunTask (
 ): Promise<any> {
   const logDebugTag = "polar:tasks:run";
 
+  const currDir = process.cwd();
+
   const nonExistent = filterNonExistent(scripts);
   if (nonExistent.length !== 0) {
     throw new PolarError(ERRORS.BUILTIN_TASKS.RUN_FILES_NOT_FOUND, {
@@ -56,6 +61,31 @@ async function executeRunTask (
   if (skipCheckpoints) { // used by Contract() class to skip checkpoints
     runtimeEnv.runtimeArgs.useCheckpoints = false;
   }
+
+  await buildTsScripts(
+    scripts,
+    {
+      baseUrl: currDir,
+      paths: {
+        "*": [
+          "node_modules/*"
+        ]
+      },
+      target: ts.ScriptTarget.ES2020,
+      outDir: path.join(currDir, "build"),
+      experimentalDecorators: true,
+      esModuleInterop: true,
+      allowJs: true,
+      module: ts.ModuleKind.CommonJS,
+      resolveJsonModule: true,
+      noImplicitReturns: true,
+      noImplicitThis: true,
+      strict: true,
+      forceConsistentCasingInFileNames: true,
+      sourceMap: true,
+      declaration: true
+    }
+  );
 
   await runScripts(
     runtimeEnv,

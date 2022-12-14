@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { sync as glob } from 'glob';
-import { compile } from 'json-schema-to-typescript';
+import { compile } from '../../internal/util/json-to-ts';
 
 import { parser } from "./schemaParser";
 

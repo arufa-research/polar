@@ -18,7 +18,9 @@ import {
   getType
 } from './utils/types';
 
-export const createWasmQueryMethod = (jsonschema: any) => {
+export const createWasmQueryMethod = (
+  jsonschema: any
+): t.ObjectProperty | t.ClassProperty => {
   const underscoreName = Object.keys(jsonschema.properties)[0];
   const methodName = camel(underscoreName);
   const responseType = `any`;
@@ -69,7 +71,7 @@ export const createQueryClass = (
   implementsClassName: string,
   extendsClassName: string,
   queryMsg: QueryMsg
-) => {
+): t.ExportNamedDeclaration => {
   const propertyNames = getMessageProperties(queryMsg)
     .map((method) => Object.keys(method.properties)?.[0])
     .filter(Boolean);
@@ -109,11 +111,24 @@ export const createQueryClass = (
   );
 };
 
-export const createWasmExecMethod = (jsonschema: any) => {
+export const createWasmExecMethod = (jsonschema: any): t.ClassProperty => {
   const underscoreName = Object.keys(jsonschema.properties)[0];
   const methodName = camel(underscoreName);
   const properties = jsonschema.properties[underscoreName].properties ?? {};
   const obj = createTypedObjectParams(jsonschema.properties[underscoreName]);
+
+  let changeConstParamNames = false;
+  for (const prop of Object.keys(properties)) {
+    if (
+      prop === 'memo' ||
+      prop === 'account' ||
+      prop === 'customFees' ||
+      prop === 'transferAmount'
+    ) {
+      changeConstParamNames = true;
+    }
+  }
+
   const args = Object.keys(properties).map((prop) => {
     return t.objectProperty(
       t.identifier(prop),
@@ -123,23 +138,30 @@ export const createWasmExecMethod = (jsonschema: any) => {
     );
   });
 
+  const accountVar = changeConstParamNames ? 'txnAccount' : 'account';
+  const customFeesVar = changeConstParamNames ? 'txnCustomFees' : 'customFees';
+  const memoVar = changeConstParamNames ? 'txnMemo' : 'memo';
+  const transferAmountVar = changeConstParamNames
+    ? 'txnTransferAmount'
+    : 'transferAmount';
+
   const constantParams = t.objectPattern([
     t.objectProperty(
-      t.identifier('account'),
-      t.identifier('account'),
+      t.identifier(accountVar),
+      t.identifier(accountVar),
       false,
       true
     ),
     t.objectProperty(
-      t.identifier('customFees'),
-      t.identifier('customFees'),
+      t.identifier(customFeesVar),
+      t.identifier(customFeesVar),
       false,
       true
     ),
-    t.objectProperty(t.identifier('memo'), t.identifier('memo'), false, true),
+    t.objectProperty(t.identifier(memoVar), t.identifier(memoVar), false, true),
     t.objectProperty(
-      t.identifier('transferAmount'),
-      t.identifier('transferAmount'),
+      t.identifier(transferAmountVar),
+      t.identifier(transferAmountVar),
       false,
       true
     )
@@ -147,23 +169,23 @@ export const createWasmExecMethod = (jsonschema: any) => {
   constantParams.typeAnnotation = t.tsTypeAnnotation(
     t.tsTypeLiteral([
       t.tSPropertySignature(
-        t.identifier('account'),
+        t.identifier(accountVar),
         t.tsTypeAnnotation(
           t.tsTypeReference(t.identifier('polarTypes.UserAccount'))
         )
       ),
       t.tSPropertySignature(
-        t.identifier('customFees?'),
+        t.identifier(`${customFeesVar}?`),
         t.tsTypeAnnotation(
           t.tsTypeReference(t.identifier('polarTypes.TxnStdFee'))
         )
       ),
       t.tSPropertySignature(
-        t.identifier('memo?'),
+        t.identifier(`${memoVar}?`),
         t.tsTypeAnnotation(t.tsStringKeyword())
       ),
       t.tSPropertySignature(
-        t.identifier('transferAmount?'),
+        t.identifier(`${transferAmountVar}?`),
         t.tsTypeAnnotation(
           tsTypeOperator(
             t.tsArrayType(t.tsTypeReference(t.identifier('Coin'))),
@@ -199,10 +221,10 @@ export const createWasmExecMethod = (jsonschema: any) => {
                     t.objectExpression([...args])
                   )
                 ]),
-                t.identifier('account'),
-                t.identifier('customFees'),
-                t.identifier('memo'),
-                t.identifier('transferAmount')
+                t.identifier(accountVar),
+                t.identifier(customFeesVar),
+                t.identifier(memoVar),
+                t.identifier(transferAmountVar)
               ]
             )
           )
@@ -228,7 +250,7 @@ export const createExecuteClass = (
   extendsClassName: string,
   execMsg: ExecuteMsg,
   contractName: string
-) => {
+): t.ExportNamedDeclaration => {
   const propertyNames = getMessageProperties(execMsg)
     .map((method) => Object.keys(method.properties)?.[0])
     .filter(Boolean);
@@ -275,7 +297,7 @@ export const createExecuteInterface = (
   className: string,
   extendsClassName: string | null,
   execMsg: ExecuteMsg
-) => {
+): t.ExportNamedDeclaration => {
   const methods = getMessageProperties(execMsg).map((jsonschema) => {
     const underscoreName = Object.keys(jsonschema.properties)[0];
     const methodName = camel(underscoreName);
@@ -314,7 +336,7 @@ export const createPropertyFunctionWithObjectParams = (
   methodName: string,
   responseType: string,
   jsonschema: any
-) => {
+): t.TSPropertySignature => {
   const obj = createTypedObjectParams(jsonschema);
 
   const func = {
@@ -333,26 +355,46 @@ export const createPropertyFunctionWithObjectParamsForExec = (
   methodName: string,
   responseType: string,
   jsonschema: any
-) => {
+): t.TSPropertySignature => {
   const obj = createTypedObjectParams(jsonschema);
+  const properties = jsonschema.properties ?? {};
+
+  let changeConstParamNames = false;
+  for (const prop of Object.keys(properties)) {
+    if (
+      prop === 'memo' ||
+      prop === 'account' ||
+      prop === 'customFees' ||
+      prop === 'transferAmount'
+    ) {
+      changeConstParamNames = true;
+    }
+  }
+
+  const accountVar = changeConstParamNames ? 'txnAccount' : 'account';
+  const customFeesVar = changeConstParamNames ? 'txnCustomFees' : 'customFees';
+  const memoVar = changeConstParamNames ? 'txnMemo' : 'memo';
+  const transferAmountVar = changeConstParamNames
+    ? 'txnTransferAmount'
+    : 'transferAmount';
 
   const fixedParams = t.objectPattern([
     t.objectProperty(
-      t.identifier('account'),
-      t.identifier('account'),
+      t.identifier(accountVar),
+      t.identifier(accountVar),
       false,
       true
     ),
     t.objectProperty(
-      t.identifier('customFees'),
-      t.identifier('customFees'),
+      t.identifier(customFeesVar),
+      t.identifier(customFeesVar),
       false,
       true
     ),
-    t.objectProperty(t.identifier('memo'), t.identifier('memo'), false, true),
+    t.objectProperty(t.identifier(memoVar), t.identifier(memoVar), false, true),
     t.objectProperty(
-      t.identifier('transferAmount'),
-      t.identifier('transferAmount'),
+      t.identifier(transferAmountVar),
+      t.identifier(transferAmountVar),
       false,
       true
     )
@@ -360,23 +402,23 @@ export const createPropertyFunctionWithObjectParamsForExec = (
   fixedParams.typeAnnotation = t.tsTypeAnnotation(
     t.tsTypeLiteral([
       t.tSPropertySignature(
-        t.identifier('account'),
+        t.identifier(accountVar),
         t.tsTypeAnnotation(
           t.tsTypeReference(t.identifier('polarTypes.UserAccount'))
         )
       ),
       t.tSPropertySignature(
-        t.identifier('customFees?'),
+        t.identifier(`${customFeesVar}?`),
         t.tsTypeAnnotation(
           t.tsTypeReference(t.identifier('polarTypes.TxnStdFee'))
         )
       ),
       t.tSPropertySignature(
-        t.identifier('memo?'),
+        t.identifier(`${memoVar}?`),
         t.tsTypeAnnotation(t.tsStringKeyword())
       ),
       t.tSPropertySignature(
-        t.identifier('transferAmount?'),
+        t.identifier(`${transferAmountVar}?`),
         t.tsTypeAnnotation(
           tsTypeOperator(
             t.tsArrayType(t.tsTypeReference(t.identifier('Coin'))),
@@ -398,7 +440,10 @@ export const createPropertyFunctionWithObjectParamsForExec = (
   );
 };
 
-export const createQueryInterface = (className: string, queryMsg: QueryMsg) => {
+export const createQueryInterface = (
+  className: string,
+  queryMsg: QueryMsg
+): t.ExportNamedDeclaration => {
   const methods = getMessageProperties(queryMsg).map((jsonschema) => {
     const underscoreName = Object.keys(jsonschema.properties)[0];
     const methodName = camel(underscoreName);
@@ -420,7 +465,10 @@ export const createQueryInterface = (className: string, queryMsg: QueryMsg) => {
   );
 };
 
-export const createTypeOrInterface = (Type: string, jsonschema: any) => {
+export const createTypeOrInterface = (
+  Type: string,
+  jsonschema: any
+): t.ExportNamedDeclaration => {
   if (jsonschema.type !== 'object') {
     if (!jsonschema.type) {
       return t.exportNamedDeclaration(
@@ -455,7 +503,9 @@ export const createTypeOrInterface = (Type: string, jsonschema: any) => {
   );
 };
 
-export const createTypeInterface = (jsonschema: any) => {
+export const createTypeInterface = (
+  jsonschema: any
+): t.ExportNamedDeclaration => {
   const Type = jsonschema.title;
   return createTypeOrInterface(Type, jsonschema);
 };

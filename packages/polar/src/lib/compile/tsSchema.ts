@@ -27,9 +27,15 @@ export async function generateTsSchema (
 
   const body = [];
 
-  body.push(
-    w.importStmt(['Contract', 'polarTypes', 'Coin'], 'secret-polar')
-  );
+  if (Object.prototype.hasOwnProperty.call(typeHash, 'Coin')) {
+    body.push(
+      w.importStmt(['Contract', 'polarTypes'], 'secret-polar')
+    );
+  } else {
+    body.push(
+      w.importStmt(['Contract', 'polarTypes', 'Coin'], 'secret-polar')
+    );
+  }
 
   // TYPES
   Object.values(typeHash).forEach(type => {

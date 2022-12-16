@@ -70,7 +70,12 @@ Promise<Coin[]> {
   if (info === undefined) {
     throw new PolarError(ERRORS.GENERAL.BALANCE_UNDEFINED);
   }
-  return [info.balance ?? { amount: "0", denom: "uscrt" }];
+
+  const infoBalance = info.balance ?? { amount: "0", denom: "uscrt" };
+  const normalisedBalance: Coin = (infoBalance.amount === undefined ||
+    infoBalance.denom === undefined) ? { amount: "0", denom: "uscrt" }
+    : { amount: infoBalance.amount, denom: infoBalance.denom };
+  return [normalisedBalance];
 }
 
 export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitive-complexity

@@ -9,7 +9,7 @@ export default function (): void {
 }
 
 async function nodeInfo (_taskArgs: TaskArguments, env: PolarRuntimeEnvironment): Promise<void> {
-  const client = await getClient(env.network);
+  const client = getClient(env.network);
   console.log("Network:", env.network.name);
   console.log("ChainId:", env.network.config.chainId);
   console.log("Block height:", await client.query.tendermint.getLatestBlock({}));

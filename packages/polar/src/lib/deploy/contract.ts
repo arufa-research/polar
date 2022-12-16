@@ -69,7 +69,7 @@ export class Contract {
   }
 
   async setupClient (): Promise<void> {
-    this.client = await getClient(this.env.network);
+    this.client = getClient(this.env.network);
   }
 
   async deploy (
@@ -94,7 +94,7 @@ export class Contract {
       parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
     );
 
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
     const uploadReceipt = await signingClient.tx.compute.storeCode(
       {
         sender: accountVal.address,
@@ -184,7 +184,7 @@ export class Contract {
       console.log("Warning: contract already instantiated, using checkpoints");
       return info;
     }
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
 
     const inGasLimit = parseInt(customFees?.gas as string);
     const inGasPrice = (
@@ -271,7 +271,7 @@ export class Contract {
       });
     }
     // Send execute msg to the contract
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
 
     const inGasLimit = parseInt(customFees?.gas as string);
     const inGasPrice = (

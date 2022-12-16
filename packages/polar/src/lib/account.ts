@@ -15,7 +15,7 @@ export class UserAccountI implements UserAccount {
   }
 
   async setupClient (env: PolarRuntimeEnvironment): Promise<void> {
-    this.client = await getClient(env.network);
+    this.client = getClient(env.network);
   }
 
   async getAccountInfo (): Promise<WasmAccount | undefined> {

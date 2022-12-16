@@ -90,7 +90,7 @@ export async function getBalanceChange ( // eslint-disable-line sonarjs/cognitiv
     });
   }
 
-  const client = await getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
+  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
   const balanceBefore = extractScrtBalance(
     await getBalance(client, accountAddr)
   );

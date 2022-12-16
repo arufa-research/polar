@@ -15,14 +15,14 @@ export class UserAccountI implements UserAccount {
   }
 
   async setupClient (env: PolarRuntimeEnvironment): Promise<void> {
-    this.client = await getClient(env.network);
+    this.client = getClient(env.network);
   }
 
   async getAccountInfo (): Promise<WasmAccount | undefined> {
     if (this.client === undefined) {
       throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }
-    return await this.client.query.auth.account({ address: this.account.address });
+    return (await this.client.query.auth.account({ address: this.account.address })).account;
   }
 
   async getBalance (): Promise<Coin[]> {
@@ -36,7 +36,12 @@ export class UserAccountI implements UserAccount {
     if (info === undefined) {
       throw new PolarError(ERRORS.GENERAL.BALANCE_UNDEFINED);
     }
-    return [info.balance ?? { amount: "0", denom: "uscrt" }];
+
+    const infoBalance = info.balance ?? { amount: "0", denom: "uscrt" };
+    const normalisedBalance: Coin = (infoBalance.amount === undefined ||
+      infoBalance.denom === undefined) ? { amount: "0", denom: "uscrt" }
+      : { amount: infoBalance.amount, denom: infoBalance.denom };
+    return [normalisedBalance];
   }
 }
 

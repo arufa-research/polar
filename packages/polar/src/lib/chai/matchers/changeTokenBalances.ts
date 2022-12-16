@@ -67,7 +67,7 @@ async function getBalances (
   accountAddresses: string[],
   token: string
 ): Promise<number[]> {
-  const client = await getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
+  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
 
   return await Promise.all(
     accountAddresses.map(async (accountAddr) => {

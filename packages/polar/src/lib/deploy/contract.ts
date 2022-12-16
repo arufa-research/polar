@@ -69,7 +69,7 @@ export class Contract {
   }
 
   async setupClient (): Promise<void> {
-    this.client = await getClient(this.env.network);
+    this.client = getClient(this.env.network);
   }
 
   async deploy (
@@ -94,11 +94,11 @@ export class Contract {
       parseFloat(customFees?.amount[0].amount as string) / parseFloat(customFees?.gas as string)
     );
 
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
     const uploadReceipt = await signingClient.tx.compute.storeCode(
       {
         sender: accountVal.address,
-        wasmByteCode: wasmFileContent,
+        wasm_byte_code: wasmFileContent,
         source: source ?? "",
         builder: builder ?? ""
       },
@@ -118,11 +118,13 @@ export class Contract {
     }
     const codeId = Number(res.value);
 
-    const contractCodeHash = await signingClient.query.compute.codeHash(codeId);
+    const contractCodeHash = await signingClient.query.compute.codeHashByCodeId(
+      { code_id: codeId.toString() }
+    );
     this.codeId = codeId;
     const deployInfo: DeployInfo = {
       codeId: codeId,
-      contractCodeHash: contractCodeHash,
+      contractCodeHash: (contractCodeHash.code_hash as string),
       deployTimestamp: String(new Date())
     };
 
@@ -131,7 +133,7 @@ export class Contract {
         { ...this.checkpointData[this.env.network.name], deployInfo };
       persistCheckpoint(this.checkpointPath, this.checkpointData);
     }
-    this.contractCodeHash = contractCodeHash;
+    this.contractCodeHash = (contractCodeHash.code_hash as string);
 
     return deployInfo;
   }
@@ -182,7 +184,7 @@ export class Contract {
       console.log("Warning: contract already instantiated, using checkpoints");
       return info;
     }
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
 
     const inGasLimit = parseInt(customFees?.gas as string);
     const inGasPrice = (
@@ -196,12 +198,12 @@ export class Contract {
 
     const tx = await signingClient.tx.compute.instantiateContract(
       {
-        codeId: this.codeId,
+        code_id: this.codeId,
         sender: accountVal.address,
-        codeHash: this.contractCodeHash,
-        initMsg: initArgs,
+        code_hash: this.contractCodeHash,
+        init_msg: initArgs,
         label: label,
-        initFunds: transferAmount
+        init_funds: transferAmount
       },
       {
         gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,
@@ -250,7 +252,7 @@ export class Contract {
       throw new PolarError(ERRORS.GENERAL.CLIENT_NOT_LOADED);
     }
     return await this.client.query.compute.queryContract(
-      { contractAddress: this.contractAddress, query: msgData, codeHash: this.contractCodeHash }
+      { contract_address: this.contractAddress, query: msgData, code_hash: this.contractCodeHash }
     );
   }
 
@@ -269,7 +271,7 @@ export class Contract {
       });
     }
     // Send execute msg to the contract
-    const signingClient = await getSigningClient(this.env.network, accountVal);
+    const signingClient = getSigningClient(this.env.network, accountVal);
 
     const inGasLimit = parseInt(customFees?.gas as string);
     const inGasPrice = (
@@ -281,10 +283,10 @@ export class Contract {
     return await signingClient.tx.compute.executeContract(
       {
         sender: accountVal.address,
-        contractAddress: this.contractAddress,
-        codeHash: this.contractCodeHash,
+        contract_address: this.contractAddress,
+        code_hash: this.contractCodeHash,
         msg: msgData,
-        sentFunds: transferAmount as Coin[] | undefined
+        sent_funds: transferAmount as Coin[] | undefined
       },
       {
         gasLimit: Number.isNaN(inGasLimit) ? undefined : inGasLimit,

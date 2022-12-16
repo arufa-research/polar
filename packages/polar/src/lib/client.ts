@@ -2,20 +2,20 @@ import { SecretNetworkClient, Wallet } from "secretjs";
 
 import { Account, Network } from "../types";
 
-export async function getClient (network: Network): Promise<SecretNetworkClient> {
-  return await SecretNetworkClient.create({
+export function getClient (network: Network): SecretNetworkClient {
+  return new SecretNetworkClient({
     chainId: network.config.chainId,
-    grpcWebUrl: network.config.endpoint
+    url: network.config.endpoint
   });
 }
 
-export async function getSigningClient (
+export function getSigningClient (
   network: Network,
   account: Account
-): Promise<SecretNetworkClient> {
+): SecretNetworkClient {
   const wall = new Wallet(account.mnemonic);
-  return await SecretNetworkClient.create({
-    grpcWebUrl: network.config.endpoint,
+  return new SecretNetworkClient({
+    url: network.config.endpoint,
     chainId: network.config.chainId,
     wallet: wall,
     walletAddress: account.address

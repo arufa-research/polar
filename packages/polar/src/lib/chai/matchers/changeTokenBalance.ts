@@ -70,7 +70,7 @@ export async function getBalanceChange (
     });
   }
 
-  const client = await getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
+  const client = getClient(PolarContext.getPolarContext().getRuntimeEnv().network);
 
   const balanceBefore = extractTokenBalance(
     await getBalance(client, accountAddr),

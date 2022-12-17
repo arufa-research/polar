@@ -280,7 +280,7 @@ export class Contract {
 
     console.log('Executing', this.contractAddress, msgData);
     // Send the same handleMsg to increment multiple times
-    return await signingClient.tx.compute.executeContract(
+    const txnResponse = await signingClient.tx.compute.executeContract(
       {
         sender: accountVal.address,
         contract_address: this.contractAddress,
@@ -294,5 +294,14 @@ export class Contract {
         memo: memo
       }
     );
+
+    if (txnResponse.code !== 0) {
+      throw new PolarError(ERRORS.INTERACTION.TRANSACTION_FAILURE, {
+        contractName: this.contractName,
+        transaction: JSON.stringify(msgData, null, 2),
+        message: JSON.stringify(txnResponse, null, 2)
+      });
+    }
+    return txnResponse;
   }
 }

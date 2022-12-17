@@ -1193,6 +1193,15 @@ If you aren't overriding compilation-related tasks, please report this as a bug.
 A fully qualified name should look like file.sol:Contract`,
       shouldBeReported: false
     }
+  },
+  INTERACTION: {
+    TRANSACTION_FAILURE: {
+      number: 1200,
+      message: 'Contract %contractName% transaction %transaction% failed with error %message%',
+      title: 'Contract execute failed',
+      description: `Contract %contractName% transaction %transaction% failed`,
+      shouldBeReported: false
+    }
   }
 };
 
@@ -1222,7 +1231,8 @@ export const ERROR_RANGES: {
   PLUGINS: { min: 800, max: 899, title: 'Plugin system errors' },
   INTERNAL: { min: 900, max: 999, title: 'Internal Polar errors' },
   SOURCE_NAMES: { min: 1000, max: 1099, title: 'Source name errors' },
-  CONTRACT_NAMES: { min: 1100, max: 1199, title: 'Contract name errors' }
+  CONTRACT_NAMES: { min: 1100, max: 1199, title: 'Contract name errors' },
+  INTERACTION: { min: 1200, max: 1299, title: 'Network interaction errors' }
 };
 
 /**

@@ -54,7 +54,7 @@ export const getType = (type) => {
 export const getPropertyType = (schema, prop) => {
   const props = schema.properties ?? {};
   let info = props[prop];
-
+  
   let type = null;
   let optional = !schema.required?.includes(prop);
 
@@ -126,7 +126,17 @@ export const getPropertyType = (schema, prop) => {
     }
 
     if (nullableType === 'array') {
-      type = t.tsArrayType(getType(info.items.type));
+      if (info.items.$ref) {
+        type = getArrayTypeFromRef(info.items.$ref);
+      } else if (info.items.title) {
+        type = t.tsArrayType(t.tsTypeReference(t.identifier(info.items.title)));
+      } else if (info.items.type) {
+        type = getArrayTypeFromType(info.items.type);
+      } else {
+        throw new Error(
+          '[info.items] case not handled by transpiler. contact maintainers.'
+        );
+      }
     } else {
       type = getType(nullableType);
     }

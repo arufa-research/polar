@@ -12,7 +12,8 @@ import { findAndParseTypes, findExecuteMsg, findQueryMsg } from "./utils";
 export async function generateTsSchema (
   name: string,
   schemas: any[], // eslint-disable-line  @typescript-eslint/no-explicit-any
-  outPath: string
+  outPath: string,
+  skipSchemaErrors: boolean
 ): Promise<void> {
   const Contract = pascal(name) + 'Contract.ts';
 
@@ -50,10 +51,10 @@ export async function generateTsSchema (
     ReadOnlyInstance = pascal(`${name}ReadOnlyInterface`);
 
     body.push(
-      w.createQueryInterface(ReadOnlyInstance, QueryMsg as any) // eslint-disable-line  @typescript-eslint/no-explicit-any
+      w.createQueryInterface(ReadOnlyInstance, QueryMsg as any, skipSchemaErrors) // eslint-disable-line  @typescript-eslint/no-explicit-any
     );
     body.push(
-      w.createQueryClass(QueryClient, ReadOnlyInstance, "Contract", QueryMsg as any) // eslint-disable-line  @typescript-eslint/no-explicit-any
+      w.createQueryClass(QueryClient, ReadOnlyInstance, "Contract", QueryMsg as any, skipSchemaErrors) // eslint-disable-line  @typescript-eslint/no-explicit-any
     );
   }
 
@@ -68,7 +69,8 @@ export async function generateTsSchema (
         w.createExecuteInterface(
           Instance,
           ReadOnlyInstance,
-          ExecuteMsg as any // eslint-disable-line  @typescript-eslint/no-explicit-any
+          ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+          skipSchemaErrors
         )
       );
       body.push(
@@ -77,7 +79,8 @@ export async function generateTsSchema (
           Instance,
           QueryClient as string,
           ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-          name
+          name,
+          skipSchemaErrors
         )
       );
     }

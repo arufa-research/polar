@@ -15,6 +15,7 @@ export default function (): void {
     )
     .addFlag("force", "recompile even if the source file didn't change")
     .addFlag("skipSchema", "do not generate schema at compile")
+    .addFlag("skipSchemaErrors", "skip methods in TS schema having issues converting")
     .setAction(compileTask);
 }
 
@@ -23,10 +24,11 @@ export interface TaskArgs {
   sourceDir: string[]
   force: boolean
   skipSchema: boolean
+  skipSchemaErrors: boolean
 }
 
 async function compileTask (
-  { docker, sourceDir, force, skipSchema }: TaskArgs,
+  { docker, sourceDir, force, skipSchema, skipSchemaErrors }: TaskArgs,
   env: PolarRuntimeEnvironment
 ): Promise<void> {
   // check if proper version of rust wasm compiler is installed
@@ -35,5 +37,5 @@ async function compileTask (
     process.exit(1);
   }
 
-  return await compile(docker, sourceDir, force, skipSchema);
+  return await compile(docker, sourceDir, force, skipSchema, skipSchemaErrors);
 }

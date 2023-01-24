@@ -6,10 +6,10 @@ export declare const getPropertyType: (schema: any, prop: any) => {
     optional: any;
 };
 export declare const createWasmQueryMethod: (jsonschema: any) => t.ClassProperty;
-export declare const createQueryClass: (className: string, implementsClassName: string, extendsClassName: string, queryMsg: QueryMsg) => t.ExportNamedDeclaration;
+export declare const createQueryClass: (className: string, implementsClassName: string, extendsClassName: string, queryMsg: QueryMsg, skipSchemaErrors: boolean) => t.ExportNamedDeclaration;
 export declare const createWasmExecMethod: (jsonschema: any) => t.ClassProperty;
-export declare const createExecuteClass: (className: string, implementsClassName: string, extendsClassName: string, execMsg: ExecuteMsg, contractName: string) => t.ExportNamedDeclaration;
-export declare const createExecuteInterface: (className: string, extendsClassName: string | null, execMsg: ExecuteMsg) => t.ExportNamedDeclaration;
+export declare const createExecuteClass: (className: string, implementsClassName: string, extendsClassName: string, execMsg: ExecuteMsg, contractName: string, skipSchemaErrors: boolean) => t.ExportNamedDeclaration;
+export declare const createExecuteInterface: (className: string, extendsClassName: string | null, execMsg: ExecuteMsg, skipSchemaErrors: boolean) => t.ExportNamedDeclaration;
 export declare const propertySignature: (name: string, typeAnnotation: t.TSTypeAnnotation, optional?: boolean) => {
     type: string;
     key: t.Identifier;
@@ -19,6 +19,6 @@ export declare const propertySignature: (name: string, typeAnnotation: t.TSTypeA
 export declare const createTypedObjectParams: (jsonschema: any, camelize?: boolean) => t.ObjectPattern;
 export declare const createPropertyFunctionWithObjectParams: (methodName: string, responseType: string, jsonschema: any) => t.TSPropertySignature;
 export declare const createPropertyFunctionWithObjectParamsForExec: (methodName: string, responseType: string, jsonschema: any) => t.TSPropertySignature;
-export declare const createQueryInterface: (className: string, queryMsg: QueryMsg) => t.ExportNamedDeclaration;
+export declare const createQueryInterface: (className: string, queryMsg: QueryMsg, skipSchemaErrors: boolean) => t.ExportNamedDeclaration;
 export declare const createTypeOrInterface: (Type: string, jsonschema: any) => t.ExportNamedDeclaration;
 export declare const createTypeInterface: (jsonschema: any) => t.ExportNamedDeclaration;

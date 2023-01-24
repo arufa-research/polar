@@ -70,7 +70,8 @@ export const createQueryClass = (
   className: string,
   implementsClassName: string,
   extendsClassName: string,
-  queryMsg: QueryMsg
+  queryMsg: QueryMsg,
+  skipSchemaErrors: boolean
 ): t.ExportNamedDeclaration => {
   const propertyNames = getMessageProperties(queryMsg)
     .map((method) => Object.keys(method.properties)?.[0])
@@ -78,9 +79,19 @@ export const createQueryClass = (
 
   const bindings = propertyNames.map(camel).map(bindMethod);
 
-  const methods = getMessageProperties(queryMsg).map((schema) => {
-    return createWasmQueryMethod(schema);
-  });
+  const methods = getMessageProperties(queryMsg)
+    .map((schema) => {
+      try {
+        return createWasmQueryMethod(schema);
+      } catch (e) {
+        if (skipSchemaErrors) {
+          return null;
+        } else {
+          throw e;
+        }
+      }
+    })
+    .filter((method) => method !== null);
 
   return t.exportNamedDeclaration(
     classDeclaration(
@@ -249,7 +260,8 @@ export const createExecuteClass = (
   implementsClassName: string,
   extendsClassName: string,
   execMsg: ExecuteMsg,
-  contractName: string
+  contractName: string,
+  skipSchemaErrors: boolean
 ): t.ExportNamedDeclaration => {
   const propertyNames = getMessageProperties(execMsg)
     .map((method) => Object.keys(method.properties)?.[0])
@@ -257,9 +269,19 @@ export const createExecuteClass = (
 
   const bindings = propertyNames.map(camel).map(bindMethod);
 
-  const methods = getMessageProperties(execMsg).map((schema) => {
-    return createWasmExecMethod(schema);
-  });
+  const methods = getMessageProperties(execMsg)
+    .map((schema) => {
+      try {
+        return createWasmExecMethod(schema);
+      } catch (e) {
+        if (skipSchemaErrors) {
+          return null;
+        } else {
+          throw e;
+        }
+      }
+    })
+    .filter((method) => method !== null);
 
   const blockStmt = [];
 
@@ -296,17 +318,28 @@ export const createExecuteClass = (
 export const createExecuteInterface = (
   className: string,
   extendsClassName: string | null,
-  execMsg: ExecuteMsg
+  execMsg: ExecuteMsg,
+  skipSchemaErrors: boolean
 ): t.ExportNamedDeclaration => {
-  const methods = getMessageProperties(execMsg).map((jsonschema) => {
-    const underscoreName = Object.keys(jsonschema.properties)[0];
-    const methodName = camel(underscoreName);
-    return createPropertyFunctionWithObjectParamsForExec(
-      methodName,
-      'any',
-      jsonschema.properties[underscoreName]
-    );
-  });
+  const methods = getMessageProperties(execMsg)
+    .map((jsonschema) => {
+      const underscoreName = Object.keys(jsonschema.properties)[0];
+      const methodName = camel(underscoreName);
+      try {
+        return createPropertyFunctionWithObjectParamsForExec(
+          methodName,
+          'any',
+          jsonschema.properties[underscoreName]
+        );
+      } catch (e) {
+        if (skipSchemaErrors) {
+          return null;
+        } else {
+          throw e;
+        }
+      }
+    })
+    .filter((method) => method !== null);
 
   const extendsAst = extendsClassName
     ? [t.tSExpressionWithTypeArguments(t.identifier(extendsClassName))]
@@ -442,18 +475,29 @@ export const createPropertyFunctionWithObjectParamsForExec = (
 
 export const createQueryInterface = (
   className: string,
-  queryMsg: QueryMsg
+  queryMsg: QueryMsg,
+  skipSchemaErrors: boolean
 ): t.ExportNamedDeclaration => {
-  const methods = getMessageProperties(queryMsg).map((jsonschema) => {
-    const underscoreName = Object.keys(jsonschema.properties)[0];
-    const methodName = camel(underscoreName);
-    const responseType = `any`;
-    return createPropertyFunctionWithObjectParams(
-      methodName,
-      responseType,
-      jsonschema.properties[underscoreName]
-    );
-  });
+  const methods = getMessageProperties(queryMsg)
+    .map((jsonschema) => {
+      const underscoreName = Object.keys(jsonschema.properties)[0];
+      const methodName = camel(underscoreName);
+      const responseType = `any`;
+      try {
+        return createPropertyFunctionWithObjectParams(
+          methodName,
+          responseType,
+          jsonschema.properties[underscoreName]
+        );
+      } catch (e) {
+        if (skipSchemaErrors) {
+          return null;
+        } else {
+          throw e;
+        }
+      }
+    })
+    .filter((method) => method !== null);
 
   return t.exportNamedDeclaration(
     t.tsInterfaceDeclaration(
@@ -463,49 +507,4 @@ export const createQueryInterface = (
       t.tSInterfaceBody([...methods])
     )
   );
-};
-
-export const createTypeOrInterface = (
-  Type: string,
-  jsonschema: any
-): t.ExportNamedDeclaration => {
-  if (jsonschema.type !== 'object') {
-    if (!jsonschema.type) {
-      return t.exportNamedDeclaration(
-        t.tsTypeAliasDeclaration(
-          t.identifier(Type),
-          null,
-          t.tsTypeReference(t.identifier(jsonschema.title))
-        )
-      );
-    }
-
-    return t.exportNamedDeclaration(
-      t.tsTypeAliasDeclaration(
-        t.identifier(Type),
-        null,
-        getType(jsonschema.type)
-      )
-    );
-  }
-  const props = Object.keys(jsonschema.properties ?? {}).map((prop) => {
-    const { type, optional } = getPropertyType(jsonschema, prop);
-    return propertySignature(camel(prop), t.tsTypeAnnotation(type), optional);
-  });
-
-  return t.exportNamedDeclaration(
-    t.tsInterfaceDeclaration(
-      t.identifier(Type),
-      null,
-      [],
-      t.tsInterfaceBody([...props])
-    )
-  );
-};
-
-export const createTypeInterface = (
-  jsonschema: any
-): t.ExportNamedDeclaration => {
-  const Type = jsonschema.title;
-  return createTypeOrInterface(Type, jsonschema);
 };

@@ -23,7 +23,8 @@ export async function compile (
   docker: boolean,
   sourceDir: string[],
   force: boolean,
-  skipSchema: boolean
+  skipSchema: boolean,
+  skipSchemaErrors: boolean
 ): Promise<void> {
   await assertDir(CACHE_DIR);
   let contractDirs: string[] = [];
@@ -62,7 +63,7 @@ export async function compile (
     compileContract(dir, docker);
     const contractName = readContractName(path.join(dir, toml));
     if (!skipSchema) { // only generate schema if this flag is not passed
-      await generateSchema(contractName, dir, docker);
+      await generateSchema(contractName, dir, docker, skipSchemaErrors);
     }
     createArtifacts(
       TARGET_DIR, path.join(SCHEMA_DIR, contractName), path.join(ARTIFACTS_DIR, CONTRACTS_DIR), path.join(dir, "schema"), docker, skipSchema
@@ -98,7 +99,8 @@ export function compileContract (contractDir: string, docker: boolean): void {
 export async function generateSchema (
   contractName: string,
   contractDir: string,
-  docker: boolean
+  docker: boolean,
+  skipSchemaErrors: boolean
 ): Promise<void> {
   const currDir = process.cwd();
   process.chdir(contractDir);
@@ -118,7 +120,7 @@ export async function generateSchema (
   console.log(`Creating TS schema objects for contract in directory: ${chalk.gray(contractTsSchemaDir)}`);
 
   const srcSchemas = readSchemas(path.join(contractDir, "schema"));
-  await generateTsSchema(contractName, srcSchemas, contractTsSchemaDir);
+  await generateTsSchema(contractName, srcSchemas, contractTsSchemaDir, skipSchemaErrors);
 }
 
 export function createArtifacts (

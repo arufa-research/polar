@@ -232,13 +232,6 @@ export const createTypedObjectParams = (
       }
     }
 
-    try {
-      getPropertyType(jsonschema, prop);
-    } catch (e) {
-      console.log(e);
-      console.log(jsonschema, prop);
-    }
-
     const { type, optional } = getPropertyType(jsonschema, prop);
     return propertySignature(
       camelize ? camel(prop) : prop,

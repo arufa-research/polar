@@ -39,6 +39,7 @@ export class Contract {
   public codeId: number;
   public contractCodeHash: string;
   public contractAddress: string;
+  public instantiateTag: string;
   private checkpointData: Checkpoints;
   private readonly checkpointPath: string;
 
@@ -52,7 +53,7 @@ export class Contract {
       "contracts",
       `${this.contractName}_compressed.wasm`
     );
-    const instantiationTag = instantiateTag ?? "default_instantiate";
+    this.instantiateTag = instantiateTag ?? "default_instantiate";
 
     // Load checkpoints
     this.checkpointPath = path.join(ARTIFACTS_DIR, "checkpoints", `${this.contractName}.yaml`);
@@ -61,12 +62,12 @@ export class Contract {
     if (fs.existsSync(this.checkpointPath) && this.env.runtimeArgs.useCheckpoints === true) {
       this.checkpointData = loadCheckpoint(this.checkpointPath);
       const contractHash =
-        this.checkpointData[this.env.network.name].deployInfo?.contractCodeHash;
-      const contractCodeId = this.checkpointData[this.env.network.name].deployInfo?.codeId;
+        this.checkpointData[this.env.network.name]?.deployInfo?.contractCodeHash;
+      const contractCodeId = this.checkpointData[this.env.network.name]?.deployInfo?.codeId;
       let contractAddr;
       // Load instantiate info for tag
-      for (const value of this.checkpointData[this.env.network.name].instantiateInfo ?? []) {
-        if (value.instantiateTag === instantiationTag) {
+      for (const value of this.checkpointData[this.env.network.name]?.instantiateInfo ?? []) {
+        if (value.instantiateTag === this.instantiateTag) {
           contractAddr = value.contractAddress;
         }
       }
@@ -154,8 +155,7 @@ export class Contract {
 
   instantiatedWithAddress (
     address: string,
-    timestamp?: Date | undefined,
-    instantiateTag?: string
+    timestamp?: Date | undefined
   ): void {
     const initTimestamp = timestamp !== undefined ? String(timestamp) : String(new Date());
 
@@ -170,12 +170,17 @@ export class Contract {
     }
 
     const instantiateInfo: InstantiateInfo = {
-      instantiateTag: instantiateTag ?? "default_instantiate",
+      instantiateTag: this.instantiateTag,
       contractAddress: address,
       instantiateTimestamp: initTimestamp
     };
     // set init data (contract address, init timestamp) in checkpoints
-    this.checkpointData[this.env.network.name].instantiateInfo?.push(instantiateInfo);
+    const instInfo = this.checkpointData[this.env.network.name].instantiateInfo;
+    if (instInfo) {
+      this.checkpointData[this.env.network.name].instantiateInfo?.push(instantiateInfo);
+    } else {
+      this.checkpointData[this.env.network.name].instantiateInfo = [instantiateInfo];
+    }
     persistCheckpoint(this.checkpointPath, this.checkpointData);
   }
 
@@ -184,8 +189,7 @@ export class Contract {
     label: string,
     account: Account | UserAccount,
     transferAmount?: Coin[],
-    customFees?: TxnStdFee,
-    instantiateTag?: string
+    customFees?: TxnStdFee
   ): Promise<InstantiateInfo> {
     const accountVal: Account =
       (account as UserAccount).account !== undefined
@@ -197,11 +201,9 @@ export class Contract {
       });
     }
     let info;
-    // const info = this.checkpointData[this.env.network.name]?.instantiateInfo;
-    const instantiationTag = instantiateTag ?? "default_instantiate";
     // Load instantiate info for tag
     for (const value of this.checkpointData[this.env.network.name].instantiateInfo ?? []) {
-      if (value.instantiateTag === instantiationTag) {
+      if (value.instantiateTag === this.instantiateTag) {
         info = value;
       }
     }
@@ -251,13 +253,18 @@ export class Contract {
     this.contractAddress = res.value;
 
     const instantiateInfo: InstantiateInfo = {
-      instantiateTag: instantiateTag ?? "default_instantiate",
+      instantiateTag: this.instantiateTag,
       contractAddress: this.contractAddress,
       instantiateTimestamp: initTimestamp
     };
 
     if (this.env.runtimeArgs.useCheckpoints === true) {
-      this.checkpointData[this.env.network.name].instantiateInfo?.push(instantiateInfo);
+      const instInfo = this.checkpointData[this.env.network.name].instantiateInfo;
+      if (instInfo) {
+        this.checkpointData[this.env.network.name].instantiateInfo?.push(instantiateInfo);
+      } else {
+        this.checkpointData[this.env.network.name].instantiateInfo = [instantiateInfo];
+      }
       persistCheckpoint(this.checkpointPath, this.checkpointData);
     }
     return instantiateInfo;

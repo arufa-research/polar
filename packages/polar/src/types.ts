@@ -62,11 +62,12 @@ export interface Checkpoints {
 
 export interface CheckpointInfo {
   deployInfo?: DeployInfo
-  instantiateInfo?: InstantiateInfo
+  instantiateInfo?: [InstantiateInfo]
   metadata?: Map<string, string>
 }
 
 export interface InstantiateInfo {
+  instantiateTag: string
   contractAddress: string
   instantiateTimestamp: string
 }

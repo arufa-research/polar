@@ -1,6 +1,6 @@
 {
   "name": "secret-polar",
-  "version": "0.10.6",
+  "version": "0.10.8",
   "main": "dist/index.js",
   "repository": "https://github.com/arufa-research/polar.git",
   "description": "Polar is a development environment to compile, deploy, test, run scrt contracts on different networks.",
@@ -12,6 +12,10 @@
     {
       "name": "Udit Gulati",
       "url": "https://github.com/udit-gulati"
+    },
+    {
+      "name": "Amit Yadav",
+      "url": "https://github.com/amityadav0"
     }
   ],
   "keywords": [

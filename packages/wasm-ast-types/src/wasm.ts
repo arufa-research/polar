@@ -105,11 +105,18 @@ export const createQueryClass = (
             typedIdentifier(
               'contractName',
               t.tsTypeAnnotation(t.tsStringKeyword())
+            ),
+            typedIdentifier(
+              'instantiateTag?',
+              t.tsTypeAnnotation(t.tsStringKeyword())
             )
           ],
           t.blockStatement([
             t.expressionStatement(
-              t.callExpression(t.super(), [t.identifier('contractName')])
+              t.callExpression(t.super(), [
+                t.identifier('contractName'),
+                t.identifier('instantiateTag')
+              ])
             ),
             ...bindings
           ])

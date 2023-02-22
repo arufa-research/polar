@@ -294,9 +294,11 @@ export const createExecuteClass = (
 
   if (extendsClassName) {
     blockStmt.push(
-      // super()
       t.expressionStatement(
-        t.callExpression(t.super(), [t.stringLiteral(contractName)])
+        t.callExpression(t.super(), [
+          t.stringLiteral(contractName),
+          t.identifier('instantiateTag')
+        ])
       )
     );
   }
@@ -311,7 +313,12 @@ export const createExecuteClass = (
         t.classMethod(
           'constructor',
           t.identifier('constructor'),
-          [],
+          [
+            typedIdentifier(
+              'instantiateTag?',
+              t.tsTypeAnnotation(t.tsStringKeyword())
+            )
+          ],
           t.blockStatement(blockStmt)
         ),
         ...methods

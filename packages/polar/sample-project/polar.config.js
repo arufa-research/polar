@@ -55,6 +55,6 @@ module.exports = {
     timeout: 60000
   },
   rust: {
-    version: "1.60.0",
+    version: "1.63.0",
   }
 };

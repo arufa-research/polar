@@ -82,15 +82,15 @@ export async function generateTsSchema (
       );
       body.push(executeInterface);
 
-      // const executeClass = await w.createExecuteClass(
-      //   Client,
-      //   Instance,
-      //   QueryClient as string,
-      //   ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-      //   name,
-      //   skipSchemaErrors
-      // )
-      // body.push(executeClass);
+      const executeClass = await w.createExecuteClass(
+        Client,
+        Instance,
+        QueryClient as string,
+        ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+        name,
+        skipSchemaErrors
+      );
+      body.push(executeClass);
     }
   }
 

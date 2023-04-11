@@ -21,6 +21,7 @@ export interface QueryMsg {
   oneOf?: any;
   allOf?: any;
   anyOf?: any;
+  definitions: any;
 }
 
 export interface ExecuteMsg {
@@ -29,4 +30,5 @@ export interface ExecuteMsg {
   oneOf?: any;
   allOf?: any;
   anyOf?: any;
+  definitions: any;
 }

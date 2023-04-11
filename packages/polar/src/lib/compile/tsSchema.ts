@@ -50,12 +50,21 @@ export async function generateTsSchema (
     QueryClient = pascal(`${name}QueryContract`);
     ReadOnlyInstance = pascal(`${name}ReadOnlyInterface`);
 
-    body.push(
-      w.createQueryInterface(ReadOnlyInstance, QueryMsg as any, skipSchemaErrors) // eslint-disable-line  @typescript-eslint/no-explicit-any
-    );
-    body.push(
-      w.createQueryClass(QueryClient, ReadOnlyInstance, "Contract", QueryMsg as any, skipSchemaErrors) // eslint-disable-line  @typescript-eslint/no-explicit-any
-    );
+    const queryInterface = await w.createQueryInterface(
+      ReadOnlyInstance,
+      QueryMsg as any,
+      skipSchemaErrors
+    ); // eslint-disable-line  @typescript-eslint/no-explicit-any
+    body.push(queryInterface);
+
+    const queryClass = await w.createQueryClass(
+      QueryClient,
+      ReadOnlyInstance,
+      "Contract",
+      QueryMsg as any,
+      skipSchemaErrors
+    ); // eslint-disable-line  @typescript-eslint/no-explicit-any
+    body.push(queryClass);
   }
 
   // execute messages
@@ -65,24 +74,23 @@ export async function generateTsSchema (
       Client = pascal(`${name}Contract`);
       Instance = pascal(`${name}Interface`);
 
-      body.push(
-        w.createExecuteInterface(
-          Instance,
-          ReadOnlyInstance,
-          ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-          skipSchemaErrors
-        )
+      const executeInterface = await w.createExecuteInterface(
+        Instance,
+        ReadOnlyInstance,
+        ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+        skipSchemaErrors
       );
-      body.push(
-        w.createExecuteClass(
-          Client,
-          Instance,
-          QueryClient as string,
-          ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
-          name,
-          skipSchemaErrors
-        )
-      );
+      body.push(executeInterface);
+
+      // const executeClass = await w.createExecuteClass(
+      //   Client,
+      //   Instance,
+      //   QueryClient as string,
+      //   ExecuteMsg as any, // eslint-disable-line  @typescript-eslint/no-explicit-any
+      //   name,
+      //   skipSchemaErrors
+      // )
+      // body.push(executeClass);
     }
   }
 

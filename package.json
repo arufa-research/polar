@@ -47,5 +47,8 @@
     "**/{src,test}/**/*.ts": [
       "eslint --format stylish --fix"
     ]
+  },
+  "dependencies": {
+    "yarn": "^1.22.19"
   }
 }

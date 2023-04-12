@@ -12,21 +12,21 @@ import {
   typedIdentifier
 } from './utils';
 import { identifier, propertySignature, tsTypeOperator } from './utils/babel';
-import {
-  createTypedObjectParams,
-  getPropertyType,
-  getType
-} from './utils/types';
+import { createTypedObjectParams } from './utils/types';
 
-export const createWasmQueryMethod = (
-  jsonschema: any
-): t.ObjectProperty | t.ClassProperty => {
+export const createWasmQueryMethod = async (
+  jsonschema: any,
+  definitions: any
+): Promise<t.ObjectProperty | t.ClassProperty> => {
   const underscoreName = Object.keys(jsonschema.properties)[0];
   const methodName = camel(underscoreName);
   const responseType = `any`;
   const properties = jsonschema.properties[underscoreName].properties ?? {};
 
-  const obj = createTypedObjectParams(jsonschema.properties[underscoreName]);
+  const obj = await createTypedObjectParams(
+    jsonschema.properties[underscoreName],
+    definitions
+  );
   const args = Object.keys(properties).map((prop) => {
     return t.objectProperty(
       t.identifier(prop),
@@ -66,74 +66,17 @@ export const createWasmQueryMethod = (
   );
 };
 
-export const createQueryClass = (
-  className: string,
-  implementsClassName: string,
-  extendsClassName: string,
-  queryMsg: QueryMsg,
-  skipSchemaErrors: boolean
-): t.ExportNamedDeclaration => {
-  const propertyNames = getMessageProperties(queryMsg)
-    .map((method) => Object.keys(method.properties)?.[0])
-    .filter(Boolean);
-
-  const bindings = propertyNames.map(camel).map(bindMethod);
-
-  const methods = getMessageProperties(queryMsg)
-    .map((schema) => {
-      try {
-        return createWasmQueryMethod(schema);
-      } catch (e) {
-        if (skipSchemaErrors) {
-          return null;
-        } else {
-          throw e;
-        }
-      }
-    })
-    .filter((method) => method !== null);
-
-  return t.exportNamedDeclaration(
-    classDeclaration(
-      className,
-      [
-        // constructor
-        t.classMethod(
-          'constructor',
-          t.identifier('constructor'),
-          [
-            typedIdentifier(
-              'contractName',
-              t.tsTypeAnnotation(t.tsStringKeyword())
-            ),
-            typedIdentifier(
-              'instantiateTag?',
-              t.tsTypeAnnotation(t.tsStringKeyword())
-            )
-          ],
-          t.blockStatement([
-            t.expressionStatement(
-              t.callExpression(t.super(), [
-                t.identifier('contractName'),
-                t.identifier('instantiateTag')
-              ])
-            ),
-            ...bindings
-          ])
-        ),
-        ...methods
-      ],
-      [t.tSExpressionWithTypeArguments(t.identifier(implementsClassName))],
-      extendsClassName ? t.identifier(extendsClassName) : null
-    )
-  );
-};
-
-export const createWasmExecMethod = (jsonschema: any): t.ClassProperty => {
+export const createWasmExecMethod = async (
+  jsonschema: any,
+  definitions: any
+): Promise<t.ClassProperty> => {
   const underscoreName = Object.keys(jsonschema.properties)[0];
   const methodName = camel(underscoreName);
   const properties = jsonschema.properties[underscoreName].properties ?? {};
-  const obj = createTypedObjectParams(jsonschema.properties[underscoreName]);
+  const obj = await createTypedObjectParams(
+    jsonschema.properties[underscoreName],
+    definitions
+  );
 
   let changeConstParamNames = false;
   for (const prop of Object.keys(properties)) {
@@ -262,33 +205,100 @@ export const createWasmExecMethod = (jsonschema: any): t.ClassProperty => {
   );
 };
 
-export const createExecuteClass = (
+export const createQueryClass = async (
+  className: string,
+  implementsClassName: string,
+  extendsClassName: string,
+  queryMsg: QueryMsg,
+  skipSchemaErrors: boolean
+): Promise<t.ExportNamedDeclaration> => {
+  const propertyNames = getMessageProperties(queryMsg)
+    .map((method) => Object.keys(method.properties)?.[0])
+    .filter(Boolean);
+
+  const bindings = propertyNames.map(camel).map(bindMethod);
+
+  const methods = await Promise.all(
+    getMessageProperties(queryMsg)
+      .map(async (schema) => {
+        try {
+          return await createWasmQueryMethod(schema, queryMsg.definitions);
+        } catch (e) {
+          if (skipSchemaErrors) {
+            return null;
+          } else {
+            throw e;
+          }
+        }
+      })
+      .filter((method) => method !== null)
+  );
+
+  return t.exportNamedDeclaration(
+    classDeclaration(
+      className,
+      [
+        // constructor
+        t.classMethod(
+          'constructor',
+          t.identifier('constructor'),
+          [
+            typedIdentifier(
+              'contractName',
+              t.tsTypeAnnotation(t.tsStringKeyword())
+            ),
+            typedIdentifier(
+              'instantiateTag?',
+              t.tsTypeAnnotation(t.tsStringKeyword())
+            )
+          ],
+          t.blockStatement([
+            t.expressionStatement(
+              t.callExpression(t.super(), [
+                t.identifier('contractName'),
+                t.identifier('instantiateTag')
+              ])
+            ),
+            ...bindings
+          ])
+        ),
+        ...methods
+      ],
+      [t.tSExpressionWithTypeArguments(t.identifier(implementsClassName))],
+      extendsClassName ? t.identifier(extendsClassName) : null
+    )
+  );
+};
+
+export const createExecuteClass = async (
   className: string,
   implementsClassName: string,
   extendsClassName: string,
   execMsg: ExecuteMsg,
   contractName: string,
   skipSchemaErrors: boolean
-): t.ExportNamedDeclaration => {
+): Promise<t.ExportNamedDeclaration> => {
   const propertyNames = getMessageProperties(execMsg)
     .map((method) => Object.keys(method.properties)?.[0])
     .filter(Boolean);
 
   const bindings = propertyNames.map(camel).map(bindMethod);
 
-  const methods = getMessageProperties(execMsg)
-    .map((schema) => {
-      try {
-        return createWasmExecMethod(schema);
-      } catch (e) {
-        if (skipSchemaErrors) {
-          return null;
-        } else {
-          throw e;
+  const methods = await Promise.all(
+    getMessageProperties(execMsg)
+      .map(async (schema) => {
+        try {
+          return await createWasmExecMethod(schema, execMsg.definitions);
+        } catch (e) {
+          if (skipSchemaErrors) {
+            return null;
+          } else {
+            throw e;
+          }
         }
-      }
-    })
-    .filter((method) => method !== null);
+      })
+      .filter((method) => method !== null)
+  );
 
   const blockStmt = [];
 
@@ -329,31 +339,73 @@ export const createExecuteClass = (
   );
 };
 
-export const createExecuteInterface = (
+export const createQueryInterface = async (
+  className: string,
+  queryMsg: QueryMsg,
+  skipSchemaErrors: boolean
+): Promise<t.ExportNamedDeclaration> => {
+  const methods = await Promise.all(
+    getMessageProperties(queryMsg)
+      .map(async (jsonschema) => {
+        const underscoreName = Object.keys(jsonschema.properties)[0];
+        const methodName = camel(underscoreName);
+        const responseType = `any`;
+        try {
+          return await createPropertyFunctionWithObjectParams(
+            methodName,
+            responseType,
+            jsonschema.properties[underscoreName],
+            queryMsg.definitions
+          );
+        } catch (e) {
+          if (skipSchemaErrors) {
+            return null;
+          } else {
+            throw e;
+          }
+        }
+      })
+      .filter((method) => method !== null)
+  );
+
+  return t.exportNamedDeclaration(
+    t.tsInterfaceDeclaration(
+      t.identifier(className),
+      null,
+      [],
+      t.tSInterfaceBody([...methods])
+    )
+  );
+};
+
+export const createExecuteInterface = async (
   className: string,
   extendsClassName: string | null,
   execMsg: ExecuteMsg,
   skipSchemaErrors: boolean
-): t.ExportNamedDeclaration => {
-  const methods = getMessageProperties(execMsg)
-    .map((jsonschema) => {
-      const underscoreName = Object.keys(jsonschema.properties)[0];
-      const methodName = camel(underscoreName);
-      try {
-        return createPropertyFunctionWithObjectParamsForExec(
-          methodName,
-          'any',
-          jsonschema.properties[underscoreName]
-        );
-      } catch (e) {
-        if (skipSchemaErrors) {
-          return null;
-        } else {
-          throw e;
+): Promise<t.ExportNamedDeclaration> => {
+  const methods = await Promise.all(
+    getMessageProperties(execMsg)
+      .map(async (jsonschema) => {
+        const underscoreName = Object.keys(jsonschema.properties)[0];
+        const methodName = camel(underscoreName);
+        try {
+          return await createPropertyFunctionWithObjectParamsForExec(
+            methodName,
+            'any',
+            jsonschema.properties[underscoreName],
+            execMsg.definitions
+          );
+        } catch (e) {
+          if (skipSchemaErrors) {
+            return null;
+          } else {
+            throw e;
+          }
         }
-      }
-    })
-    .filter((method) => method !== null);
+      })
+      .filter((method) => method !== null)
+  );
 
   const extendsAst = extendsClassName
     ? [t.tSExpressionWithTypeArguments(t.identifier(extendsClassName))]
@@ -364,27 +416,18 @@ export const createExecuteInterface = (
       t.identifier(className),
       null,
       extendsAst,
-      t.tSInterfaceBody([
-        // // contract address
-        // t.tSPropertySignature(
-        //   t.identifier('account'),
-        //   t.tsTypeAnnotation(
-        //     t.tsStringKeyword()
-        //   )
-        // ),
-
-        ...methods
-      ])
+      t.tSInterfaceBody([...methods])
     )
   );
 };
 
-export const createPropertyFunctionWithObjectParams = (
+export const createPropertyFunctionWithObjectParams = async (
   methodName: string,
   responseType: string,
-  jsonschema: any
-): t.TSPropertySignature => {
-  const obj = createTypedObjectParams(jsonschema);
+  jsonschema: any,
+  definitions: any
+): Promise<t.TSPropertySignature> => {
+  const obj = await createTypedObjectParams(jsonschema, definitions);
 
   const func = {
     type: 'TSFunctionType',
@@ -398,12 +441,13 @@ export const createPropertyFunctionWithObjectParams = (
   );
 };
 
-export const createPropertyFunctionWithObjectParamsForExec = (
+export const createPropertyFunctionWithObjectParamsForExec = async (
   methodName: string,
   responseType: string,
-  jsonschema: any
-): t.TSPropertySignature => {
-  const obj = createTypedObjectParams(jsonschema);
+  jsonschema: any,
+  definitions: any
+): Promise<t.TSPropertySignature> => {
+  const obj = await createTypedObjectParams(jsonschema, definitions);
   const properties = jsonschema.properties ?? {};
 
   let changeConstParamNames = false;
@@ -484,41 +528,5 @@ export const createPropertyFunctionWithObjectParamsForExec = (
   return t.tSPropertySignature(
     t.identifier(methodName),
     t.tsTypeAnnotation(func)
-  );
-};
-
-export const createQueryInterface = (
-  className: string,
-  queryMsg: QueryMsg,
-  skipSchemaErrors: boolean
-): t.ExportNamedDeclaration => {
-  const methods = getMessageProperties(queryMsg)
-    .map((jsonschema) => {
-      const underscoreName = Object.keys(jsonschema.properties)[0];
-      const methodName = camel(underscoreName);
-      const responseType = `any`;
-      try {
-        return createPropertyFunctionWithObjectParams(
-          methodName,
-          responseType,
-          jsonschema.properties[underscoreName]
-        );
-      } catch (e) {
-        if (skipSchemaErrors) {
-          return null;
-        } else {
-          throw e;
-        }
-      }
-    })
-    .filter((method) => method !== null);
-
-  return t.exportNamedDeclaration(
-    t.tsInterfaceDeclaration(
-      t.identifier(className),
-      null,
-      [],
-      t.tSInterfaceBody([...methods])
-    )
   );
 };

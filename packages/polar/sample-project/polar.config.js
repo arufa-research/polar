@@ -30,17 +30,13 @@ const networks = {
     accounts: localnet_accounts,
   },
   testnet: {
-    endpoint: 'http://testnet.securesecrets.org:1317/',
+    endpoint: 'https://lcd.testnet.secretsaturn.net/',
     chainId: 'pulsar-2',
-    trustNode: true,
-    keyringBackend: 'test',
     accounts: testnet_accounts,
   },
   mainnet: {
     endpoint: 'https://secretnetwork-lcd.stakely.io/',
     chainId: 'secret-4',
-    trustNode: true,
-    keyringBackend: 'test',
     accounts: mainnet_accounts,
   },
 };
@@ -48,6 +44,7 @@ const networks = {
 module.exports = {
   networks: {
     default: networks.testnet,
+    testnet: networks.testnet,
     localnet: networks.localnet,
     mainnet: networks.mainnet,
   },

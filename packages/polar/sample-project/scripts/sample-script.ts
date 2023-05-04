@@ -30,7 +30,9 @@ export default async function run () {
   );
   console.log(contract_info);
 
-  const inc_response = await contract.increment({account: contract_owner});
+  const inc_response = await contract.increment(
+    {account: contract_owner, customFees: customFees}
+  );
   console.log(inc_response);
 
   const response = await contract.getCount();

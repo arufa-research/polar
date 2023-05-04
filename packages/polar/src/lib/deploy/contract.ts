@@ -175,7 +175,7 @@ export class Contract {
       instantiateTimestamp: initTimestamp
     };
     // set init data (contract address, init timestamp) in checkpoints
-    const instInfo = this.checkpointData[this.env.network.name].instantiateInfo;
+    const instInfo = this.checkpointData[this.env.network.name]?.instantiateInfo;
     if (instInfo) {
       this.checkpointData[this.env.network.name].instantiateInfo?.push(instantiateInfo);
     } else {
@@ -202,7 +202,7 @@ export class Contract {
     }
     let info;
     // Load instantiate info for tag
-    for (const value of this.checkpointData[this.env.network.name].instantiateInfo ?? []) {
+    for (const value of this.checkpointData[this.env.network.name]?.instantiateInfo ?? []) {
       if (value.instantiateTag === this.instantiateTag) {
         info = value;
       }

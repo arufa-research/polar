@@ -6470,10 +6470,10 @@ safe-regex-test@^1.0.0:
     get-intrinsic "^1.1.3"
     is-regex "^1.1.4"
 
-secretjs@^1.7.1-beta.3:
-  version "1.7.1-beta.3"
-  resolved "https://registry.npmjs.org/secretjs/-/secretjs-1.7.1-beta.3.tgz"
-  integrity sha512-gJNpWmh5XEReNyeUBp75Osg+kyHVtImk3+d33bIIQ4gFzuzEaT8sD7bP5Ie9um2+F2PqFvKe1IRRjvadm3o14w==
+secretjs@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.8.1.tgz#0f9b054c8a2f55567be2566c482e06b9e15bd4c9"
+  integrity sha512-Yx+iPE5EkOPpP1cwHhVso+8A+3v34qGVWLi5uHps8nJFPa60n3h/QI0NAnn4OmXcQ24s287mYUdVzLZiAemq1w==
   dependencies:
     "@cosmjs/encoding" "0.27.1"
     "@cosmjs/math" "0.27.1"
